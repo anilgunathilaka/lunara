@@ -1,0 +1,194 @@
+/**
+ * Lunara Sarees — Design Tokens
+ *
+ * The ONLY file in this codebase permitted to contain a raw hex, px or ms
+ * value. Every other file must reference a token defined here (directly,
+ * or via the Tailwind theme mapping in app/globals.css).
+ *
+ * Source: docs/2-ui.md §8 (Token Reference), §2 (Colour), §3.2-3.3 (Type),
+ * §4 (Space, Shape, Depth), §7 (Motion). Values are pixel-exact samples
+ * from the supplied Lunara wordmark artwork and must not be adjusted.
+ *
+ * `npm run lint:tokens` (scripts/check-tokens.mjs) fails the build on any
+ * hex literal found outside this file.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- */
+  /* Brand — sampled from lunara-png.png                               */
+  /* ---------------------------------------------------------------- */
+  --lun-plum: #5a1e2d;
+  --lun-plum-light: #7a3a45;
+  --lun-gold: #c9a24d;
+
+  /* Extended */
+  --lun-plum-deep: #3e1420;
+  --lun-gold-pale: #e8d9b0;
+  --lun-gold-deep: #a07f35;
+  --lun-ground: #fbfaf8;
+  --lun-surface: #ffffff;
+  --lun-line: #e4dfd8;
+  --lun-ink: #1a1a1a;
+  --lun-ink-muted: #6b6b6b;
+
+  /* Semantic — deliberately distinct from brand plum (docs/2-ui.md §2.3) */
+  --lun-success: #2e6b4f;
+  --lun-warning: #8a6516;
+  --lun-danger: #9b2c2c;
+  --lun-info: #3e2a56;
+
+  /* ---------------------------------------------------------------- */
+  /* Type families                                                     */
+  /* The concrete font names are supplied by next/font/google loaders  */
+  /* in lib/fonts.ts (--font-cormorant, --font-inter, etc, applied to   */
+  /* <html> in app/[locale]/layout.tsx). These tokens stay the single  */
+  /* semantic reference point, with the spec's fallback stacks intact. */
+  /* ---------------------------------------------------------------- */
+  --font-display: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-inter), system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-sinhala: var(--font-noto-sinhala), 'Iskoola Pota', sans-serif;
+  --font-tamil: var(--font-noto-tamil), 'Latha', sans-serif;
+
+  /*
+   * Type scale — compound `size/line-height` tokens, intended for use
+   * with the CSS `font` shorthand: font: var(--type-body) var(--font-body);
+   * Desktop values. Display tokens step down below 768px — see the
+   * media query at the foot of this file (docs/2-ui.md §3.3).
+   */
+  --type-display-xl: 48px/56px;
+  --type-display-l: 36px/44px;
+  --type-display-m: 28px/36px;
+  --type-heading: 20px/28px;
+  --type-body-l: 17px/26px;
+  --type-body: 15px/24px;
+  --type-body-s: 13px/20px;
+  --type-label: 12px/16px;
+  --type-price: 20px/28px;
+
+  /* Type detail — weight and tracking per docs/2-ui.md §3.2 */
+  --type-display-xl-weight: 400;
+  --type-display-xl-tracking: 0.06em;
+  --type-display-l-weight: 400;
+  --type-display-l-tracking: 0.05em;
+  --type-display-m-weight: 400;
+  --type-display-m-tracking: 0.04em;
+  --type-heading-weight: 600;
+  --type-heading-tracking: 0.01em;
+  --type-body-l-weight: 400;
+  --type-body-l-tracking: 0em;
+  --type-body-weight: 400;
+  --type-body-tracking: 0em;
+  --type-body-s-weight: 400;
+  --type-body-s-tracking: 0em;
+  --type-label-weight: 600;
+  --type-label-tracking: 0.1em;
+  --type-price-weight: 600;
+  --type-price-tracking: 0em;
+
+  /* ---------------------------------------------------------------- */
+  /* Space — 4px base unit. No arbitrary spacing values.                */
+  /* ---------------------------------------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* ---------------------------------------------------------------- */
+  /* Shape — radii stay small and disciplined                          */
+  /* ---------------------------------------------------------------- */
+  --radius-none: 0;
+  --radius-s: 2px;
+  --radius-m: 4px;
+  --radius-full: 999px;
+
+  /* ---------------------------------------------------------------- */
+  /* Elevation — depth via hairline + whitespace, shadow tints in plum  */
+  /* ---------------------------------------------------------------- */
+  --elev-0: none;
+  --elev-1: 0 2px 8px rgba(90, 30, 45, 0.08);
+  --elev-2: 0 8px 32px rgba(90, 30, 45, 0.14);
+
+  /* ---------------------------------------------------------------- */
+  /* Motion                                                             */
+  /* ---------------------------------------------------------------- */
+  --motion-instant: 0ms;
+  --motion-quick: 120ms ease-out;
+  --motion-standard: 200ms ease-out;
+  --motion-preview: 280ms ease-in-out;
+  --motion-page: 320ms ease-out;
+  --motion-spin-duration: 800ms;
+  --motion-pulse-duration: 1500ms;
+
+  /* ---------------------------------------------------------------- */
+  /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
+  /* (Button, Input, Select, Checkbox, Radio). Not enumerated in the    */
+  /* docs/2-ui.md §8 token table; added here rather than inlining a raw */
+  /* px value in component code, per the "tokens only" rule.            */
+  /* ---------------------------------------------------------------- */
+  --control-height-sm: 36px;
+  --control-height-md: 44px;
+  --control-height-lg: 52px;
+
+  /* Icon / checkbox / radio visual sizing — docs/2-ui.md line "Size | 20px
+     default, 24px for touch targets, 16px inline with text" and
+     docs/3-components.md §2.2 (Checkbox, Radio both 20×20px visual). */
+  --size-icon-default: 20px;
+  --size-icon-touch: 24px;
+
+  /* Focus ring — docs/3-components.md §2.1 ("2px --lun-gold outline at
+     2px offset"), reused identically by Checkbox/Radio per §2.2. */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  /* Disabled state — "40% opacity, no pointer" for every Button variant
+     per docs/3-components.md §2.1, and reused by Input/Select/Checkbox. */
+  --opacity-disabled: 0.4;
+
+  /* Reusable semibold weight for body-scale text that needs emphasis
+     without switching to the all-caps --type-label treatment — a form
+     field label, JacketBlock's "ships unstitched" notice (which must
+     never render as fine print per docs/3-components.md §3.5). */
+  --weight-semibold: 600;
+
+  /* SwatchChip visual sizes — docs/3-components.md §3.1 ('sm' 32px | 'md'
+     44px | 'lg' 56px). Independent of --control-height-* / --space-* so
+     this component's sizing doesn't silently move if those change for
+     unrelated reasons. */
+  --size-swatch-sm: 32px;
+  --size-swatch-md: 44px;
+  --size-swatch-lg: 56px;
+
+  /* Texture tile overlay opacity — docs/3-components.md §3.1 ("texture
+     tile, overlaid at low opacity for weave"). Exact value not specified;
+     flag for design review before Phase 1 visual QA. */
+  --opacity-texture: 0.25;
+}
+
+/* Mobile display scale — docs/2-ui.md §3.3. Body tokens are unchanged;
+   15px is already the floor for comfortable reading on a mid-range
+   Android, so they do not step down. The spec's §3.3 table defines the
+   mobile FONT SIZE only (32 / 26 / 22); it does not specify a mobile
+   line-height. The line-heights below are proportionally derived from
+   each token's desktop ratio, not verbatim spec values — flag for
+   design review before Phase 2 visual QA. */
+@media (max-width: 767px) {
+  :root {
+    --type-display-xl: 32px/40px;
+    --type-display-l: 26px/34px;
+    --type-display-m: 22px/30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-quick: 0ms;
+    --motion-standard: 0ms;
+    --motion-preview: 0ms;
+    --motion-page: 0ms;
+  }
+}

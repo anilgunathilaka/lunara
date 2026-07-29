@@ -1,0 +1,83 @@
+// Lunara Sarees — Prisma schema
+//
+// Phase 1 scope: PostgreSQL connection plus Better Auth's core tables
+// (User, Session, Account, Verification), so account creation "after
+// purchase, never before" (PRD FR-33) has somewhere to live.
+//
+// The product data model — SAREE_DESIGN, COTTON_MATERIAL,
+// JACKET_MATERIAL, SAREE_COLOURWAY, JACKET_COLOURWAY, PRICE_MATRIX,
+// STOCK_ITEM, CURATED_LISTING, CONFIGURED_DESIGN and the order lifecycle
+// — is Phase 4 (docs/4-architecture.md §3, §7.2), built once the
+// catalogue's design/colour/jacket counts are confirmed (PRD Q1).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model Account {
+  id           String @id @default(cuid())
+  accountId    String
+  providerId   String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}

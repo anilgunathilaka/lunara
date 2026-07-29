@@ -1,0 +1,44 @@
+{
+  "name": "lunara",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lunara Sarees — premium Sri Lankan cotton saree brand with a Design Your Own Saree configurator.",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . && npm run lint:tokens",
+    "lint:tokens": "node scripts/check-tokens.mjs",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
+    "@prisma/client": "^6.19.3",
+    "@react-email/components": "^1.0.12",
+    "@vercel/blob": "^2.6.1",
+    "better-auth": "^1.6.23",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^1.25.0",
+    "next": "^16.2.10",
+    "next-intl": "^4.13.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-email": "^6.9.0",
+    "react-hook-form": "^7.82.0",
+    "resend": "^6.17.2",
+    "sharp": "^0.35.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.10",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,281 @@
+{
+  "common": {
+    "brand": "Lunara Sarees",
+    "skipToContent": "Skip to content",
+    "languageEnglish": "English",
+    "languageSinhala": "Sinhala",
+    "languageTamil": "Tamil"
+  },
+  "product": {
+    "fabric": {
+      "material": "Material",
+      "materialPlain": "Plain Cotton",
+      "materialSuper": "Super Cotton",
+      "weight": "Weight",
+      "weightValue": "{gsm} GSM",
+      "length": "Length",
+      "lengthValue": "{metres} m",
+      "opacity": "Opacity"
+    },
+    "opacity": {
+      "opaque": "Opaque",
+      "semiSheer": "Semi-sheer",
+      "sheer": "Sheer"
+    },
+    "jacket": {
+      "shipsUnstitched": "Ships unstitched",
+      "pieceLength": "{metres} m jacket material"
+    },
+    "stock": {
+      "outOfStock": "Out of stock",
+      "lowStock": "Low stock",
+      "left": "{count} left"
+    },
+    "gallery": {
+      "referenceFrame": "Colour reference"
+    }
+  },
+  "commerce": {
+    "cart": {
+      "editDesign": "Edit this design",
+      "remove": "Remove",
+      "decreaseQuantity": "Decrease quantity",
+      "increaseQuantity": "Increase quantity"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "deliveryFee": "Delivery fee",
+      "codFee": "Cash on delivery fee",
+      "codWaived": "Waived when you pay online",
+      "total": "Total"
+    },
+    "unstitched": {
+      "message": "This jacket ships as unstitched material. We do not stitch or take measurements.",
+      "acknowledge": "I understand this jacket ships unstitched"
+    },
+    "payment": {
+      "cod": "Cash on delivery",
+      "codDetail": "+LKR 350 COD fee — waived when you pay online",
+      "bankTransfer": "Bank transfer",
+      "bankTransferDetail": "Pay directly to our account, no extra fee",
+      "lankaqr": "LankaQR",
+      "lankaqrDetail": "Scan and pay from any local banking app",
+      "card": "Card",
+      "cardDetail": "Visa or Mastercard, no extra fee"
+    },
+    "delivery": {
+      "estimateRange": "3–5 working days",
+      "dispatchCutoff": "Order before 2pm for same-day dispatch",
+      "feeLabel": "Delivery fee"
+    },
+    "checkout": {
+      "stepIndicator": "Step {current} of {total}",
+      "back": "Back",
+      "cartTitle": "Your cart",
+      "detailsTitle": "Your details",
+      "deliveryTitle": "Delivery",
+      "paymentTitle": "Payment",
+      "reviewTitle": "Review your order",
+      "placeOrder": "Place order",
+      "continue": "Continue",
+      "nameLabel": "Full name",
+      "phoneLabel": "Phone number",
+      "addressLabel": "Delivery address",
+      "districtLabel": "District",
+      "districtPlaceholder": "Choose your district",
+      "eventDateLabel": "I need this by (optional)",
+      "eventDateNote": "Advisory only — this helps us pack in time but isn't a guaranteed delivery date.",
+      "confirmedHeading": "Order confirmed",
+      "confirmedOrderNumberLabel": "Order number",
+      "confirmedBody": "We've sent your confirmation by SMS and WhatsApp, with your order number and delivery estimate.",
+      "confirmedUnstitchedReminder": "Remember: your jacket material ships unstitched. Your printed care and returns cards will arrive in the parcel.",
+      "backHome": "Back to home",
+      "continueShopping": "Keep shopping"
+    }
+  },
+  "layout": {
+    "nav": {
+      "shop": "Shop",
+      "designYourOwn": "Design Your Own",
+      "jacketMaterial": "Jacket Material",
+      "support": "Support",
+      "cart": "Cart",
+      "menu": "Menu"
+    },
+    "whatsapp": "Chat on WhatsApp",
+    "footer": {
+      "support": "Support",
+      "returns": "Returns",
+      "careGuide": "Cotton care guide",
+      "shipping": "Shipping",
+      "privacy": "Privacy policy",
+      "terms": "Terms of service"
+    },
+    "slideover": {
+      "addedTitle": "Added to cart",
+      "close": "Close"
+    },
+    "accordion": {
+      "shipping": "Shipping & delivery",
+      "shippingContent": "Dispatched within one working day. 3–5 working days islandwide, longer to some outstation areas.",
+      "care": "Cotton care",
+      "careContent": "Machine wash cold, inside out. Line dry in shade. Warm iron on the reverse.",
+      "returns": "Returns & exchanges",
+      "returnsContent": "7-day returns on unworn items with tags attached. Because nothing is personalised, all returned stock is resellable."
+    }
+  },
+  "feedback": {
+    "toast": {
+      "added": "Added to cart",
+      "removed": "Removed from cart",
+      "undo": "Undo"
+    },
+    "emptyState": {
+      "cartEmpty": "Your cart is empty",
+      "shopCurated": "Shop curated pairings",
+      "designYourOwn": "Design your own"
+    },
+    "fallback": {
+      "rendererFailed": "360° rotation isn't available right now — showing photography instead. You can still order."
+    }
+  },
+  "configurator": {
+    "drape": {
+      "saree": "Saree",
+      "osariya": "Osariya",
+      "explainer": "What's Kandyan Osariya?"
+    },
+    "rotation": {
+      "left": "Rotate left",
+      "right": "Rotate right"
+    },
+    "honesty": {
+      "text": "This is an approximate view. See the real photographs for true colour.",
+      "seeSaree": "See saree photos",
+      "seeJacket": "See jacket photos"
+    },
+    "suggested": {
+      "heading": "You might also like",
+      "refresh": "Refresh"
+    },
+    "bar": {
+      "addToCart": "Add to cart",
+      "save": "Save this design",
+      "share": "Share",
+      "requestSwatches": "Request physical swatches"
+    },
+    "axisHeadings": {
+      "design": "Design",
+      "material": "Material",
+      "colour": "Saree colour",
+      "jacket": "Jacket design"
+    },
+    "toast": {
+      "saved": "Design saved",
+      "shared": "Link copied — share it for a second opinion",
+      "swatchesRequested": "Swatch request noted — we'll be in touch"
+    },
+    "devOnly": {
+      "simulateFailure": "Simulate renderer failure",
+      "restoreRenderer": "Restore renderer"
+    }
+  },
+  "home": {
+    "hero": {
+      "headline": "See it before you wear it",
+      "subhead": "Cotton sarees with unstitched jacket material — recolour any design, compare Plain and Super Cotton, and preview it draped either way before you buy.",
+      "shopCurated": "Shop curated pairings",
+      "designYourOwn": "Design your own"
+    },
+    "trust": {
+      "colourPromise": "Colour-accurate photography",
+      "returns": "7-day returns",
+      "dispatch": "Dispatched in 1 working day",
+      "whatsapp": "Reach us on WhatsApp"
+    },
+    "newArrivals": {
+      "heading": "New arrivals"
+    },
+    "osariya": {
+      "heading": "One saree, two drapes",
+      "body": "Every saree can be draped the traditional way or as a Kandyan Osariya — same fabric, same price, same item shipped."
+    },
+    "proof": {
+      "heading": "From our customers",
+      "placeholderNote": "Customer photo reviews will appear here once published.",
+      "sampleReviewerLabel": "Reviewer name",
+      "sampleDistrictLabel": "District",
+      "sampleQuote": "Review text will appear here."
+    }
+  },
+  "shop": {
+    "title": "Shop curated pairings",
+    "resultsCount": "{count} sarees",
+    "filters": {
+      "material": "Material",
+      "occasion": "Occasion",
+      "priceBand": "Price",
+      "opacity": "Opacity",
+      "all": "All",
+      "clear": "Clear filters"
+    },
+    "occasion": {
+      "office": "Office",
+      "everyday": "Everyday",
+      "festive": "Festive",
+      "temple": "Temple"
+    },
+    "priceBand": {
+      "under8000": "Under LKR 8,000",
+      "8000to9000": "LKR 8,000–9,000",
+      "over9000": "Over LKR 9,000"
+    },
+    "noResults": "No sarees match these filters.",
+    "noResultsAction": "Clear filters"
+  },
+  "pdp": {
+    "addToCart": "Add to cart",
+    "customiseThis": "Customise this",
+    "sendSwatches": "Send me swatches",
+    "colourPromiseHeading": "Colour accuracy promise",
+    "colourPromiseBody": "This material is photographed in natural daylight, with one unedited reference frame published for its colourway. If the delivered item differs materially from that reference, we collect it at our cost and replace or refund in full.",
+    "deliveryHeading": "Delivery",
+    "reviewsHeading": "Reviews",
+    "reviewsNone": "Customer photo reviews will appear here once published.",
+    "relatedHeading": "You might also like",
+    "outOfStockLabel": "This colourway is out of stock.",
+    "viewCart": "View cart",
+    "keepShopping": "Keep shopping"
+  },
+  "jacketPage": {
+    "title": "Jacket Material",
+    "standaloneNote": "Order jacket material on its own — no saree required.",
+    "pairsWith": "Pairs well with",
+    "seeAgainstSaree": "See this against a saree",
+    "composition": "Composition",
+    "deliveryNote": "A flat delivery fee applies to jacket-only orders, shown at checkout before you pay."
+  },
+  "cartPage": {
+    "title": "Your cart",
+    "checkout": "Go to checkout",
+    "continueShopping": "Keep shopping"
+  },
+  "support": {
+    "title": "Support",
+    "intro": "Delivery, returns, colour accuracy and care — the questions we're asked most, answered plainly.",
+    "contactHeading": "Contact us",
+    "contactBody": "Reach us on WhatsApp for the fastest response, or by phone during service hours.",
+    "colourPromiseHeading": "Colour accuracy promise",
+    "colourPromiseBody": "Every material is photographed in natural daylight, with one unedited reference frame published per colourway. If a delivered item differs materially from that reference, we collect it at our cost and replace or refund it in full. The Design Your Own preview is a rendered approximation and is not covered by this promise — see the honesty note in the configurator.",
+    "jacketStitchingHeading": "Getting your jacket stitched",
+    "jacketStitchingBody": "Your jacket material ships unstitched, cut to the piece length stated on the listing. Take it to your regular tailor along with your measurements — we don't take measurements or stitch, so any tailor of your choice can complete it.",
+    "returnsPageTitle": "Returns & exchanges",
+    "careGuidePageTitle": "Cotton care guide",
+    "shippingPageTitle": "Shipping & delivery"
+  },
+  "policies": {
+    "privacyTitle": "Privacy policy",
+    "termsTitle": "Terms of service",
+    "pending": "This page is pending final legal review and will be published before launch. For questions in the meantime, reach us on WhatsApp."
+  }
+}

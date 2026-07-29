@@ -1,0 +1,50 @@
+import { getTranslations } from 'next-intl/server';
+import { SectionMarker } from '@/components/brand/SectionMarker';
+import { placeholderCatalogue } from '@/content/catalogue/placeholder-catalogue';
+import { ShopClient } from './ShopClient';
+
+export default async function ShopPage() {
+  const t = await getTranslations('shop');
+  const tFabric = await getTranslations('product.fabric');
+  const tStock = await getTranslations('product.stock');
+
+  return (
+    <div className="home-section">
+      <div className="home-section-inner">
+        <div className="home-section-header">
+          <div>
+            <SectionMarker />
+            <h1 className="home-section-title">{t('title')}</h1>
+          </div>
+        </div>
+
+        <ShopClient
+          products={placeholderCatalogue}
+          materialLabels={{ plain: tFabric('materialPlain'), super: tFabric('materialSuper') }}
+          filterLabels={{
+            material: t('filters.material'),
+            occasion: t('filters.occasion'),
+            priceBand: t('filters.priceBand'),
+            all: t('filters.all'),
+            clear: t('filters.clear'),
+          }}
+          occasionLabels={{
+            office: t('occasion.office'),
+            everyday: t('occasion.everyday'),
+            festive: t('occasion.festive'),
+            temple: t('occasion.temple'),
+          }}
+          priceBandLabels={{
+            under8000: t('priceBand.under8000'),
+            '8000to9000': t('priceBand.8000to9000'),
+            over9000: t('priceBand.over9000'),
+          }}
+          noResultsLabel={t('noResults')}
+          noResultsActionLabel={t('noResultsAction')}
+          outOfStockLabel={tStock('outOfStock')}
+          lowStockLabel={tStock('lowStock')}
+        />
+      </div>
+    </div>
+  );
+}

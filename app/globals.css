@@ -1,0 +1,1928 @@
+@import 'tailwindcss';
+@import '../lib/tokens.css';
+
+/*
+ * Maps Lunara's design tokens (lib/tokens.css) into Tailwind v4's theme
+ * namespaces so utilities like `bg-plum`, `text-ink-muted`, `rounded-m`,
+ * `shadow-elev-1` and `p-4` resolve to the exact brand values — never a
+ * Tailwind default. `inline` keeps these as live references to the
+ * custom properties rather than copies, so lib/tokens.css remains the
+ * single edit point (docs/2-ui.md §8.1).
+ */
+@theme inline {
+  /* Colour */
+  --color-plum: var(--lun-plum);
+  --color-plum-light: var(--lun-plum-light);
+  --color-plum-deep: var(--lun-plum-deep);
+  --color-gold: var(--lun-gold);
+  --color-gold-pale: var(--lun-gold-pale);
+  --color-gold-deep: var(--lun-gold-deep);
+  --color-ground: var(--lun-ground);
+  --color-surface: var(--lun-surface);
+  --color-line: var(--lun-line);
+  --color-ink: var(--lun-ink);
+  --color-ink-muted: var(--lun-ink-muted);
+  --color-success: var(--lun-success);
+  --color-warning: var(--lun-warning);
+  --color-danger: var(--lun-danger);
+  --color-info: var(--lun-info);
+
+  /* Type families */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-sinhala: var(--font-sinhala);
+  --font-tamil: var(--font-tamil);
+
+  /*
+   * Type scale. Tailwind's --text-* / --text-*--line-height pair drives
+   * `text-display-xl` etc. Referencing the tokens.css custom property
+   * (rather than a literal) means the mobile media-query step-down in
+   * tokens.css keeps working automatically at every breakpoint.
+   */
+  --text-display-xl: var(--type-display-xl);
+  --text-display-l: var(--type-display-l);
+  --text-display-m: var(--type-display-m);
+  --text-heading: var(--type-heading);
+  --text-body-l: var(--type-body-l);
+  --text-body: var(--type-body);
+  --text-body-s: var(--type-body-s);
+  --text-label: var(--type-label);
+  --text-price: var(--type-price);
+
+  /* Space — 4px base unit, overriding Tailwind's default multiplier scale
+     so p-1..p-9 resolve exactly to docs/2-ui.md §4.1, not a generic ramp. */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-8: var(--space-8);
+  --spacing-9: var(--space-9);
+
+  /* Shape */
+  --radius-none: var(--radius-none);
+  --radius-s: var(--radius-s);
+  --radius-m: var(--radius-m);
+  --radius-full: var(--radius-full);
+
+  /* Elevation */
+  --shadow-elev-1: var(--elev-1);
+  --shadow-elev-2: var(--elev-2);
+
+  /* Motion */
+  --ease-preview: ease-in-out;
+  --default-transition-duration: var(--motion-standard);
+}
+
+/*
+ * Everything below is wrapped in Tailwind's `components` cascade layer
+ * (docs/2-ui.md/3-components.md predate this fix but the intent was
+ * always that Tailwind's responsive utilities — `hidden`, `md:flex`,
+ * `md:hidden` etc, all in the `utilities` layer — win over a component's
+ * own base styles when both target the same element. Left unlayered,
+ * plain CSS always beats ANY `@layer` rule regardless of source order or
+ * specificity, so e.g. `.whatsapp-action { display: inline-flex }` was
+ * silently overriding the `hidden md:inline-flex` classes meant to hide
+ * it on mobile — the exact bug class the `.gallery-thumbs` comment
+ * further down already flags and works around by omission. Wrapping in
+ * `components` (which sits below `utilities` in Tailwind's layer order)
+ * fixes every such collision at once instead of patching each one.
+ */
+@layer components {
+body {
+  background-color: var(--lun-ground);
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+}
+
+/*
+ * Shared interactive-primitive utilities. Kept here rather than as Tailwind
+ * theme entries because height/outline are not themeable Tailwind v4
+ * namespaces — these still resolve to nothing but lib/tokens.css values.
+ */
+.control-h-sm {
+  height: var(--control-height-sm);
+}
+.control-h-md {
+  height: var(--control-height-md);
+}
+.control-h-lg {
+  height: var(--control-height-lg);
+}
+
+.focus-ring {
+  outline: none;
+}
+.focus-ring:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 0.15em solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--radius-full);
+  animation: lun-spin var(--motion-spin-duration) linear infinite;
+}
+@keyframes lun-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+/*
+ * Button — docs/3-components.md §2.1. Colour-mix() derives the hover/active
+ * tints and the danger darken-on-hover straight from the brand tokens, so
+ * no additional raw or alpha colour values are introduced.
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  position: relative;
+  border-radius: var(--radius-m);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-quick),
+    border-color var(--motion-quick),
+    color var(--motion-quick),
+    box-shadow var(--motion-quick);
+}
+.btn:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.btn-full {
+  width: 100%;
+}
+
+.btn-sm {
+  height: var(--control-height-sm);
+  padding-inline: var(--space-3);
+  font: var(--type-body-s) var(--font-body);
+}
+.btn-md {
+  height: var(--control-height-md);
+  padding-inline: var(--space-4);
+  font: var(--type-body) var(--font-body);
+}
+.btn-lg {
+  height: var(--control-height-lg);
+  padding-inline: var(--space-5);
+  font: var(--type-body-l) var(--font-body);
+}
+/* sm is desktop-only: any touch surface still gets the 44px control height. */
+@media (pointer: coarse) {
+  .btn-sm {
+    height: var(--control-height-md);
+  }
+}
+
+.btn-primary {
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--lun-plum-deep);
+}
+.btn-primary:active:not(:disabled) {
+  background: var(--lun-plum-deep);
+  box-shadow: inset 0 0 0 1px var(--lun-plum-deep);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--lun-plum);
+  border-color: var(--lun-plum);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--lun-plum) 6%, transparent);
+}
+.btn-secondary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--lun-plum) 12%, transparent);
+}
+
+.btn-tertiary {
+  background: transparent;
+  color: var(--lun-plum);
+}
+.btn-tertiary:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.btn-tertiary:active:not(:disabled) {
+  text-decoration: underline;
+  color: var(--lun-plum-deep);
+}
+
+.btn-danger {
+  background: var(--lun-danger);
+  color: var(--lun-surface);
+}
+.btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--lun-danger) 92%, black);
+}
+.btn-danger:active:not(:disabled) {
+  background: color-mix(in srgb, var(--lun-danger) 88%, black);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lun-danger) 80%, black);
+}
+
+/*
+ * Input — docs/3-components.md §2.2. Label is always visible above the
+ * field; placeholders (native `placeholder` attr, if a caller passes one)
+ * are a supplementary hint only, never a label substitute.
+ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.field-label {
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.field-message {
+  font: var(--type-body-s) var(--font-body);
+}
+.field-message-error {
+  color: var(--lun-danger);
+}
+
+.input {
+  width: 100%;
+  height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  box-sizing: border-box;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-s);
+  background: var(--lun-surface);
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+  transition:
+    border-color var(--motion-quick),
+    outline-color var(--motion-quick);
+}
+.input::placeholder {
+  color: var(--lun-ink-muted);
+}
+.input:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+.input:focus-visible {
+  border: 2px solid var(--lun-plum);
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.field-invalid {
+  border-color: var(--lun-danger);
+}
+.field-invalid:focus-visible {
+  border-color: var(--lun-danger);
+}
+
+/*
+ * Select — docs/3-components.md §2.2 ("Matches Input metrics. Native select
+ * on mobile for reliability"). Always a native <select>; appearance:none
+ * only replaces the closed-state chrome, the OS picker UI on mobile is
+ * untouched.
+ */
+.select-wrap {
+  position: relative;
+}
+.select {
+  width: 100%;
+  height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  padding-right: var(--space-7);
+  box-sizing: border-box;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-s);
+  background: var(--lun-surface);
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-quick),
+    outline-color var(--motion-quick);
+}
+.select:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+.select:focus-visible {
+  border: 2px solid var(--lun-plum);
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.select-icon {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  color: var(--lun-ink-muted);
+  pointer-events: none;
+}
+.select-icon-disabled {
+  opacity: var(--opacity-disabled);
+}
+
+/*
+ * Checkbox / Radio — docs/3-components.md §2.2. The real input stays in
+ * the DOM at a 44×44px hit area (accessible, keyboard/touch operable) but
+ * is visually transparent; a sibling span renders the 20×20px visual and
+ * reads the input's :checked / :focus-visible state via the adjacent-
+ * sibling combinator, so no JS state duplication is needed.
+ */
+.option-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+.option-row-disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+.option-hit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  flex-shrink: 0;
+}
+.option-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.option-row-disabled .option-input,
+.option-row-disabled .option-hit {
+  cursor: not-allowed;
+}
+.option-box {
+  width: var(--size-icon-default);
+  height: var(--size-icon-default);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--lun-line);
+  background: var(--lun-surface);
+  color: var(--lun-surface);
+  pointer-events: none;
+  transition:
+    background-color var(--motion-quick),
+    border-color var(--motion-quick);
+}
+.checkbox-box {
+  border-radius: var(--radius-s);
+}
+.radio-box {
+  border-radius: var(--radius-full);
+}
+.option-input:focus-visible + .option-box {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Checkbox checked: full --lun-plum fill, white check (docs §2.2). */
+.option-input:checked + .checkbox-box {
+  background: var(--lun-plum);
+  border-color: var(--lun-plum);
+}
+.checkbox-check {
+  opacity: 0;
+  transition: opacity var(--motion-quick);
+}
+.option-input:checked + .checkbox-box .checkbox-check {
+  opacity: 1;
+}
+
+/* Radio selected: plum RING, not a fill, with a filled plum centre dot. */
+.option-input:checked + .radio-box {
+  border-color: var(--lun-plum);
+}
+.radio-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+  opacity: 0;
+  transition: opacity var(--motion-quick);
+}
+.option-input:checked + .radio-box .radio-dot {
+  opacity: 1;
+}
+.option-label {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/*
+ * Icon — docs/2-ui.md §6.3. Colour always inherits from text colour (use a
+ * Tailwind text-* utility, e.g. text-gold, on the icon or its parent for
+ * the active/selected exception); size is one of three fixed steps.
+ */
+.icon {
+  color: inherit;
+  flex-shrink: 0;
+}
+.icon-inline {
+  width: var(--space-4);
+  height: var(--space-4);
+}
+.icon-default {
+  width: var(--size-icon-default);
+  height: var(--size-icon-default);
+}
+.icon-touch {
+  width: var(--size-icon-touch);
+  height: var(--size-icon-touch);
+}
+
+/*
+ * Divider / SectionMarker / MotifDivider — docs/3-components.md §2.3, the
+ * brand signature devices. MotifDivider is capped at once per section by
+ * convention, not by the component (it has no way to know how many times
+ * it has been rendered on a page).
+ */
+.divider {
+  border: none;
+  height: 1px;
+  width: 100%;
+  background: var(--lun-line);
+}
+.divider-gold {
+  background: var(--lun-gold);
+}
+
+.section-marker {
+  width: var(--space-6);
+  height: 2px;
+  background: var(--lun-gold);
+  margin-bottom: var(--space-2);
+}
+
+.motif-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--lun-gold);
+}
+.motif-divider::before,
+.motif-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--lun-line);
+}
+.motif-divider-mark {
+  font: var(--type-body) var(--font-display);
+  line-height: 1;
+}
+
+/*
+ * SwatchChip — docs/3-components.md §3.1. The 44×44px hit area always
+ * wraps the visual chip regardless of `size`, so `sm` (32px) still meets
+ * the touch-target rule. The selection ring is an outline OUTSIDE the
+ * chip, never overlaid on the colour itself.
+ */
+.swatch-chip-hit {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height-md);
+  min-height: var(--control-height-md);
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-s);
+}
+.swatch-chip-hit:focus-visible,
+.swatch-chip-hit.swatch-chip-selected {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.swatch-chip-hit.swatch-chip-disabled {
+  cursor: not-allowed;
+}
+.swatch-chip {
+  position: relative;
+  display: block;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-s);
+  overflow: hidden;
+}
+.swatch-chip-sm {
+  width: var(--size-swatch-sm);
+  height: var(--size-swatch-sm);
+}
+.swatch-chip-md {
+  width: var(--size-swatch-md);
+  height: var(--size-swatch-md);
+}
+.swatch-chip-lg {
+  width: var(--size-swatch-lg);
+  height: var(--size-swatch-lg);
+}
+.swatch-chip-hit.swatch-chip-disabled .swatch-chip {
+  opacity: var(--opacity-disabled);
+}
+.swatch-chip-texture {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: var(--opacity-texture);
+}
+.swatch-chip-diagonal {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent calc(50% - 0.5px),
+    var(--lun-ink-muted) 50%,
+    transparent calc(50% + 0.5px)
+  );
+}
+.swatch-chip-dot {
+  position: absolute;
+  top: calc(-1 * var(--space-1));
+  right: calc(-1 * var(--space-1));
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--lun-gold);
+  border: 2px solid var(--lun-surface);
+}
+
+/*
+ * PriceDisplay — docs/3-components.md §3.3 ("--type-price, tabular
+ * figures").
+ */
+.price-display {
+  font: var(--type-price) var(--font-body);
+  font-weight: var(--type-price-weight);
+  color: var(--lun-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * StockState — docs/3-components.md §3.3 ("Badge only when low or out.
+ * In-stock is the silent default"). Warning/danger tints via color-mix()
+ * on the existing semantic tokens — no new raw colour introduced.
+ */
+.stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-s);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--lun-warning) 12%, var(--lun-surface));
+  color: var(--lun-warning);
+  border: 1px solid color-mix(in srgb, var(--lun-warning) 35%, transparent);
+}
+.stock-badge-out {
+  background: color-mix(in srgb, var(--lun-danger) 12%, var(--lun-surface));
+  color: var(--lun-danger);
+  border-color: color-mix(in srgb, var(--lun-danger) 35%, transparent);
+}
+
+/*
+ * OpacityRating — docs/3-components.md §3.5. A three-segment indicator;
+ * colour is never the only signal, the plain-language label always
+ * accompanies it.
+ */
+.opacity-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.opacity-rating-segments {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+.opacity-rating-segment {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-s);
+  border: 1px solid var(--lun-line);
+  background: transparent;
+}
+.opacity-rating-segment-filled {
+  background: var(--lun-plum);
+  border-color: var(--lun-plum);
+}
+.opacity-rating-label {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/*
+ * FabricBlock / JacketBlock — docs/3-components.md §3.5. Every field is
+ * mandatory (no field omitted for missing data); JacketBlock's unstitched
+ * phrase must never render as fine print.
+ */
+.spec-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.spec-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.spec-row-term {
+  color: var(--lun-ink-muted);
+  font: var(--type-body-s) var(--font-body);
+}
+.jacket-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.jacket-block-unstitched {
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.mini-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--size-icon-default);
+  height: var(--size-icon-default);
+  border-radius: var(--radius-s);
+  border: 1px solid var(--lun-line);
+}
+
+/*
+ * ProductCard — docs/3-components.md §3.3.
+ */
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: inherit;
+  text-decoration: none;
+}
+.product-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.product-card-image img {
+  object-fit: cover;
+}
+.product-card-name {
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--type-heading-weight);
+  color: var(--lun-plum);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.product-card-material {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+.product-card-jacket-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * ProductGallery — docs/3-components.md §3.4.
+ */
+.gallery-main {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.gallery-main img,
+.gallery-main video {
+  object-fit: cover;
+}
+.gallery-thumbs {
+  /* display is controlled by the hidden/md:flex utilities in JSX, not here,
+     so the responsive toggle isn't overridden by this rule's cascade order. */
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+.gallery-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--space-8);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--lun-line);
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  background: none;
+}
+.gallery-thumb img {
+  object-fit: cover;
+}
+.gallery-thumb-active {
+  border: 2px solid var(--lun-plum);
+}
+.gallery-dots {
+  /* display controlled by the flex/md:hidden utilities in JSX. */
+  justify-content: center;
+  gap: var(--space-2);
+}
+.gallery-dot {
+  width: var(--space-2);
+  height: var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--lun-line);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.gallery-dot-active {
+  background: var(--lun-plum);
+}
+.gallery-reference-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-gold-deep);
+}
+
+/*
+ * CartLine — docs/3-components.md §5.1. All five identifying facts (design,
+ * material, saree colour, jacket material+colour, drape) render on one line.
+ */
+.cart-line {
+  display: flex;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-bottom: 1px solid var(--lun-line);
+}
+.cart-line-thumb {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--space-9);
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-s);
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+.cart-line-thumb img {
+  object-fit: cover;
+}
+.cart-line-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.cart-line-name {
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--type-heading-weight);
+  color: var(--lun-plum);
+}
+.cart-line-spec {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.cart-line-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+.cart-line-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cart-line-quantity {
+  min-width: var(--space-4);
+  text-align: center;
+  font: var(--type-body) var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+.cart-line-price {
+  flex-shrink: 0;
+}
+
+/*
+ * CartSummary — docs/1-ux.md §3.4 ("itemised summary").
+ */
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.cart-summary-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.cart-summary-note {
+  color: var(--lun-ink-muted);
+}
+.cart-summary-total {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--lun-line);
+  font-weight: var(--weight-semibold);
+}
+
+/*
+ * CheckoutStep — docs/1-ux.md §3.4 Flow D, the shared shell for each step.
+ */
+.checkout-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.checkout-step-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.checkout-step-indicator {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+.checkout-step-title {
+  font: var(--type-display-m) var(--font-display);
+  color: var(--lun-plum);
+}
+.checkout-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/*
+ * PaymentMethod — docs/3-components.md §5.3. All four options share the
+ * same row treatment so none reads as more prominent than another.
+ */
+.payment-method {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.payment-option-label {
+  display: flex;
+  flex-direction: column;
+}
+.payment-option-name {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.payment-option-detail {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * DeliveryEstimate — docs/3-components.md §5.3.
+ */
+.delivery-estimate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+}
+.delivery-estimate-range {
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+
+/*
+ * UnstitchedReminder — docs/3-components.md §5.2. The single most
+ * important commerce component; the checkout variant's acknowledgement
+ * can never be pre-checked or skipped (enforced by the caller's gate on
+ * the order-placement action, not by this component alone).
+ */
+.unstitched-reminder {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-m);
+  background: color-mix(in srgb, var(--lun-info) 8%, var(--lun-surface));
+  border: 1px solid color-mix(in srgb, var(--lun-info) 25%, transparent);
+}
+.unstitched-reminder-icon {
+  flex-shrink: 0;
+  color: var(--lun-info);
+  margin-top: var(--space-1);
+}
+.unstitched-reminder-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+.unstitched-reminder-message {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/*
+ * Wordmark — docs/3-components.md §1.1 (brand/ Wordmark).
+ */
+.wordmark {
+  font: var(--type-heading) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum);
+}
+.wordmark-inverted {
+  color: var(--lun-surface);
+}
+
+/*
+ * LanguageSelector — docs/1-ux.md §1 ("present in the header on every
+ * page ... never resets on navigation").
+ */
+.language-selector {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+.language-option {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-s);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--lun-ink-muted);
+  font: var(--type-body-s) var(--font-body);
+  cursor: pointer;
+}
+.language-option-active {
+  border-color: var(--lun-line);
+  color: var(--lun-ink);
+  font-weight: var(--weight-semibold);
+}
+.site-footer-language .language-option {
+  color: color-mix(in srgb, var(--lun-surface) 70%, transparent);
+}
+.site-footer-language .language-option-active {
+  border-color: color-mix(in srgb, var(--lun-surface) 40%, transparent);
+  color: var(--lun-surface);
+}
+
+/*
+ * WhatsAppAction — docs/3-components.md §6.2. Floating FAB on mobile,
+ * inline icon+label in Header/Footer on desktop.
+ */
+.whatsapp-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: inherit;
+  text-decoration: none;
+}
+.whatsapp-action-floating {
+  position: fixed;
+  right: var(--space-4);
+  /* Clears the fixed MobileNav bar (--control-height-lg tall, bottom:0)
+     plus its safe-area inset, so the FAB never sits on top of it — the
+     two are only ever visible together on mobile (both md:hidden). */
+  bottom: calc(var(--control-height-lg) + env(safe-area-inset-bottom, 0px) + var(--space-3));
+  z-index: 40;
+  width: var(--space-8);
+  height: var(--space-8);
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+  box-shadow: var(--elev-2);
+}
+
+/*
+ * Header — docs/3-components.md §6.2. "Design Your Own" gets a bordered
+ * pill so it never reads as one plain link among five.
+ */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--lun-line);
+  background: var(--lun-surface);
+}
+.site-header-nav {
+  align-items: center;
+  gap: var(--space-5);
+}
+.site-header-link {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+  text-decoration: none;
+}
+.site-header-link:hover {
+  color: var(--lun-plum);
+}
+.site-header-link-featured {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--lun-plum);
+  border-radius: var(--radius-full);
+  color: var(--lun-plum);
+  font-weight: var(--weight-semibold);
+}
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.site-header-cart {
+  position: relative;
+  display: inline-flex;
+  color: var(--lun-ink);
+}
+.site-header-cart-count {
+  position: absolute;
+  top: calc(-1 * var(--space-2));
+  right: calc(-1 * var(--space-2));
+  min-width: var(--space-4);
+  height: var(--space-4);
+  padding-inline: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+}
+
+/*
+ * Footer — docs/3-components.md §6.2. --lun-plum-deep ground.
+ */
+.site-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-5);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+.site-footer-link {
+  font: var(--type-body-s) var(--font-body);
+  color: color-mix(in srgb, var(--lun-surface) 85%, transparent);
+  text-decoration: none;
+}
+.site-footer-link:hover {
+  color: var(--lun-surface);
+}
+.site-footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font: var(--type-body-s) var(--font-body);
+  color: color-mix(in srgb, var(--lun-surface) 70%, transparent);
+}
+
+/*
+ * MobileNav — docs/3-components.md §6.2. Persistent bottom bar.
+ */
+.mobile-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  background: var(--lun-surface);
+  border-top: 1px solid var(--lun-line);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+/*
+ * Reserves space for the fixed MobileNav bar at the end of the scrollable
+ * page (wraps <main> + <Footer> in SiteChrome) so footer content can
+ * scroll fully into view instead of ending up hidden underneath the bar.
+ * The formula mirrors .mobile-nav's own box exactly (item min-height +
+ * its safe-area padding) rather than a guessed constant, so it can't
+ * silently drift out of sync if that box ever changes.
+ */
+.site-content {
+  padding-bottom: calc(var(--control-height-lg) + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  .site-content {
+    padding-bottom: 0;
+  }
+}
+.mobile-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--space-2) 0;
+  min-height: var(--control-height-lg);
+  border: none;
+  background: none;
+  color: var(--lun-ink-muted);
+  cursor: pointer;
+  text-decoration: none;
+}
+.mobile-nav-item-active {
+  color: var(--lun-plum);
+}
+.mobile-nav-icon-wrap {
+  position: relative;
+}
+.mobile-nav-badge {
+  position: absolute;
+  top: calc(-1 * var(--space-1));
+  right: calc(-1 * var(--space-2));
+  min-width: var(--space-3);
+  height: var(--space-3);
+  padding-inline: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--lun-gold-deep);
+  color: var(--lun-surface);
+  font: var(--type-label) var(--font-body);
+  font-size: 9px;
+}
+.mobile-nav-label {
+  font: var(--type-label) var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/*
+ * SlideOver — docs/3-components.md §6.2. Slides from the side on desktop,
+ * from the bottom on mobile.
+ */
+.slideover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--lun-plum-deep) 45%, transparent);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 768px) {
+  .slideover-backdrop {
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+}
+.slideover-panel {
+  width: 100%;
+  max-height: 85vh;
+  background: var(--lun-surface);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+  padding: var(--space-4);
+  overflow-y: auto;
+  animation: lun-slide-up var(--motion-page);
+}
+@media (min-width: 768px) {
+  .slideover-panel {
+    max-width: 420px;
+    max-height: 100vh;
+    border-radius: 0;
+    animation: lun-slide-in var(--motion-page);
+  }
+}
+@keyframes lun-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes lun-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slideover-panel {
+    animation: none;
+  }
+}
+.slideover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.slideover-title {
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--type-heading-weight);
+  color: var(--lun-plum);
+}
+
+/*
+ * Accordion — docs/3-components.md §6.2. First panel open by default.
+ */
+.accordion {
+  display: flex;
+  flex-direction: column;
+}
+.accordion-item {
+  border-bottom: 1px solid var(--lun-line);
+}
+.accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.accordion-title {
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.accordion-chevron {
+  transition: transform var(--motion-quick);
+}
+.accordion-chevron-open {
+  transform: rotate(180deg);
+}
+.accordion-panel {
+  padding-bottom: var(--space-4);
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * Toast — docs/3-components.md §6.1. Bottom-centre mobile, bottom-right desktop.
+ */
+.toast {
+  position: fixed;
+  bottom: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  box-shadow: var(--elev-2);
+  max-width: calc(100vw - var(--space-5) * 2);
+}
+@media (min-width: 768px) {
+  .toast {
+    left: auto;
+    right: var(--space-5);
+    transform: none;
+  }
+}
+.toast-message {
+  font: var(--type-body-s) var(--font-body);
+}
+.toast-undo {
+  color: var(--lun-gold-pale);
+}
+
+/*
+ * EmptyState — docs/3-components.md §6.1. Always offers an action; a
+ * cart empty state offers two doors at equal weight.
+ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-7) var(--space-4);
+  color: var(--lun-ink-muted);
+}
+.empty-state-icon {
+  color: var(--lun-ink-muted);
+}
+.empty-state-message {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/*
+ * LoadingSkeleton — docs/3-components.md §6.1. Shape-matched to the
+ * content it replaces; the caller controls size via className.
+ */
+.skeleton {
+  background: var(--lun-line);
+  border-radius: var(--radius-s);
+  animation: lun-pulse var(--motion-pulse-duration) ease-in-out infinite;
+}
+.skeleton-circle {
+  border-radius: var(--radius-full);
+}
+.skeleton-text {
+  height: 1em;
+  border-radius: var(--radius-s);
+}
+@keyframes lun-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/*
+ * SwatchGrid — docs/3-components.md §3.2. Grid columns are set per-instance
+ * via CSS custom properties (see the component's inline style), not
+ * hardcoded here, so mobile/tablet/desktop counts stay data-driven.
+ */
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols-mobile, 5), minmax(0, 1fr));
+  gap: var(--space-2);
+}
+@media (min-width: 768px) {
+  .swatch-grid {
+    grid-template-columns: repeat(var(--grid-cols-tablet, 7), minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .swatch-grid {
+    grid-template-columns: repeat(var(--grid-cols-desktop, 8), minmax(0, 1fr));
+  }
+}
+.swatch-grid-group-label {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * PreviewCanvas / RotationControl — docs/3-components.md §4.1. Pure
+ * --lun-surface, no border/shadow/motif of any kind on the canvas itself.
+ */
+.preview-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.preview-canvas:active {
+  cursor: grabbing;
+}
+.preview-canvas-frame {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  animation: lun-fade-in var(--motion-preview);
+}
+@keyframes lun-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-canvas-frame {
+    animation: none;
+  }
+}
+.rotation-control {
+  position: absolute;
+  inset-inline: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.rotation-control-button {
+  pointer-events: auto;
+  background: color-mix(in srgb, var(--lun-surface) 85%, transparent);
+}
+
+/*
+ * HonestyNote — docs/3-components.md §4.2 (UX-C6). Factual and calm, never
+ * dismissible.
+ */
+.honesty-note {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-top: 1px solid var(--lun-line);
+  background: color-mix(in srgb, var(--lun-gold-pale) 20%, var(--lun-surface));
+}
+.honesty-note-icon {
+  flex-shrink: 0;
+  color: var(--lun-info);
+  margin-top: 2px;
+}
+.honesty-note-text {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-info);
+}
+
+/*
+ * PriceAttribution — docs/3-components.md §4.2b (UX-C10a).
+ */
+.price-attribution {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * FallbackNotice — docs/3-components.md §6.1, docs/4-architecture.md §5.4.
+ */
+.fallback-notice {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-m);
+  background: color-mix(in srgb, var(--lun-warning) 10%, var(--lun-surface));
+  border: 1px solid color-mix(in srgb, var(--lun-warning) 30%, transparent);
+}
+.fallback-notice-icon {
+  flex-shrink: 0;
+  color: var(--lun-warning);
+}
+.fallback-notice-message {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/*
+ * DesignPicker — docs/3-components.md §4.2a.
+ */
+.design-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+@media (min-width: 768px) {
+  .design-picker {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.design-picker-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-m);
+}
+.design-picker-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-m);
+  border: 1px solid var(--lun-line);
+  overflow: hidden;
+}
+.design-picker-thumb img {
+  object-fit: cover;
+}
+.design-picker-tile-selected .design-picker-thumb {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.design-picker-tile-disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+.design-picker-name {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+  text-align: left;
+}
+.design-picker-tile:focus-visible .design-picker-thumb {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/*
+ * MaterialSelector — docs/3-components.md §4.2a (UX-C10b). Two options
+ * only; the Super delta is always visible, never revealed only on hover.
+ */
+.material-selector {
+  display: flex;
+  gap: var(--space-3);
+}
+.material-option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+  cursor: pointer;
+}
+.material-option-active {
+  border: 2px solid var(--lun-plum);
+  color: var(--lun-plum);
+  font-weight: var(--weight-semibold);
+}
+.material-option-delta {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+
+/*
+ * DrapeToggle — docs/3-components.md §4.3. Active option carries the gold
+ * 2px rule beneath, the signature device.
+ */
+.drape-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.drape-toggle-options {
+  display: flex;
+  gap: var(--space-4);
+}
+.drape-option {
+  border: none;
+  background: none;
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid transparent;
+  color: var(--lun-ink-muted);
+  font: var(--type-body) var(--font-body);
+  cursor: pointer;
+}
+.drape-option-active {
+  border-bottom-color: var(--lun-gold);
+  color: var(--lun-ink);
+  font-weight: var(--weight-semibold);
+}
+
+/*
+ * SuggestedStrip — docs/3-components.md §4.4 (UX-C11).
+ */
+.suggested-strip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.suggested-strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.suggested-strip-track {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+}
+.suggested-strip-item {
+  flex-shrink: 0;
+  width: var(--space-9);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+}
+.suggested-strip-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  border: 1px solid var(--lun-line);
+}
+.suggested-strip-thumb img {
+  object-fit: cover;
+}
+.suggested-strip-name {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/*
+ * Home — docs/1-ux.md §4.1. Section rhythm uses --space-7 on mobile /
+ * --space-8 on desktop between blocks, per docs/2-ui.md §4.1.
+ */
+.home-section {
+  padding-inline: var(--space-4);
+  padding-block: var(--space-7);
+}
+@media (min-width: 768px) {
+  .home-section {
+    padding-inline: var(--space-6);
+    padding-block: var(--space-8);
+  }
+}
+.home-section-inner {
+  max-width: 1320px;
+  margin-inline: auto;
+}
+.home-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.home-section-title {
+  font: var(--type-display-m) var(--font-display);
+  font-weight: var(--type-display-m-weight);
+  letter-spacing: var(--type-display-m-tracking);
+  color: var(--lun-plum);
+}
+
+/* Hero — the configurator's promise, shown rather than described. */
+.home-hero {
+  padding-inline: var(--space-4);
+  padding-block: var(--space-7);
+  background: var(--lun-ground);
+}
+@media (min-width: 768px) {
+  .home-hero {
+    padding-inline: var(--space-6);
+    padding-block: var(--space-9);
+  }
+}
+.home-hero-inner {
+  max-width: 1320px;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+@media (min-width: 1024px) {
+  .home-hero-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-8);
+  }
+}
+.home-hero-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--lun-surface);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .home-hero-media {
+    flex: 1 1 55%;
+  }
+}
+.home-hero-media img {
+  object-fit: cover;
+}
+.home-hero-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+@media (min-width: 1024px) {
+  .home-hero-body {
+    flex: 1 1 45%;
+  }
+}
+.home-hero-headline {
+  font: var(--type-display-xl) var(--font-display);
+  font-weight: var(--type-display-xl-weight);
+  letter-spacing: var(--type-display-xl-tracking);
+  color: var(--lun-plum);
+}
+.home-hero-subhead {
+  font: var(--type-body-l) var(--font-body);
+  color: var(--lun-ink);
+  max-width: 68ch;
+}
+.home-hero-doors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+/* Trust strip — four facts answering the category's biggest doubts,
+   above the fold on mobile (docs/1-ux.md §4.1). */
+.home-trust-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  padding-inline: var(--space-4);
+  padding-block: var(--space-5);
+  border-block: 1px solid var(--lun-line);
+}
+@media (min-width: 768px) {
+  .home-trust-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-inline: var(--space-6);
+  }
+}
+.home-trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--lun-ink);
+}
+.home-trust-item-text {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+
+/* New arrivals grid. */
+.home-arrivals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+@media (min-width: 768px) {
+  .home-arrivals-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .home-arrivals-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Osariya feature — one saree, two drapes, a culturally distinctive
+   panel no competitor shows online. */
+.home-osariya-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+.home-osariya-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.home-osariya-frame img {
+  object-fit: cover;
+}
+.home-osariya-label {
+  display: block;
+  margin-top: var(--space-2);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+.home-osariya-body {
+  margin-top: var(--space-5);
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink-muted);
+  max-width: 68ch;
+}
+
+/* Proof — customer photo reviews. No fabricated reviews are ever rendered
+   here; until real, verified reviews exist (FR-46) this shows an honest
+   placeholder note instead. */
+.home-proof-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+  color: var(--lun-ink-muted);
+  font: var(--type-body) var(--font-body);
+  max-width: 68ch;
+}
+
+/*
+ * ConfiguratorBar — docs/3-components.md §4.5. Pinned to the viewport
+ * bottom on mobile, elev-1 and a 1px top hairline.
+ */
+.configurator-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--lun-surface);
+  border-top: 1px solid var(--lun-line);
+  box-shadow: var(--elev-1);
+}
+@media (max-width: 767px) {
+  .configurator-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+  }
+}
+.configurator-bar-price {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.configurator-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+} /* end @layer components */
