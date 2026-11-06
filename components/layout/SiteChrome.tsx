@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Header } from '@/components/layout/Header';
-import { Footer, type FooterLink } from '@/components/layout/Footer';
+import { Header, type HeaderProps } from '@/components/layout/Header';
+import { Footer, type FooterLink, type FooterProps } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 import { SlideOver } from '@/components/layout/SlideOver';
@@ -18,8 +18,11 @@ export interface SiteChromeProps {
   closeLabel: string;
   whatsappHref: string;
   whatsappLabel: string;
+  headerTopBar: HeaderProps['topBar'];
+  footerUsefulLinks: FooterLink[];
   footerSupportLinks: FooterLink[];
   footerPolicyLinks: FooterLink[];
+  footerLabels: FooterProps['labels'];
   registrationNumber: string;
   address: string;
   phone: string;
@@ -48,8 +51,11 @@ function SiteChromeInner({
   closeLabel,
   whatsappHref,
   whatsappLabel,
+  headerTopBar,
+  footerUsefulLinks,
   footerSupportLinks,
   footerPolicyLinks,
+  footerLabels,
   registrationNumber,
   address,
   phone,
@@ -73,9 +79,8 @@ function SiteChromeInner({
         cartHref="/cart"
         cartLabel={navLabels.cart}
         cartCount={itemCount}
-        whatsappHref={whatsappHref}
-        whatsappLabel={whatsappLabel}
         languageLabels={languageLabels}
+        topBar={headerTopBar}
       />
 
       {/* .site-content reserves space at the end of the scroll area for the
@@ -88,12 +93,16 @@ function SiteChromeInner({
         </main>
 
         <Footer
+          usefulLinks={footerUsefulLinks}
           supportLinks={footerSupportLinks}
           policyLinks={footerPolicyLinks}
           registrationNumber={registrationNumber}
           address={address}
           phone={phone}
+          whatsappHref={whatsappHref}
+          whatsappLabel={whatsappLabel}
           languageLabels={languageLabels}
+          labels={footerLabels}
         />
       </div>
 

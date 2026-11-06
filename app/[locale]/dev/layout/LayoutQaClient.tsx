@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { Header, type HeaderProps } from '@/components/layout/Header';
+import { Footer, type FooterProps } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 import { SlideOver } from '@/components/layout/SlideOver';
@@ -15,7 +15,9 @@ export interface LayoutQaClientProps {
   languageLabels: LanguageSelectorProps['labels'];
   navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'cart' | 'menu', string>;
   whatsappLabel: string;
-  footerLabels: Record<'support' | 'returns' | 'careGuide' | 'shipping' | 'privacy' | 'terms', string>;
+  headerTopBar: HeaderProps['topBar'];
+  footerLinkLabels: Record<'support' | 'returns' | 'careGuide' | 'shipping' | 'privacy' | 'terms', string>;
+  footerLabels: FooterProps['labels'];
   registrationNumber: string;
   address: string;
   phone: string;
@@ -28,6 +30,8 @@ export function LayoutQaClient({
   languageLabels,
   navLabels,
   whatsappLabel,
+  headerTopBar,
+  footerLinkLabels,
   footerLabels,
   registrationNumber,
   address,
@@ -52,9 +56,8 @@ export function LayoutQaClient({
             cartHref="/dev/cart"
             cartLabel={navLabels.cart}
             cartCount={2}
-            whatsappHref="https://wa.me/94000000000"
-            whatsappLabel={whatsappLabel}
             languageLabels={languageLabels}
+            topBar={headerTopBar}
           />
         </div>
       </section>
@@ -62,20 +65,30 @@ export function LayoutQaClient({
       <section className="flex flex-col gap-2">
         <h2 className="field-label">Footer</h2>
         <Footer
+          usefulLinks={[
+            { href: '/', label: navLabels.shop },
+            { href: '/', label: navLabels.designYourOwn },
+            { href: '/', label: navLabels.jacketMaterial },
+            { href: '/', label: navLabels.cart },
+            { href: '/', label: navLabels.support },
+          ]}
           supportLinks={[
-            { href: '/', label: footerLabels.support },
-            { href: '/', label: footerLabels.returns },
-            { href: '/', label: footerLabels.careGuide },
-            { href: '/', label: footerLabels.shipping },
+            { href: '/', label: footerLinkLabels.support },
+            { href: '/', label: footerLinkLabels.returns },
+            { href: '/', label: footerLinkLabels.careGuide },
+            { href: '/', label: footerLinkLabels.shipping },
           ]}
           policyLinks={[
-            { href: '/', label: footerLabels.privacy },
-            { href: '/', label: footerLabels.terms },
+            { href: '/', label: footerLinkLabels.privacy },
+            { href: '/', label: footerLinkLabels.terms },
           ]}
           registrationNumber={registrationNumber}
           address={address}
           phone={phone}
+          whatsappHref="https://wa.me/94000000000"
+          whatsappLabel={whatsappLabel}
           languageLabels={languageLabels}
+          labels={footerLabels}
         />
       </section>
 

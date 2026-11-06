@@ -36,6 +36,8 @@
   --lun-warning: #8a6516;
   --lun-danger: #9b2c2c;
   --lun-info: #3e2a56;
+  /* Partner / channel — WhatsApp brand green for the chat FAB only. */
+  --lun-whatsapp: #25d366;
 
   /* ---------------------------------------------------------------- */
   /* Type families                                                     */
@@ -123,6 +125,8 @@
   --motion-page: 320ms ease-out;
   --motion-spin-duration: 800ms;
   --motion-pulse-duration: 1500ms;
+  /* Home marquee loop — long, quiet scroll; paused under reduced-motion. */
+  --motion-marquee-duration: 40000ms;
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */

@@ -17,8 +17,10 @@ export default async function LayoutQaPage() {
   const tNav = await getTranslations('layout.nav');
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');
+  const tHeader = await getTranslations('layout.header');
   const tSlideover = await getTranslations('layout.slideover');
   const tAccordion = await getTranslations('layout.accordion');
+  const tPayment = await getTranslations('commerce.payment');
 
   return (
     <main className="flex flex-col gap-8 pb-24">
@@ -44,13 +46,38 @@ export default async function LayoutQaPage() {
             menu: tNav('menu'),
           }}
           whatsappLabel={tLayout('whatsapp')}
-          footerLabels={{
+          headerTopBar={{
+            promo: tHeader('promo'),
+            promoHref: '/shop',
+            promoCta: tHeader('promoCta'),
+            shipping: { href: '/support/shipping', label: tFooter('shipping') },
+            support: { href: '/support', label: tFooter('support') },
+          }}
+          footerLinkLabels={{
             support: tFooter('support'),
             returns: tFooter('returns'),
             careGuide: tFooter('careGuide'),
             shipping: tFooter('shipping'),
             privacy: tFooter('privacy'),
             terms: tFooter('terms'),
+          }}
+          footerLabels={{
+            usefulLinksHeading: tFooter('usefulLinksHeading'),
+            customerServiceHeading: tFooter('customerServiceHeading'),
+            newsletterHeading: tFooter('newsletterHeading'),
+            newsletterBody: tFooter('newsletterBody'),
+            newsletterEmailLabel: tFooter('newsletterEmailLabel'),
+            newsletterPlaceholder: tFooter('newsletterPlaceholder'),
+            newsletterSubscribe: tFooter('newsletterSubscribe'),
+            newsletterThanks: tFooter('newsletterThanks'),
+            newsletterDisclaimer: tFooter('newsletterDisclaimer'),
+            copyright: tFooter('copyright'),
+            backToTop: tFooter('backToTop'),
+            paymentsHeading: tFooter('paymentsHeading'),
+            paymentBank: tPayment('bankTransfer'),
+            paymentCod: tPayment('cod'),
+            paymentLankaQr: tPayment('lankaqr'),
+            paymentCard: tPayment('card'),
           }}
           registrationNumber="Business Reg. No. [placeholder — pending founder input]"
           address="[Address placeholder — pending founder input]"

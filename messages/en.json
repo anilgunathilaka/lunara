@@ -103,13 +103,29 @@
       "menu": "Menu"
     },
     "whatsapp": "Chat on WhatsApp",
+    "header": {
+      "promo": "Colour-accurate photography · 7-day returns · dispatched in 1 working day.",
+      "promoCta": "Shop now"
+    },
     "footer": {
       "support": "Support",
       "returns": "Returns",
       "careGuide": "Cotton care guide",
       "shipping": "Shipping",
       "privacy": "Privacy policy",
-      "terms": "Terms of service"
+      "terms": "Terms of service",
+      "usefulLinksHeading": "Useful Links",
+      "customerServiceHeading": "Customer Service",
+      "newsletterHeading": "Our Newsletter",
+      "newsletterBody": "Get updates on new pairings, jacket materials, and care tips.",
+      "newsletterEmailLabel": "Email address",
+      "newsletterPlaceholder": "Enter your email here",
+      "newsletterSubscribe": "Subscribe",
+      "newsletterThanks": "Thanks — we’ll be in touch when the list goes live.",
+      "newsletterDisclaimer": "By entering your email you accept the",
+      "copyright": "Copyright © Lunara Sarees {year}",
+      "backToTop": "Back to top",
+      "paymentsHeading": "Payment methods"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -181,11 +197,34 @@
     }
   },
   "home": {
+    "marquee": {
+      "label": "Store promises"
+    },
     "hero": {
+      "eyebrow": "Lunara Sarees",
       "headline": "See it before you wear it",
       "subhead": "Cotton sarees with unstitched jacket material — recolour any design, compare Plain and Super Cotton, and preview it draped either way before you buy.",
       "shopCurated": "Shop curated pairings",
       "designYourOwn": "Design your own"
+    },
+    "categories": {
+      "heading": "Shop by path",
+      "shop": {
+        "title": "Curated pairings",
+        "body": "Design, material, colour and jacket — chosen together."
+      },
+      "design": {
+        "title": "Design your own",
+        "body": "Four axes plus drape, rendered live on the model."
+      },
+      "jacket": {
+        "title": "Jacket material",
+        "body": "Order jacket fabric on its own — ships unstitched."
+      },
+      "occasion": {
+        "title": "By occasion",
+        "body": "Office, everyday, festive and temple pairings."
+      }
     },
     "trust": {
       "colourPromise": "Colour-accurate photography",
@@ -194,14 +233,29 @@
       "whatsapp": "Reach us on WhatsApp"
     },
     "newArrivals": {
-      "heading": "New arrivals"
+      "heading": "New arrivals",
+      "viewAll": "View all"
     },
     "osariya": {
       "heading": "One saree, two drapes",
-      "body": "Every saree can be draped the traditional way or as a Kandyan Osariya — same fabric, same price, same item shipped."
+      "body": "Every saree can be draped the traditional way or as a Kandyan Osariya — same fabric, same price, same item shipped.",
+      "cta": "Try both drapes"
+    },
+    "promos": {
+      "design": {
+        "title": "Design your own saree",
+        "body": "Choose design, material, colour, jacket and drape — price updates as you go.",
+        "cta": "Open the configurator"
+      },
+      "jacket": {
+        "title": "Jacket material alone",
+        "body": "Standalone jacket fabric when you already have the saree.",
+        "cta": "Browse jacket material"
+      }
     },
     "proof": {
       "heading": "From our customers",
+      "lede": "Named photo reviews from real buyers — never curated to remove criticism.",
       "placeholderNote": "Customer photo reviews will appear here once published.",
       "sampleReviewerLabel": "Reviewer name",
       "sampleDistrictLabel": "District",
