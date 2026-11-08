@@ -1,4 +1,5 @@
 import 'server-only';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
 import { cache } from 'react';
@@ -12,7 +13,7 @@ import { cache } from 'react';
  *
  *   - Cloudflare Worker: the connection comes from the Hyperdrive binding
  *     and a NEW client is created per request. Reusing a client across
- *     requests with Hyperdrive hangs the Worker (prisma/orm#28193).
+ *     requests with Hyperdrive hangs the Worker (prisma/orm issue 28193).
  *   - Local `next dev` / `next start`: DATABASE_URL, and one client per
  *     process so hot reloads don't exhaust Supabase pooler connections.
  *
@@ -30,12 +31,16 @@ function createClient(connectionString: string, perRequest: boolean): PrismaClie
 }
 
 /**
- * Hyperdrive connection string when running on the Worker, else undefined.
- * Wired up with the OpenNext adapter (getCloudflareContext().env.HYPERDRIVE)
- * in the Workers adapter step; until then, always the local path.
+ * The Worker's Cloudflare context, or undefined outside a Worker
+ * (`next dev`, `next start`, build-time prerendering).
  */
-function hyperdriveConnectionString(): string | undefined {
-  return undefined;
+function workerContext() {
+  if (process.env.NODE_ENV !== 'production') return undefined;
+  try {
+    return getCloudflareContext();
+  } catch {
+    return undefined;
+  }
 }
 
 const globalForPrisma = globalThis as unknown as { lunaraPrisma?: PrismaClient };
@@ -52,6 +57,13 @@ function localClient(): PrismaClient {
 }
 
 export const getPrisma = cache((): PrismaClient => {
-  const hyperdrive = hyperdriveConnectionString();
-  return hyperdrive ? createClient(hyperdrive, true) : localClient();
+  const cf = workerContext();
+  const hyperdrive = cf?.env.HYPERDRIVE?.connectionString;
+  if (!cf || !hyperdrive) return localClient();
+
+  // No explicit $disconnect: Next gives no "response finished" hook, and a
+  // disconnect scheduled early could cut off in-flight queries. maxUses: 1
+  // stops reuse, and the Workers runtime closes the request's sockets when
+  // the request ends (OpenNext's documented pattern).
+  return createClient(hyperdrive, true);
 });

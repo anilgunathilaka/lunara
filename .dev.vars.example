@@ -1,0 +1,8 @@
+# Copy to .dev.vars for `npm run preview` (OpenNext build in local workerd).
+# Never commit .dev.vars (see .gitignore). `next dev` does not use this file.
+
+# Load Next's development .env files inside the local Worker.
+NEXTJS_ENV=development
+
+BETTER_AUTH_SECRET="generate-a-long-random-string"
+RESEND_API_KEY=""

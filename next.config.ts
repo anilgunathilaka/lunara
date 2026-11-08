@@ -25,6 +25,13 @@ const nextConfig: NextConfig = {
     remotePatterns,
   },
   typedRoutes: true,
+  // Prisma ships workerd-specific builds; keeping these external lets the
+  // OpenNext build pick them for the Worker (opennext.js.org/cloudflare/howtos/db).
+  serverExternalPackages: ['@prisma/client', '.prisma/client'],
 };
 
+// Deliberately NOT calling initOpenNextCloudflareForDev(): `next dev` needs
+// no Cloudflare bindings (lib/prisma.ts uses DATABASE_URL and lib/storage
+// uses the local disk in development), so local dev stays plain Next.js.
+// Bindings are exercised with `npm run preview` (local workerd).
 export default withNextIntl(nextConfig);

@@ -13,8 +13,12 @@ dist/
 .env
 .env*.local
 
-# vercel
-.vercel
+# cloudflare workers (OpenNext build output, wrangler state, local secrets)
+.open-next/
+.wrangler/
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # prisma
 prisma/dev.db
