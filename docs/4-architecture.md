@@ -105,6 +105,16 @@ Table of Contents
 
 Moving to Workers Paid ($5/month) lifts the CPU and request caps without code changes; it is the fallback if measured CPU does not fit.
 
+2.4 Deployment
+
+| Rule | Detail |
+| --- | --- |
+| CI is the deploy path | GitHub Actions (`.github/workflows/ci.yml`). Every pull request and push: install, lint (ESLint + token lint), Worker build (which includes `next build` and its type check). Push to `main`: the same, then deploy to the `lunara` Worker. Any branch can be deployed manually ("Run workflow"). |
+| No `.env` in a Worker build | OpenNext copies any `.env*` file in the project root into the Worker bundle. `npm run build:worker` refuses to build if one exists (`.env.example` excepted) and fails if the built bundle contains any env value. CI checkouts never contain `.env`, so a developer machine deploys only by exception, from a clean checkout. |
+| Where configuration lives | Public values: `vars` in `wrangler.jsonc`. Secrets (`BETTER_AUTH_SECRET`, `RESEND_API_KEY`): Worker secrets via `wrangler secret put`, set once and kept across deploys. Database credentials: the Hyperdrive config only. CI holds just `CLOUDFLARE_API_TOKEN` (secret) and `CLOUDFLARE_ACCOUNT_ID` (variable). |
+| Migrations are not deployed | CI never runs `prisma migrate`. Schema changes are applied deliberately from a developer machine (`DIRECT_URL`), before the code that needs them is merged. |
+| Cost | Free: GitHub Actions minutes on the repo's plan, Workers Free for the deploy itself. |
+
 3. Data Model
 
 The model separates materials from colourways from pairings. This separation is what allows a curated listing and a customer-configured design to draw from the same stock without divergence.
