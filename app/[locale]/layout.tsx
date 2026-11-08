@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { fontVariableClassName } from '@/lib/fonts';
 import { SiteChrome } from '@/components/layout/SiteChrome';
 import '../globals.css';
+import { whatsappLink } from '@/lib/commerce/business';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -28,6 +29,10 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  // Static rendering: tell next-intl the locale from the route param, so it
+  // never has to read request headers (which would force dynamic rendering
+  // and cost Worker CPU on every view — docs/4-architecture.md §2.3).
+  setRequestLocale(locale);
 
   const messages = await getMessages();
 
@@ -58,13 +63,15 @@ export default async function LocaleLayout({
               menu: tNav('menu'),
             }}
             closeLabel={tSlideover('close')}
-            whatsappHref="https://wa.me/94000000000"
+            whatsappHref={whatsappLink()}
             whatsappLabel={tLayout('whatsapp')}
             footerSupportLinks={[
               { href: '/support', label: tFooter('support') },
               { href: '/support/returns', label: tFooter('returns') },
               { href: '/support/care-guide', label: tFooter('careGuide') },
               { href: '/support/shipping', label: tFooter('shipping') },
+              // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
+              { href: '/account', label: tFooter('myOrders') },
             ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },

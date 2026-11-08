@@ -1,12 +1,15 @@
 import { MessageCircle } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Divider } from '@/components/primitives/Divider';
 import { Accordion } from '@/components/layout/Accordion';
 import { Icon } from '@/components/primitives/Icon';
 import { Link } from '@/i18n/navigation';
+import { whatsappLink } from '@/lib/commerce/business';
 
-export default async function SupportPage() {
+export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('support');
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');
@@ -55,7 +58,7 @@ export default async function SupportPage() {
           <h2 className="checkout-step-title">{t('contactHeading')}</h2>
           <p className="field-message">{t('contactBody')}</p>
           <a
-            href="https://wa.me/94000000000"
+            href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="btn focus-ring btn-primary btn-md"

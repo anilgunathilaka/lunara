@@ -55,7 +55,7 @@
     },
     "payment": {
       "cod": "Cash on delivery",
-      "codDetail": "+LKR 350 COD fee — waived when you pay online",
+      "codDetail": "+LKR {fee} COD fee — waived when you pay online",
       "bankTransfer": "Bank transfer",
       "bankTransferDetail": "Pay directly to our account, no extra fee",
       "lankaqr": "LankaQR",
@@ -66,7 +66,10 @@
     "delivery": {
       "estimateRange": "3–5 working days",
       "dispatchCutoff": "Order before 2pm for same-day dispatch",
-      "feeLabel": "Delivery fee"
+      "feeLabel": "Delivery fee",
+      "estimateDays": "{min}–{max} working days",
+      "chooseDistrict": "Choose your district to see the exact fee and delivery time.",
+      "feeRange": "LKR {min}–{max}, depending on your district"
     },
     "checkout": {
       "stepIndicator": "Step {current} of {total}",
@@ -87,10 +90,72 @@
       "eventDateNote": "Advisory only — this helps us pack in time but isn't a guaranteed delivery date.",
       "confirmedHeading": "Order confirmed",
       "confirmedOrderNumberLabel": "Order number",
-      "confirmedBody": "We've sent your confirmation by SMS and WhatsApp, with your order number and delivery estimate.",
       "confirmedUnstitchedReminder": "Remember: your jacket material ships unstitched. Your printed care and returns cards will arrive in the parcel.",
       "backHome": "Back to home",
-      "continueShopping": "Keep shopping"
+      "continueShopping": "Keep shopping",
+      "emailLabel": "Email (optional)",
+      "phoneHint": "Sri Lankan mobile, e.g. 077 123 4567",
+      "phoneInvalid": "Enter a Sri Lankan mobile number, e.g. 077 123 4567.",
+      "networkError": "That didn't go through. Your details are saved — try again, or send this to us on WhatsApp.",
+      "retry": "Try again",
+      "sendOnWhatsApp": "Send on WhatsApp",
+      "whatsappOrderIntro": "Hello Lunara, I'd like to place this order:",
+      "invalidDetails": "Some details need another look. Check them and try again.",
+      "fixCart": "Some items need your attention before you continue."
+    },
+    "quote": {
+      "priceChanged": "Price updated — was {old}",
+      "unavailable": "No longer available. Remove it to continue.",
+      "insufficient": "Only {count} left. Lower the quantity to continue.",
+      "totalChanged": "Something changed since you last looked — the updated items are marked. Check the new total, then place your order.",
+      "loading": "Checking prices and stock…",
+      "failed": "We couldn't check prices just now."
+    },
+    "confirmed": {
+      "pendingHeading": "Order received — awaiting payment",
+      "body": "We'll confirm your order on WhatsApp or by phone at {phone}. Keep this page — it's your order record.",
+      "bookmark": "Bookmark this page to check your order later.",
+      "statusLabel": "Status",
+      "paymentLabel": "Payment",
+      "deliverToLabel": "Delivering to",
+      "estimateLabel": "Estimated delivery",
+      "itemsHeading": "Items",
+      "quantity": "Qty {count}",
+      "codNote": "Please have {total} ready for the courier.",
+      "bankHeading": "Bank transfer details",
+      "bankBody": "Transfer {total} and use {number} as the reference. We confirm your order as soon as the payment arrives.",
+      "bankName": "Bank",
+      "branch": "Branch",
+      "accountName": "Account name",
+      "accountNumber": "Account number",
+      "bankPlaceholderWarning": "Our bank details are not published yet. Please don't transfer money — we'll contact you with the details.",
+      "notFound": "We couldn't find that order. Check the link from your confirmation, or contact us on WhatsApp.",
+      "contactWhatsApp": "Message us on WhatsApp"
+    },
+    "orderStatus": {
+      "placed": "Placed",
+      "payment_pending": "Awaiting payment",
+      "confirmed": "Confirmed",
+      "packed": "Packed",
+      "dispatched": "Dispatched",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "return_requested": "Return requested",
+      "refunded": "Refunded",
+      "exchanged": "Exchanged"
+    },
+    "tracking": {
+      "heading": "Order progress",
+      "courierLabel": "Courier and tracking",
+      "cancelled": "This order was cancelled on {date}.",
+      "steps": {
+        "placed": "Order placed",
+        "placedAwaitingPayment": "Order placed — awaiting payment",
+        "confirmed": "Confirmed",
+        "packed": "Packed",
+        "dispatched": "With the courier",
+        "delivered": "Delivered"
+      }
     }
   },
   "layout": {
@@ -109,7 +174,8 @@
       "careGuide": "Cotton care guide",
       "shipping": "Shipping",
       "privacy": "Privacy policy",
-      "terms": "Terms of service"
+      "terms": "Terms of service",
+      "myOrders": "My orders"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -277,5 +343,190 @@
     "privacyTitle": "Privacy policy",
     "termsTitle": "Terms of service",
     "pending": "This page is pending final legal review and will be published before launch. For questions in the meantime, reach us on WhatsApp."
+  },
+  "auth": {
+    "signInEmail": {
+      "subject": "Your Lunara sign-in code",
+      "body": "Your sign-in code is {code}. It expires in {minutes} minutes.",
+      "ignore": "If you didn't ask for this code, you can ignore this email. Never share this code with anyone."
+    },
+    "signIn": {
+      "title": "Sign in",
+      "intro": "We'll email you a 6-digit code. No password needed.",
+      "emailLabel": "Email",
+      "sendCode": "Send code",
+      "codeSent": "We sent a code to {email}. It expires in 10 minutes.",
+      "codeLabel": "6-digit code",
+      "verify": "Sign in",
+      "useDifferentEmail": "Use a different email",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidCode": "That code didn't work. Check it, or request a new one.",
+      "sendFailed": "We couldn't send the code. Try again in a moment.",
+      "claimFailed": "You're signed in, but we couldn't add this order to your account. Contact us on WhatsApp and we'll sort it out."
+    }
+  },
+  "districts": {
+    "colombo": "Colombo",
+    "gampaha": "Gampaha",
+    "kalutara": "Kalutara",
+    "kandy": "Kandy",
+    "matale": "Matale",
+    "nuwara-eliya": "Nuwara Eliya",
+    "galle": "Galle",
+    "matara": "Matara",
+    "hambantota": "Hambantota",
+    "kurunegala": "Kurunegala",
+    "puttalam": "Puttalam",
+    "anuradhapura": "Anuradhapura",
+    "polonnaruwa": "Polonnaruwa",
+    "badulla": "Badulla",
+    "monaragala": "Monaragala",
+    "ratnapura": "Ratnapura",
+    "kegalle": "Kegalle",
+    "jaffna": "Jaffna",
+    "kilinochchi": "Kilinochchi",
+    "mannar": "Mannar",
+    "vavuniya": "Vavuniya",
+    "mullaitivu": "Mullaitivu",
+    "batticaloa": "Batticaloa",
+    "ampara": "Ampara",
+    "trincomalee": "Trincomalee"
+  },
+  "ops": {
+    "title": "Operations",
+    "signedInAs": "Signed in as {email}",
+    "signOut": "Sign out",
+    "all": "All",
+    "noOrders": "No orders here yet.",
+    "saved": "Saved.",
+    "pricesNote": "Changes apply on the next page load. Customers with the item in their cart see the change marked beside it.",
+    "nav": {
+      "orders": "Orders",
+      "payments": "Bank transfers",
+      "stock": "Stock",
+      "prices": "Prices",
+      "messages": "Messages"
+    },
+    "columns": {
+      "number": "Order",
+      "date": "Placed",
+      "customer": "Customer",
+      "phone": "Phone",
+      "district": "District",
+      "total": "Total",
+      "payment": "Payment",
+      "status": "Status",
+      "waiting": "Waiting",
+      "sku": "SKU",
+      "item": "Item",
+      "inStock": "In stock",
+      "lowAt": "Low at",
+      "design": "Design",
+      "jacketMaterial": "Jacket material"
+    },
+    "order": {
+      "back": "All orders",
+      "address": "Address",
+      "email": "Email",
+      "eventDate": "Needed by (advisory)",
+      "acknowledged": "Unstitched acknowledged",
+      "shipment": "Shipment",
+      "lines": "Items",
+      "history": "History",
+      "by": "by {actor}",
+      "nextStep": "Next step",
+      "noNextStep": "No further steps.",
+      "note": "Note (optional)",
+      "courier": "Courier",
+      "tracking": "Tracking number",
+      "drape": "Drape: {drape}"
+    },
+    "transition": {
+      "confirmed": "Confirm order",
+      "confirmPayment": "Payment received — confirm",
+      "packed": "Mark packed",
+      "dispatched": "Mark dispatched",
+      "delivered": "Mark delivered",
+      "cancelled": "Cancel order (returns stock)",
+      "cancelledLate": "Cancel order",
+      "return_requested": "Record return request",
+      "refunded": "Mark refunded",
+      "exchanged": "Mark exchanged"
+    },
+    "stock": {
+      "adjust": "Adjust by",
+      "adjustHint": "e.g. 10 received, -1 damaged",
+      "reason": "Reason",
+      "save": "Save"
+    },
+    "prices": {
+      "matrixHeading": "Saree prices (design × material)",
+      "jacketHeading": "Jacket material prices",
+      "pairingAddOn": "Add-on when paired",
+      "standalone": "Standalone price"
+    },
+    "error": {
+      "invalid": "That wasn't valid. Check the values and try again.",
+      "conflict": "Someone else changed this first. The page now shows the latest.",
+      "negative": "Stock can't go below zero.",
+      "tracking": "Courier and tracking number are required to dispatch."
+    },
+    "messages": {
+      "intro": "WhatsApp and SMS messages to send by hand until those services are connected. Open, send, then mark as sent.",
+      "none": "Nothing to send right now.",
+      "openWhatsApp": "Open in WhatsApp",
+      "openSms": "Open in SMS",
+      "markSent": "Mark as sent",
+      "failedHeading": "Emails that failed",
+      "channel": "Channel",
+      "message": "Message",
+      "notificationsHeading": "Messages to the customer"
+    },
+    "notificationStatus": {
+      "pending": "Sending",
+      "manual": "To send by hand",
+      "sent": "Sent",
+      "failed": "Failed",
+      "cancelled": "Not needed"
+    }
+  },
+  "notifications": {
+    "placedCodSubject": "Order {number} placed",
+    "placedCod": "Lunara: thank you, {name}! Order {number} is placed — {total}, cash on delivery. Delivery takes {estimate} after dispatch. Your jacket material ships unstitched. Your order: {link}",
+    "placedBankSubject": "Order {number} — payment details",
+    "placedBank": "Lunara: thank you, {name}! Order {number} is placed — {total}. Please transfer {total} using the reference {number} to: {bank}. We confirm your order as soon as the payment arrives. Your jacket material ships unstitched. Your order: {link}",
+    "placedBankDetailsToFollow": "Lunara: thank you, {name}! Order {number} is placed — {total}. We will send you our bank details here shortly; please do not transfer money before then. Your jacket material ships unstitched. Your order: {link}",
+    "confirmedSubject": "Order {number} confirmed",
+    "confirmed": "Lunara: order {number} is confirmed. We'll let you know when it's packed.",
+    "packedSubject": "Order {number} packed",
+    "packed": "Lunara: order {number} is packed and will be dispatched shortly.",
+    "dispatchedSubject": "Order {number} is on its way",
+    "dispatched": "Lunara: order {number} is on its way with {courier}, tracking number {tracking}. Expect it in {estimate}.",
+    "dispatchedCod": "Lunara: order {number} is on its way with {courier}, tracking number {tracking}. Expect it in {estimate}. Please have {total} ready for the courier.",
+    "cancelledSubject": "Order {number} cancelled",
+    "cancelled": "Lunara: order {number} has been cancelled. If you didn't ask for this, reply here and we'll help.",
+    "deliveredDay1": "Lunara: we hope you love your saree! Cotton care tips: {careLink}. Returns policy: {returnsLink}. Your jacket material is unstitched — take it to your tailor to have it made.",
+    "deliveredDay3": "Lunara: how is your order {number}? If anything isn't right, reply here — we're happy to help.",
+    "deliveredDay14Subject": "Share a photo of your Lunara saree?",
+    "deliveredDay14": "Lunara: would you share a photo of your saree? Real photos help other customers trust the colour. Just reply here with a photo — thank you!",
+    "deliveredDay45Subject": "A new jacket piece for your saree?",
+    "deliveredDay45": "Lunara: new arrivals are in, and our jacket materials can be bought on their own to refresh a saree you already love: {jacketLink}"
+  },
+  "account": {
+    "ordersHeading": "My orders",
+    "orderHeading": "Order {number}",
+    "signedInAs": "Signed in as {email}",
+    "noOrders": "You don't have any orders yet. Orders placed with this email appear here.",
+    "startShopping": "Browse sarees",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "signOut": "Sign out",
+    "saveOrder": {
+      "heading": "Keep track of this order",
+      "body": "Optional: save this order to an account to follow its delivery any time. We'll email you a 6-digit code — no password.",
+      "signedInBody": "You're signed in as {email}. Add this order to your account to follow its delivery.",
+      "addToAccount": "Add to my account",
+      "viewInAccount": "View in My orders",
+      "failed": "We couldn't add this order to your account. Contact us on WhatsApp and we'll sort it out."
+    }
   }
 }

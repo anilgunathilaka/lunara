@@ -1,6 +1,7 @@
 import { ArrowRight, ShoppingCart } from 'lucide-react';
 import { Button, type ButtonVariant } from '@/components/primitives/Button';
 import { Icon } from '@/components/primitives/Icon';
+import { setRequestLocale } from 'next-intl/server';
 
 /**
  * Internal QA scratch page for the Button primitive (docs/3-components.md
@@ -10,7 +11,9 @@ import { Icon } from '@/components/primitives/Icon';
 
 const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'tertiary', 'danger'];
 
-export default function ButtonQaPage() {
+export default async function ButtonQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="mx-auto flex max-w-[960px] flex-col gap-8 p-6">
       <h1 className="text-heading text-ink" style={{ fontWeight: 'var(--type-heading-weight)' }}>

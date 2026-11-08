@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 
 /**
@@ -7,7 +7,9 @@ import { SectionMarker } from '@/components/brand/SectionMarker';
  * only approved translations are used). This page states that honestly
  * rather than fabricating legal copy.
  */
-export default async function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('policies');
 
   return (

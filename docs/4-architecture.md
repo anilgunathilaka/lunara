@@ -78,10 +78,43 @@ Table of Contents
 | Frontend | Next.js with React, server-rendered catalogue, client-side configurator | SSR gives fast first paint and SEO on catalogue pages — critical for the high-intent local search terms identified in the market research. The configurator is inherently interactive and runs client-side. |
 | Styling | CSS custom properties with a utility layer | Tokens from Document 2 map directly to custom properties, making the lint rule against raw values enforceable. |
 | Commerce | Headless commerce platform or a bespoke Node service | Either is viable. The decision hinges on whether COD, LankaQR and bank-transfer reconciliation can be modelled cleanly — see Section 9. |
-| Database | PostgreSQL | Relational integrity matters here. Stock consistency across two purchase paths is a transactional problem, not a document-store problem. |
-| Media | CDN with on-the-fly image transformation | 25+ materials × colourways × 6 assets is a large library that must be served at multiple sizes with colour management intact. |
+| Hosting | Cloudflare Workers via the OpenNext adapter (`@opennextjs/cloudflare`), deployed with Wrangler | Runs the full Next.js server (middleware, Route Handlers, SSR) at the edge on the Workers Free plan. OpenNext keeps Next's own `next build` / `next dev`, so local development is unchanged. Cloudflare Pages (static only) cannot serve this app. See §2.3 for plan limits. |
+| Database | PostgreSQL, hosted on Supabase, accessed only through Prisma (driver adapter `@prisma/adapter-pg`) via Cloudflare Hyperdrive in production | Relational integrity matters here. Stock consistency across two purchase paths is a transactional problem, not a document-store problem. Supabase is used as managed Postgres only — its Auth, Storage and client-side data APIs are not used (see §2.2). |
+| Auth | Better Auth (Prisma adapter, same database), passwordless sign-in (email one-time code or magic link) | Optional account layer offered after purchase, never before (PRD FR-33), pre-filled from the order email. Session and user tables live in the same Postgres as orders, so no second identity store is kept in sync. Passwordless because password hashing (scrypt, ~40–170 ms CPU) cannot fit the Workers Free plan's 10 ms CPU budget, and weakening the hash is not acceptable. |
+| Media | Cloudflare R2 object storage behind a CDN with on-the-fly image transformation | 25+ materials × colourways × 6 assets is a large library that must be served at multiple sizes with colour management intact. R2 has no egress charge, which matters for an image-heavy catalogue and frame sequences. Local filesystem storage substitutes in development. |
 | Rendering | Server-side compositor with an aggressive cache | See Section 5. Client-side compositing is rejected on payload grounds for the target device. |
 | Messaging | WhatsApp Business API plus a local SMS gateway | Both are required by Document 1. Email is supplementary and never the sole channel. |
+
+2.2 Provider Constraints
+
+| Provider | Constraint |
+| --- | --- |
+| Supabase | In production the Worker reaches Postgres only through Hyperdrive (below), never with a raw connection string. Locally, the app uses `DATABASE_URL` (transaction pooler, port 6543); migrations use `DIRECT_URL` (session pooler, port 5432 — the direct host is IPv6-only and unreachable from many local networks). Migrations are run from a developer machine or CI, never from the Worker. Supabase Auth, Storage, Realtime and the auto-generated REST/GraphQL Data API stay disabled or unused — all data access goes through server code and Prisma, so stock and price keep one source of truth. |
+| Cloudflare Hyperdrive | Config `lunara-db-direct` points at Supabase's direct host (Cloudflare's recommendation; Hyperdrive does its own pooling, so pooled Supabase URLs would double-pool). Query caching is DISABLED: stock and price must never be served from a stale cache. The database password lives in the Hyperdrive config, not in the Worker. Prisma clients are created per request on the Worker (reusing one across requests with Hyperdrive hangs the Worker). |
+| Cloudflare R2 | On the Worker, accessed through an R2 binding (no API keys in the Worker). The S3-compatible API with scoped keys remains available for local scripts. Server code only; credentials never reach the client. Originals are stored byte-for-byte (no processing on upload), so the embedded colour profile is preserved at rest. Any delivery-time transform must preserve that profile (§4) — verified by the publication-gate check, not assumed from provider defaults. |
+| Local dev | `next dev` as before. With no R2 binding or credentials, storage writes to `.blob-storage/` on disk (git-ignored). Same interface as R2, so no calling code branches on environment. |
+
+2.3 Hosting Constraints (Workers Free plan)
+
+| Limit | Value | Design consequence |
+| --- | --- | --- |
+| CPU per request | 10 ms | Policy, support and other content pages are prerendered and served as static assets — no Worker CPU. Catalogue pages render per request because price and stock must be live (§3.3), so each loads its data in one query. Worker requests are kept light; anything CPU-heavy (password hashing, image processing) does not run on the Worker. Measured: a warm Hyperdrive query costs ~3–4 ms CPU. |
+| Requests | 100,000 / day (static assets excluded) | Rate-limit `/api/*` at the edge; abuse is an availability risk, not just a cost one. |
+| Hyperdrive queries | 100,000 / day | Pages must not query the database when a prerendered page will do. |
+| Database round trip | ~300 ms (Supabase region: Tokyo) | Prerender wherever possible; dynamic reads are reserved for stock checks, cart, checkout and accounts. |
+
+Moving to Workers Paid ($5/month) lifts the CPU and request caps without code changes; it is the fallback if measured CPU does not fit.
+
+2.4 Deployment
+
+| Rule | Detail |
+| --- | --- |
+| CI is the deploy path | GitHub Actions (`.github/workflows/ci.yml`). Every pull request and push: install, lint (ESLint + token lint), Worker build (which includes `next build` and its type check). Push to `main`: the same, then deploy to the `lunara` Worker. Any branch can be deployed manually ("Run workflow"). |
+| No `.env` in a Worker build | OpenNext copies any `.env*` file in the project root into the Worker bundle. `npm run build:worker` refuses to build if one exists (`.env.example` excepted) and fails if the built bundle contains any env value. CI checkouts never contain `.env`, so a developer machine deploys only by exception, from a clean checkout. |
+| Domain | `lunarasarees.com` (Cloudflare zone) is the public origin, attached to the Worker as a Custom Domain in `wrangler.jsonc`; `www` is attached and redirected to the apex. `BETTER_AUTH_URL` names it, so sign-in, email links and message links all use it. The `workers.dev` address stays reachable as a preview and is sent `X-Robots-Tag: noindex`. Email is sent from `hello@lunarasarees.com`, verified in Resend. |
+| Where configuration lives | Public values: `vars` in `wrangler.jsonc`. Secrets (`BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`): Worker secrets via `wrangler secret put`, set once and kept across deploys. Database credentials: the Hyperdrive config only. CI holds just `CLOUDFLARE_API_TOKEN` (secret) and `CLOUDFLARE_ACCOUNT_ID` (variable). |
+| Migrations are not deployed | CI never runs `prisma migrate`. Schema changes are applied deliberately from a developer machine (`DIRECT_URL`), before the code that needs them is merged. |
+| Cost | Free: GitHub Actions minutes on the repo's plan, Workers Free for the deploy itself. |
 
 3. Data Model
 
@@ -196,6 +229,60 @@ share_token · created_at
 | Configured designs survive stock loss | If a saved design's colourway sells out, the design record persists and renders, with the unavailable element flagged and the nearest alternative suggested on the same axis. |
 | Stock is held at colourway level | A design in Super Cotton in emerald is a distinct stock line from the same design in Plain Cotton in emerald. Stock therefore keys on the colourway SKU, which already encodes design and material. |
 | Consistency | Stock decrements are transactional. Concurrent orders on the last unit resolve deterministically, never optimistically. |
+
+3.3 Implementation Rules (Prisma schema)
+
+| Rule | Detail |
+| --- | --- |
+| Money | Integer LKR (whole rupees), never floating point. |
+| Jacket pricing (PRD Q4/Q5) | JACKET_MATERIAL carries two prices: `pairing_add_on` (added to the matrix price whenever that jacket material is paired with a saree; may be 0) and `standalone_price` (the standalone line). Price is per jacket material, not per colourway: colour never affects price (§3.1). |
+| Every colourway is priced | SAREE_COLOURWAY references PRICE_MATRIX on (design_id, material_id) by foreign key, so a colourway cannot exist for a combination that has no price. |
+| One price function | `lib/pricing/resolve.ts` is the only code that turns matrix rows and add-ons into a customer price. Catalogue pages, the configurator and (later) checkout all call it on the server. The client receives prices; it never derives them. |
+| Stock state is derived | STOCK_ITEM stores `quantity` and `threshold` only. `out` when quantity is 0, `low` when quantity ≤ threshold, otherwise `in`. Computed in `lib/stock/state.ts`; never stored, so it can never disagree with quantity. |
+| Curated listing stock | A curated listing is available only if both its saree colourway and its jacket colourway are. Its state is the worse of the two; its "N left" count is the lower quantity. |
+| Live reads | Catalogue pages (home arrivals, shop, product, jacket pages, configurator) read price and stock from Postgres on every request — they are not prerendered, so a price or stock change is visible on the next page load. Each page loads its data in a single query (Prisma `relationJoins`) to keep one database round trip per page. |
+| Seed data | `prisma/seed.ts` loads the placeholder catalogue from `content/catalogue/seed-catalogue.ts`. It is idempotent (upserts) and is run deliberately, like a migration — never by CI or the Worker. |
+
+3.4 Orders (Phase 1 checkout)
+
+ORDER: number (`LUN-` + 6 characters, unambiguous alphabet) · status (§7.2) · payment_method · customer name, phone, optional email · address · district · optional advisory event date · `unstitched_acknowledged_at` (NOT NULL — an order cannot exist without the acknowledgement) · subtotal, delivery_fee, cod_fee, total (whole LKR, frozen at placement) · delivery estimate range · locale · hashed guest access token.
+ORDER_LINE: kind (`listing` | `configured` | `jacket`) · the ids it was resolved from · the SKUs it consumed · a snapshot of the names shown to the customer · unit_price (frozen) · quantity · drape (configured lines only; rendering-only, §3.1).
+ORDER_EVENT: one row per status change, with the actor — the order's history and the source for tracking and notifications.
+
+| Rule | Detail |
+| --- | --- |
+| The server is the only authority | The client sends only references (listing id, jacket colourway id, or design + material + colour + jacket colourway) and quantities. Every price, fee and SKU is resolved on the server at quote time and again at placement. |
+| Price changes are attributed, never silent | Placement carries the total the customer last saw. If the server total differs, the order is NOT placed: the client receives the new quote with each changed line marked (old → new price) and the customer confirms again. |
+| Stock is taken at placement | Inside the order transaction, each SKU is decremented with a conditional update (`quantity >= n`); if any SKU is short the whole order rolls back and the affected lines are reported. Deterministic, never optimistic (§3.2). Reservation at add-to-cart (§3.2) follows when the cart moves server-side; until then the cart lives on the device. |
+| Configured lines need a real stock line | A configured design is orderable only when its design + material + colour resolves to a SAREE_COLOURWAY. Otherwise the line is reported unavailable. |
+| Guest access | The confirmation and tracking pages are reached with the order number plus a random token from the confirmation link; only the token's SHA-256 is stored. |
+| Limits | At most 10 lines and 5 of any line per order, so a single request cannot drain stock. Edge rate limiting (§2.3) is the second layer. |
+
+3.5 Operations Panel (`/[locale]/ops`)
+
+| Rule | Detail |
+| --- | --- |
+| Who | Staff sign in with the same passwordless email code as customers. Access requires an active STAFF_MEMBER row for the signed-in email. Staff emails live only in the database (added with `npm run staff:add`), never in the repository. Every ops page AND every ops action checks this on the server; hiding a link is not access control. |
+| Orders | List by status, newest first; detail with lines, history and the allowed next steps only (transition table in §7.2). Dispatch requires courier and tracking number. Every transition writes an ORDER_EVENT with the staff email as actor. |
+| Bank transfers | The `payment_pending` queue with amount, reference (order number) and age; "payment received" confirms the order. Matching against the bank statement is manual in Phase 1. |
+| Cancellation | Cancelling before dispatch returns the order's units to stock in the same transaction. Returned goods are inspected first, so refunds and exchanges never restock automatically — staff adjust stock explicitly. |
+| Stock | Adjust by a signed amount with a reason (atomic; can never go below zero) and set the low-stock threshold. Never "overwrite the count", which would silently undo an order placed meanwhile. |
+| Prices | Edit PRICE_MATRIX cells and each jacket material's pairing add-on and standalone price. Takes effect on the next page load; customers with the item in their cart see the change attributed inline (§3.4). |
+| Audit | Stock and price changes write an AUDIT_LOG row (actor, entity, before, after). |
+| Not indexed | `noindex` on every ops page. |
+
+3.6 Customer Accounts and Tracking (`/[locale]/account`)
+
+| Rule | Detail |
+| --- | --- |
+| Optional, after purchase | Guest checkout stays the only required path (PRD FR-33). The account is offered on the order page once the order exists, with the order's email pre-filled; sign-in is the same passwordless 6-digit code. A "My orders" link sits in the footer, not the five-item header. |
+| Which orders an account sees | Orders linked to it (`order.userId`), plus orders nobody has linked that carry the account's verified email. Once an order is linked to one account it never appears in another. |
+| Linking | Orders placed while signed in are linked at placement. A guest order is linked by "claiming" it: the claim must present the order's access token, the same proof that opens the guest order page, and only an unlinked order can be claimed. |
+| Tracking | Progress (placed → confirmed → packed → with the courier → delivered) is derived from ORDER_EVENT, never stored twice. Courier and tracking number show once dispatched. The guest order page and the account show the same record from one component, so they cannot disagree. |
+| Privacy | Account pages are `noindex` and dynamic. Someone else's order number returns 404, the same as one that doesn't exist. |
+| Later | Saved designs (with the configurator on real data) and saved addresses. |
+
+Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
 
@@ -364,6 +451,16 @@ Templates exist in all three languages. Language is selected from the customer's
 
 Delivery failures retry with backoff and are logged. A customer who receives no notification is a support ticket and a trust failure.
 
+Implementation (`lib/notifications/`):
+
+| Rule | Detail |
+| --- | --- |
+| Transactional outbox | NOTIFICATION rows are written in the SAME transaction as the order change that causes them, with the message already rendered in the order's language. An order can never change state without its messages being recorded, and a failed send never rolls back an order. |
+| Routing | placed → WhatsApp + SMS (+ email if given); confirmed, packed → WhatsApp (+ email); dispatched → WhatsApp + SMS (+ email); cancelled → WhatsApp + SMS (+ email); delivered → follow-ups due at d+1 (WhatsApp), d+3 (WhatsApp), d+14 (WhatsApp + email), d+45 (email). Bank-transfer orders' placed message carries the transfer instructions (or, while the bank details are placeholders, says they will follow). Out-for-delivery waits for courier integration. |
+| Providers | Email: Resend, sent automatically. WhatsApp Business API and SMS: no provider yet, so those rows are `manual` — the ops "Messages" queue shows each due message with one-tap WhatsApp / SMS links pre-filled with the text, and staff mark it sent. Adding a provider later flips those channels to automatic without changing the outbox. |
+| Delivery and retry | After commit the Worker attempts due automatic rows at once (`waitUntil`). A Cron Trigger (every 10 minutes) calls `/api/internal/notifications` with `CRON_SECRET` to send anything due or failed. Retries back off exponentially (2, 4, 8, 16 minutes); after 5 failed attempts a row is `failed` and shown in ops. |
+| Links | The placed message includes the customer's private confirmation link (order number + token, §3.4). Later messages reference the order number. |
+
 7. Commerce Logic
 
 7.1 Pricing
@@ -408,6 +505,18 @@ refunded         exchanged
 | dispatched | Courier handover | SMS + WhatsApp with tracking |
 | delivered | Courier confirmation | Triggers the d+1 sequence |
 | return_requested | Customer initiates | WhatsApp with collection detail |
+
+Allowed transitions (enforced in `lib/ops/transitions.ts`; anything else is refused):
+
+| From | To |
+| --- | --- |
+| placed | confirmed, cancelled |
+| payment_pending | confirmed, cancelled |
+| confirmed | packed, cancelled |
+| packed | dispatched, cancelled |
+| dispatched | delivered |
+| delivered | return_requested |
+| return_requested | refunded, exchanged |
 
 7.3 COD Handling
 

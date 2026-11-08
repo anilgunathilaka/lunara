@@ -5,7 +5,14 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: ['node_modules/**', '.next/**', 'docs/**'],
+    ignores: [
+      'node_modules/**',
+      '.next/**',
+      '.open-next/**',
+      '.wrangler/**',
+      'cloudflare-env.d.ts',
+      'docs/**',
+    ],
   },
   {
     rules: {

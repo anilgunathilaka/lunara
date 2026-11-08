@@ -1,0 +1,67 @@
+# Lint, build and deploy the Worker (docs/4-architecture.md §2.4).
+#
+# - Pull requests and pushes: lint + Worker build (no secrets needed).
+# - Push to main: also deploy to the `lunara` Worker.
+# - Actions → "CI / Deploy" → Run workflow: deploy any branch on demand.
+#
+# Repository settings → Secrets and variables → Actions:
+#   secret   CLOUDFLARE_API_TOKEN   ("Edit Cloudflare Workers" token template)
+#   variable CLOUDFLARE_ACCOUNT_ID
+#
+# Never runs Prisma migrations. Never needs database credentials: the Worker
+# reaches Postgres through Hyperdrive.
+name: CI / Deploy
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # One production deploy at a time, never cancelled half-way; PR runs for
+  # the same branch supersede each other.
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.ref) || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # `prisma generate` resolves prisma.config.ts, which requires DIRECT_URL.
+      # Generation never connects, so a placeholder is enough.
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci
+      # Public bucket URL, read by next.config.ts at build time for
+      # next/image. Keep in step with `vars` in wrangler.jsonc.
+      R2_PUBLIC_BASE_URL: https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Lint (ESLint + design tokens)
+        run: npm run lint
+
+      - name: Build Worker (includes next build and type check)
+        run: npm run build:worker
+
+      - name: Deploy to Cloudflare Workers
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: npx opennextjs-cloudflare deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          # The deploy step starts a local platform proxy that insists on a
+          # Hyperdrive connection string. It is never connected to.
+          CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: postgresql://ci:ci@localhost:5432/ci

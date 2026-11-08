@@ -1,18 +1,19 @@
 'use client';
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { MAX_QUANTITY, type CartLineRef } from '@/lib/commerce/cart-ref';
 
 /**
- * TEMPORARY client-only cart store (localStorage), standing in for the
- * real Cart & Order API in docs/4-architecture.md §2 (no backend cart
- * service exists yet). Survives across sessions on the same device, which
- * satisfies docs/1-ux.md §2.2 ("Cart contents survive ... for at least 30
- * days") without a server. Replace with a real API-backed store once one
- * exists — the CartLineItem shape is deliberately the same data CartLine
- * already renders, so that swap shouldn't touch component code.
+ * Device-local cart (localStorage). Survives across sessions on the same
+ * device (docs/1-ux.md §2.2). Each line carries a `ref` — the only thing
+ * the server trusts — plus display fields. `unitPrice` is the price the
+ * customer saw when adding; the cart and checkout re-quote every line on
+ * the server and show any difference inline (docs/4-architecture.md §3.4).
  */
 export interface CartLineItem {
   id: string;
+  /** What the server resolves price, stock and SKUs from. */
+  ref: CartLineRef;
   designName: string;
   materialLabel: string;
   sareeColourName?: string;
@@ -43,7 +44,9 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-const STORAGE_KEY = 'lunara.cart.v1';
+// v2: lines carry a server-resolvable `ref`. v1 carts had none and cannot
+// be priced, so they are discarded rather than migrated.
+const STORAGE_KEY = 'lunara.cart.v2';
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartLineItem[]>([]);
@@ -59,7 +62,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw) setItems(JSON.parse(raw));
+      if (raw) setItems((JSON.parse(raw) as CartLineItem[]).filter((item) => item && item.ref));
     } catch {
       // Corrupt/blocked storage — start from an empty cart rather than crash.
     }
@@ -87,7 +90,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       },
       removeItem: (id) => setItems((prev) => prev.filter((i) => i.id !== id)),
       setQuantity: (id, quantity) =>
-        setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i))),
+        // Same bounds the server enforces (docs/4-architecture.md §3.4).
+        setItems((prev) =>
+          prev.map((i) => (i.id === id ? { ...i, quantity: Math.min(Math.max(quantity, 1), MAX_QUANTITY) } : i)),
+        ),
       restoreItem: (item, index) =>
         setItems((prev) => {
           const next = [...prev];

@@ -1,0 +1,58 @@
+// Cloudflare Workers deployment for Lunara (docs/4-architecture.md §2.1–2.3).
+// Built by OpenNext: `npm run preview` (local workerd) / `npm run deploy`.
+// Secrets are NOT set here — use `npx wrangler secret put <NAME>`:
+//   BETTER_AUTH_SECRET, RESEND_API_KEY, CRON_SECRET
+// Hyperdrive replaces DATABASE_URL on the Worker; never set DB URLs here.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lunara",
+  // worker.ts wraps OpenNext's .open-next/worker.js and adds the cron handler.
+  "main": "worker.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+
+  // Lets OpenNext call the Worker from within itself (required by the adapter).
+  "services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "lunara" }],
+
+  // Supabase Postgres via Hyperdrive, config `lunara-db-direct`
+  // (direct host, query caching disabled — §2.2). For `npm run preview`,
+  // set CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE in .env
+  // to your DIRECT_URL (session pooler).
+  "hyperdrive": [{ "binding": "HYPERDRIVE", "id": "db19b2b035264d1e96cebb33c7717949" }],
+
+  // next/image optimisation on the Worker. Colour-profile preservation must
+  // be verified before real product photography ships (§2.2, §4).
+  "images": { "binding": "IMAGES" },
+
+  // Media storage (lib/storage, R2 binding driver). Bucket `lunara-media`,
+  // served publicly from its r2.dev URL (R2_PUBLIC_BASE_URL below) until a
+  // custom media domain is attached.
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "lunara-media" }],
+
+  // lunarasarees.com (zone on this Cloudflare account) serves the Worker;
+  // Cloudflare creates the DNS records and certificate on deploy. www is
+  // attached too and redirected to the apex by a zone Redirect Rule.
+  // The workers.dev address keeps working as a noindexed preview.
+  "routes": [
+    { "pattern": "lunarasarees.com", "custom_domain": true },
+    { "pattern": "www.lunarasarees.com", "custom_domain": true }
+  ],
+
+  // Public origin of the app: sign-in, links in emails and messages.
+  // EMAIL_FROM must be on a domain verified in Resend (lunarasarees.com).
+  "vars": {
+    "BETTER_AUTH_URL": "https://lunarasarees.com",
+    "EMAIL_FROM": "Lunara Sarees <hello@lunarasarees.com>",
+    "R2_PUBLIC_BASE_URL": "https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev"
+  },
+
+  // Notifications: send due and retrying messages (docs/4-architecture.md §6.1).
+  "triggers": { "crons": ["*/10 * * * *"] },
+
+  "observability": { "enabled": true }
+}

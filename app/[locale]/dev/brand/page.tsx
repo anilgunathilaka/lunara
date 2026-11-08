@@ -3,6 +3,7 @@ import { Icon } from '@/components/primitives/Icon';
 import { Divider } from '@/components/primitives/Divider';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { MotifDivider } from '@/components/brand/MotifDivider';
+import { setRequestLocale } from 'next-intl/server';
 
 /**
  * Internal QA scratch page for Icon, Divider, SectionMarker and
@@ -10,7 +11,9 @@ import { MotifDivider } from '@/components/brand/MotifDivider';
  * of the shipped product surface — delete or gate behind an env check
  * before launch.
  */
-export default function BrandQaPage() {
+export default async function BrandQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="mx-auto flex max-w-[420px] flex-col gap-8 p-6">
       <h1 className="text-heading text-ink" style={{ fontWeight: 'var(--type-heading-weight)' }}>

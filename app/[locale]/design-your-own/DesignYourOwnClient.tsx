@@ -17,16 +17,15 @@ import { Button } from '@/components/primitives/Button';
 import { SlideOver } from '@/components/layout/SlideOver';
 import { useCart } from '@/lib/cart/CartContext';
 import type { PriceChangeCause } from '@/components/configurator/PriceAttribution';
-import {
-  devDesigns,
-  devPriceMatrix,
-  devColours,
-  devColourAvailabilityByDesign,
-  devJacketDesigns,
-  devSuggested,
-} from '@/content/dev/configurator-samples';
+import { deltaKey, quoteKey, type ConfiguratorCatalogue } from '@/lib/catalogue/types';
+// Colours are still sample data: per-colour stock for every design ×
+// material needs the real range (PRD Q1) and arrives with the configurator
+// data rebuild. Designs, jackets and prices below are live.
+import { devColours } from '@/content/dev/configurator-samples';
 
 export interface DesignYourOwnClientProps {
+  /** Designs, jackets and server-resolved prices (docs/4-architecture.md §7.1). */
+  catalogue: ConfiguratorCatalogue;
   plainLabel: string;
   superLabel: string;
   sareeLabel: string;
@@ -64,16 +63,17 @@ export interface DesignYourOwnClientProps {
 }
 
 const FRAME_COUNT = 8;
-const DEFAULT_PRICE = { plain: 0, super: 0 };
 const SAVED_DESIGNS_KEY = 'lunara.savedDesigns.v1';
 
 export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
+  const { designs, jackets, quotes, materialDeltas } = props.catalogue;
   const { addItem, items, setQuantity, removeItem } = useCart();
 
-  const [designId, setDesignId] = useState<string>(devDesigns[0].id);
+  // The page guarantees at least one design and one jacket.
+  const [designId, setDesignId] = useState<string>(designs[0]!.id);
   const [material, setMaterial] = useState<MaterialValue>('plain');
   const [colourId, setColourId] = useState('teal');
-  const [jacketDesignId, setJacketDesignId] = useState<string>(devJacketDesigns[0].id);
+  const [jacketId, setJacketId] = useState<string>(jackets[0]!.id);
   const [drape, setDrape] = useState<DrapeValue>('saree');
   const [frameIndex, setFrameIndex] = useState(0);
   const [rendererBroken, setRendererBroken] = useState(false);
@@ -86,34 +86,40 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
   const [addedId, setAddedId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const designPrices = devPriceMatrix[designId] ?? DEFAULT_PRICE;
-  const price = designPrices[material];
-  const priceDelta = designPrices.super - designPrices.plain;
-  const availability = devColourAvailabilityByDesign[designId] ?? {};
-  const selectedDesign = devDesigns.find((d) => d.id === designId) ?? devDesigns[0];
+  // Looked up, never computed: every price was resolved on the server.
+  const price = quotes[quoteKey(designId, material, jacketId)];
+  const priceDelta = materialDeltas[deltaKey(designId, jacketId)] ?? 0;
+  const selectedDesign = designs.find((d) => d.id === designId) ?? designs[0]!;
   const selectedColour = devColours.find((c) => c.id === colourId);
-  const selectedJacket = devJacketDesigns.find((j) => j.id === jacketDesignId) ?? devJacketDesigns[0];
+  const selectedJacket = jackets.find((j) => j.id === jacketId) ?? jackets[0]!;
 
   const colourItems = devColours.map((c) => ({
     id: c.id,
     colourHex: c.colourHex,
     label: c.label,
     materialName: c.materialName,
-    availability: availability[c.id] ?? 'available',
+    availability: 'available' as const,
+  }));
+
+  const jacketOptions = jackets.map((j) => ({
+    id: j.id,
+    name: j.name,
+    thumbnailUrl: j.thumbnailUrl,
+    disabled: j.stockState === 'out',
   }));
 
   function handleDesignSelect(nextDesignId: string) {
     setPreviousPrice(price);
     setCause('design');
-    setCauseLabel(devDesigns.find((d) => d.id === nextDesignId)?.name);
+    setCauseLabel(designs.find((d) => d.id === nextDesignId)?.name);
     setDesignId(nextDesignId);
+  }
 
-    // UX-C1b: preserve the current colour where it's available for the new design.
-    const nextAvailability = devColourAvailabilityByDesign[nextDesignId] ?? {};
-    if (nextAvailability[colourId] === 'disabled') {
-      const firstAvailable = Object.entries(nextAvailability).find(([, v]) => v !== 'disabled')?.[0];
-      if (firstAvailable) setColourId(firstAvailable);
-    }
+  function handleJacketSelect(nextJacketId: string) {
+    setPreviousPrice(price);
+    setCause('jacket');
+    setCauseLabel(jackets.find((j) => j.id === nextJacketId)?.name);
+    setJacketId(nextJacketId);
   }
 
   function handleMaterialChange(nextMaterial: MaterialValue) {
@@ -130,13 +136,24 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
   }
 
   function handleAddToCart() {
+    if (price === undefined) return;
     const drapeLabel = drape === 'saree' ? props.sareeLabel : props.osariyaLabel;
     const id = addItem({
+      // The server decides whether this combination is a real, stocked
+      // colourway; colours are still sample data (see import note above).
+      ref: {
+        kind: 'configured',
+        designId,
+        materialId: material,
+        colourName: selectedColour?.label ?? '',
+        jacketColourwayId: jacketId,
+        drape,
+      },
       designName: selectedDesign.name,
       materialLabel: material === 'plain' ? props.plainLabel : props.superLabel,
       sareeColourName: selectedColour?.label ?? '',
-      jacketMaterialName: selectedJacket.name,
-      jacketColourName: '',
+      jacketMaterialName: selectedJacket.materialName,
+      jacketColourName: selectedJacket.colourName,
       drapeLabel,
       unitPrice: price,
       quantity: 1,
@@ -152,7 +169,7 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
     try {
       const raw = window.localStorage.getItem(SAVED_DESIGNS_KEY);
       const saved = raw ? JSON.parse(raw) : [];
-      saved.push({ designId, material, colourId, jacketDesignId, drape, savedAt: Date.now() });
+      saved.push({ designId, material, colourId, jacketId, drape, savedAt: Date.now() });
       window.localStorage.setItem(SAVED_DESIGNS_KEY, JSON.stringify(saved));
     } catch {
       // Storage unavailable — the save simply doesn't persist this session.
@@ -212,7 +229,7 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
 
         <SuggestedStrip
           heading={props.suggestedHeading}
-          items={devSuggested.filter((s) => s.id !== designId)}
+          items={designs.filter((d) => d.id !== designId).slice(0, 3)}
           onSelect={handleDesignSelect}
         />
       </div>
@@ -221,7 +238,7 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
         <div className="flex flex-col gap-2">
           <h2 className="field-label">{props.designHeading}</h2>
           <DesignPicker
-            designs={devDesigns.map((d) => ({ ...d }))}
+            designs={designs}
             selectedDesignId={designId}
             onSelect={handleDesignSelect}
             disabledAnnouncement={props.disabledAnnouncement}
@@ -252,21 +269,23 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
 
         <div className="flex flex-col gap-2">
           <h2 className="field-label">{props.jacketHeading}</h2>
+          {/* Jacket MATERIAL + colour, sold unstitched — never a blouse style
+              (CLAUDE.md: we do not stitch). */}
           <DesignPicker
-            designs={devJacketDesigns.map((d) => ({ ...d }))}
-            selectedDesignId={jacketDesignId}
-            onSelect={setJacketDesignId}
+            designs={jacketOptions}
+            selectedDesignId={jacketId}
+            onSelect={handleJacketSelect}
             disabledAnnouncement={props.disabledAnnouncement}
           />
         </div>
       </div>
 
       <ConfiguratorBar
-        price={price}
+        price={price ?? 0}
         previousPrice={previousPrice}
         cause={cause}
         causeLabel={causeLabel}
-        canAddToCart={availability[colourId] !== 'disabled'}
+        canAddToCart={price !== undefined && selectedJacket.stockState !== 'out'}
         onAddToCart={handleAddToCart}
         onSave={handleSave}
         onShare={handleShare}

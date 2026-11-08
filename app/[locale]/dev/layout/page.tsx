@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { LayoutQaClient } from './LayoutQaClient';
 
 /**
@@ -12,7 +12,9 @@ import { LayoutQaClient } from './LayoutQaClient';
  * decision (docs/0-prd.md "Business registration and published contact
  * details | Founder | Before Phase 1 launch"), never fabricated here.
  */
-export default async function LayoutQaPage() {
+export default async function LayoutQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tCommon = await getTranslations('common');
   const tNav = await getTranslations('layout.nav');
   const tLayout = await getTranslations('layout');

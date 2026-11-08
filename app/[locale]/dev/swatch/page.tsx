@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SwatchChip } from '@/components/product/SwatchChip';
 import { devSwatchSamples } from '@/content/dev/swatch-samples';
 
@@ -7,7 +7,9 @@ import { devSwatchSamples } from '@/content/dev/swatch-samples';
  * part of the shipped product surface — delete or gate behind an env
  * check before launch.
  */
-export default async function SwatchQaPage() {
+export default async function SwatchQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('product.stock');
   const { teal, rose, ivory, charcoal, marigold } = devSwatchSamples;
 

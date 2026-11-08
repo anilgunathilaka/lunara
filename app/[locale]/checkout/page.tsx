@@ -1,21 +1,11 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CheckoutClient } from './CheckoutClient';
+import { COD_FEE, DISTRICT_IDS } from '@/lib/commerce/delivery';
+import { formatAmount } from '@/lib/pricing/format';
 
-const DISTRICTS = [
-  'Colombo',
-  'Gampaha',
-  'Kalutara',
-  'Kandy',
-  'Kurunegala',
-  'Galle',
-  'Matara',
-  'Jaffna',
-  'Anuradhapura',
-  'Ratnapura',
-  'Badulla',
-] as const;
-
-export default async function CheckoutPage() {
+export default async function CheckoutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('commerce.checkout');
   const tCart = await getTranslations('commerce.cart');
   const tSummary = await getTranslations('commerce.summary');
@@ -24,6 +14,7 @@ export default async function CheckoutPage() {
   const tUnstitched = await getTranslations('commerce.unstitched');
   const tJacket = await getTranslations('product.jacket');
   const tEmpty = await getTranslations('feedback.emptyState');
+  const tDistricts = await getTranslations('districts');
 
   return (
     <div className="home-section">
@@ -51,16 +42,18 @@ export default async function CheckoutPage() {
           addressLabel={t('addressLabel')}
           districtLabel={t('districtLabel')}
           districtPlaceholder={t('districtPlaceholder')}
-          districtOptions={DISTRICTS.map((d) => ({ value: d, label: d }))}
+          districtOptions={DISTRICT_IDS.map((id) => ({ value: id, label: tDistricts(id) })).sort((a, b) =>
+            a.label.localeCompare(b.label, locale),
+          )}
           eventDateLabel={t('eventDateLabel')}
           eventDateNote={t('eventDateNote')}
-          deliveryEstimateRangeLabel={tDelivery('estimateRange')}
           dispatchCutoffLabel={tDelivery('dispatchCutoff')}
           paymentOptions={[
-            { value: 'cod', label: tPayment('cod'), detail: tPayment('codDetail') },
+            // Bank transfer first: first-class, never hidden (docs/1-ux.md §3.4).
+            // LankaQR and card appear once a payment gateway is contracted
+            // (docs/4-architecture.md §3.4).
             { value: 'bank_transfer', label: tPayment('bankTransfer'), detail: tPayment('bankTransferDetail') },
-            { value: 'lankaqr', label: tPayment('lankaqr'), detail: tPayment('lankaqrDetail') },
-            { value: 'card', label: tPayment('card'), detail: tPayment('cardDetail') },
+            { value: 'cod', label: tPayment('cod'), detail: tPayment('codDetail', { fee: formatAmount(COD_FEE) }) },
           ]}
           unstitchedCheckoutMessage={tUnstitched('message')}
           unstitchedAcknowledgeLabel={tUnstitched('acknowledge')}

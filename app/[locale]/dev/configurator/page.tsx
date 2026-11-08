@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ConfiguratorQaClient } from './ConfiguratorQaClient';
 
 /**
@@ -14,7 +14,9 @@ import { ConfiguratorQaClient } from './ConfiguratorQaClient';
  * yet (docs/4-architecture.md §5). The "Simulate renderer failure"
  * button demonstrates the FallbackNotice degradation path (UX-C9).
  */
-export default async function ConfiguratorQaPage() {
+export default async function ConfiguratorQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');
