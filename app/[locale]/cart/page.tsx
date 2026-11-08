@@ -1,8 +1,10 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { CartPageClient } from './CartPageClient';
 
-export default async function CartPage() {
+export default async function CartPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('cartPage');
   const tEmpty = await getTranslations('feedback.emptyState');
   const tCart = await getTranslations('commerce.cart');

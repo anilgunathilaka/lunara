@@ -1,12 +1,14 @@
 import { MessageCircle } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Divider } from '@/components/primitives/Divider';
 import { Accordion } from '@/components/layout/Accordion';
 import { Icon } from '@/components/primitives/Icon';
 import { Link } from '@/i18n/navigation';
 
-export default async function SupportPage() {
+export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('support');
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');

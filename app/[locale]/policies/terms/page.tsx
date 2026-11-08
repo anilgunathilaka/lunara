@@ -1,8 +1,10 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 
 /** See app/[locale]/policies/privacy/page.tsx — same rationale for not fabricating legal text. */
-export default async function TermsOfServicePage() {
+export default async function TermsOfServicePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('policies');
 
   return (

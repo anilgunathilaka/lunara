@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { DesignYourOwnClient } from './DesignYourOwnClient';
 
 /**
@@ -9,7 +9,9 @@ import { DesignYourOwnClient } from './DesignYourOwnClient';
  * canvas — devDesigns[0]/'plain'/'teal'/first jacket/'saree' is the
  * starting combination.
  */
-export default async function DesignYourOwnPage() {
+export default async function DesignYourOwnPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');

@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CheckoutQaClient } from './CheckoutQaClient';
 
 /**
@@ -7,7 +7,9 @@ import { CheckoutQaClient } from './CheckoutQaClient';
  * (docs/3-components.md §5.2, §5.3). Not part of the shipped product
  * surface — delete or gate behind an env check before launch.
  */
-export default async function CheckoutQaPage() {
+export default async function CheckoutQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tCheckout = await getTranslations('commerce.checkout');
   const tPayment = await getTranslations('commerce.payment');
   const tDelivery = await getTranslations('commerce.delivery');

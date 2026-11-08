@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider, hasLocale } from 'next-intl';
-import { getMessages, getTranslations } from 'next-intl/server';
+import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { fontVariableClassName } from '@/lib/fonts';
@@ -28,6 +28,10 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+  // Static rendering: tell next-intl the locale from the route param, so it
+  // never has to read request headers (which would force dynamic rendering
+  // and cost Worker CPU on every view — docs/4-architecture.md §2.3).
+  setRequestLocale(locale);
 
   const messages = await getMessages();
 

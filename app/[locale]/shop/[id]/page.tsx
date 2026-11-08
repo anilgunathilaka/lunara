@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Divider } from '@/components/primitives/Divider';
@@ -20,9 +20,9 @@ export function generateStaticParams() {
 export default async function ProductDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+  params: Promise<{ locale: string; id: string }> }) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
   const product = getCatalogueProduct(id);
   if (!product) notFound();
 

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Camera, MessageCircle, RotateCcw, Truck } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { SectionMarker } from '@/components/brand/SectionMarker';
@@ -8,7 +8,9 @@ import { MotifDivider } from '@/components/brand/MotifDivider';
 import { ProductCard } from '@/components/product/ProductCard';
 import { placeholderArrivals } from '@/content/catalogue/placeholder-arrivals';
 
-export default async function HomePage() {
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('home');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');

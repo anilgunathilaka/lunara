@@ -1,9 +1,11 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { placeholderCatalogue } from '@/content/catalogue/placeholder-catalogue';
 import { ShopClient } from './ShopClient';
 
-export default async function ShopPage() {
+export default async function ShopPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('shop');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');

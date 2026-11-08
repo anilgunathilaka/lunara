@@ -1,11 +1,14 @@
 import { Checkbox } from '@/components/primitives/Checkbox';
+import { setRequestLocale } from 'next-intl/server';
 
 /**
  * Internal QA scratch page for the Checkbox primitive (docs/3-components.md
  * §2.2). Not part of the shipped product surface — delete or gate behind
  * an env check before launch.
  */
-export default function CheckboxQaPage() {
+export default async function CheckboxQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="mx-auto flex max-w-[420px] flex-col gap-6 p-6">
       <h1 className="text-heading text-ink" style={{ fontWeight: 'var(--type-heading-weight)' }}>

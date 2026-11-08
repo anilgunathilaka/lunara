@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ProductGallery } from '@/components/product/ProductGallery';
 import { FabricBlock } from '@/components/product/FabricBlock';
@@ -14,7 +14,9 @@ import { devCatalogueSamples } from '@/content/dev/catalogue-samples';
  * (docs/3-components.md §3.3-3.5). Not part of the shipped product
  * surface — delete or gate behind an env check before launch.
  */
-export default async function CatalogueQaPage() {
+export default async function CatalogueQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tFabric = await getTranslations('product.fabric');
   const tOpacity = await getTranslations('product.opacity');
   const tJacket = await getTranslations('product.jacket');

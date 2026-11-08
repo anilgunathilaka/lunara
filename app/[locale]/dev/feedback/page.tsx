@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { FeedbackQaClient } from './FeedbackQaClient';
 
 /**
@@ -6,7 +6,9 @@ import { FeedbackQaClient } from './FeedbackQaClient';
  * LoadingSkeleton (docs/3-components.md §6.1). Not part of the shipped
  * product surface — delete or gate behind an env check before launch.
  */
-export default async function FeedbackQaPage() {
+export default async function FeedbackQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tToast = await getTranslations('feedback.toast');
   const tEmpty = await getTranslations('feedback.emptyState');
 

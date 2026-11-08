@@ -1,11 +1,13 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState } from '@/components/product/StockState';
 import { placeholderJackets } from '@/content/catalogue/placeholder-jackets';
 
-export default async function JacketMaterialPage() {
+export default async function JacketMaterialPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('jacketPage');
   const tStock = await getTranslations('product.stock');
 

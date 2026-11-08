@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CartQaClient } from './CartQaClient';
 
 /**
@@ -7,7 +7,9 @@ import { CartQaClient } from './CartQaClient';
  * shipped product surface — delete or gate behind an env check before
  * launch.
  */
-export default async function CartQaPage() {
+export default async function CartQaPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const tCart = await getTranslations('commerce.cart');
   const tSummary = await getTranslations('commerce.summary');
   const tUnstitched = await getTranslations('commerce.unstitched');

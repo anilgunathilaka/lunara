@@ -1,7 +1,9 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 
-export default async function CareGuidePage() {
+export default async function CareGuidePage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('support');
   const tAccordion = await getTranslations('layout.accordion');
 

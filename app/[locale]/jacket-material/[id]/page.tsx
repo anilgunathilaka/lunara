@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Divider } from '@/components/primitives/Divider';
@@ -13,8 +13,9 @@ export function generateStaticParams() {
   return placeholderJackets.map((jacket) => ({ id: jacket.id }));
 }
 
-export default async function JacketDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function JacketDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
+  const { locale, id } = await params;
+  setRequestLocale(locale);
   const jacket = getJacketProduct(id);
   if (!jacket) notFound();
 

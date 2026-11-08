@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CheckoutClient } from './CheckoutClient';
 
 const DISTRICTS = [
@@ -15,7 +15,9 @@ const DISTRICTS = [
   'Badulla',
 ] as const;
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations('commerce.checkout');
   const tCart = await getTranslations('commerce.cart');
   const tSummary = await getTranslations('commerce.summary');
