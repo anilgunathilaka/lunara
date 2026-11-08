@@ -257,6 +257,19 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Guest access | The confirmation and tracking pages are reached with the order number plus a random token from the confirmation link; only the token's SHA-256 is stored. |
 | Limits | At most 10 lines and 5 of any line per order, so a single request cannot drain stock. Edge rate limiting (§2.3) is the second layer. |
 
+3.5 Operations Panel (`/[locale]/ops`)
+
+| Rule | Detail |
+| --- | --- |
+| Who | Staff sign in with the same passwordless email code as customers. Access requires an active STAFF_MEMBER row for the signed-in email. Staff emails live only in the database (added with `npm run staff:add`), never in the repository. Every ops page AND every ops action checks this on the server; hiding a link is not access control. |
+| Orders | List by status, newest first; detail with lines, history and the allowed next steps only (transition table in §7.2). Dispatch requires courier and tracking number. Every transition writes an ORDER_EVENT with the staff email as actor. |
+| Bank transfers | The `payment_pending` queue with amount, reference (order number) and age; "payment received" confirms the order. Matching against the bank statement is manual in Phase 1. |
+| Cancellation | Cancelling before dispatch returns the order's units to stock in the same transaction. Returned goods are inspected first, so refunds and exchanges never restock automatically — staff adjust stock explicitly. |
+| Stock | Adjust by a signed amount with a reason (atomic; can never go below zero) and set the low-stock threshold. Never "overwrite the count", which would silently undo an order placed meanwhile. |
+| Prices | Edit PRICE_MATRIX cells and each jacket material's pairing add-on and standalone price. Takes effect on the next page load; customers with the item in their cart see the change attributed inline (§3.4). |
+| Audit | Stock and price changes write an AUDIT_LOG row (actor, entity, before, after). |
+| Not indexed | `noindex` on every ops page. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
@@ -470,6 +483,18 @@ refunded         exchanged
 | dispatched | Courier handover | SMS + WhatsApp with tracking |
 | delivered | Courier confirmation | Triggers the d+1 sequence |
 | return_requested | Customer initiates | WhatsApp with collection detail |
+
+Allowed transitions (enforced in `lib/ops/transitions.ts`; anything else is refused):
+
+| From | To |
+| --- | --- |
+| placed | confirmed, cancelled |
+| payment_pending | confirmed, cancelled |
+| confirmed | packed, cancelled |
+| packed | dispatched, cancelled |
+| dispatched | delivered |
+| delivered | return_requested |
+| return_requested | refunded, exchanged |
 
 7.3 COD Handling
 

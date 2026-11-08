@@ -1926,3 +1926,71 @@ body {
   gap: var(--space-2);
 }
 } /* end @layer components */
+
+/* ── Operations panel (docs/4-architecture.md §3.5) ─────────────────────
+   Staff-only, dense data views. Tokens only. Tables scroll horizontally
+   inside their wrapper at 360px rather than squashing columns. */
+.ops-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--lun-line);
+}
+.ops-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height-md); /* 44px touch target */
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-s);
+  font: var(--type-label) var(--font-body);
+  color: var(--lun-ink);
+  text-decoration: none;
+}
+.ops-nav-link[aria-current='page'] {
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+}
+.ops-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-s);
+  background: var(--lun-surface);
+}
+.ops-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+.ops-table th,
+.ops-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--lun-line);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.ops-table th {
+  font: var(--type-label) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.ops-table tr:last-child td {
+  border-bottom: none;
+}
+.ops-inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ops-number-input {
+  width: calc(var(--space-9) * 1.5);
+  min-height: var(--control-height-md);
+}
+.ops-status-out {
+  color: var(--lun-danger);
+}
+.ops-status-low {
+  color: var(--lun-warning);
+}

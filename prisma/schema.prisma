@@ -309,6 +309,9 @@ model Order {
   estimateMinDays          Int
   estimateMaxDays          Int
   locale                   String
+  /// Set when dispatched (§3.5).
+  courier                  String?
+  trackingNumber           String?
   /// SHA-256 (hex) of the guest access token; the token itself is never stored.
   accessTokenHash          String
   userId                   String?
@@ -363,4 +366,37 @@ model OrderEvent {
 
   @@index([orderId, createdAt])
   @@map("order_event")
+}
+
+// ─── Operations (docs/4-architecture.md §3.5) ────────────────────────────
+
+enum StaffRole {
+  admin
+}
+
+/// Who may use /ops. Emails are added with `npm run staff:add`, never committed.
+model StaffMember {
+  email     String    @id
+  role      StaffRole @default(admin)
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("staff_member")
+}
+
+/// Stock and price changes made in /ops: who, what, before, after.
+model AuditLog {
+  id         String   @id @default(cuid())
+  actor      String
+  action     String
+  entityType String
+  entityId   String
+  before     Json?
+  after      Json?
+  note       String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId, createdAt])
+  @@map("audit_log")
 }

@@ -335,6 +335,19 @@
       "subject": "Your Lunara sign-in code",
       "body": "Your sign-in code is {code}. It expires in {minutes} minutes.",
       "ignore": "If you didn't ask for this code, you can ignore this email. Never share this code with anyone."
+    },
+    "signIn": {
+      "title": "Sign in",
+      "intro": "We'll email you a 6-digit code. No password needed.",
+      "emailLabel": "Email",
+      "sendCode": "Send code",
+      "codeSent": "We sent a code to {email}. It expires in 10 minutes.",
+      "codeLabel": "6-digit code",
+      "verify": "Sign in",
+      "useDifferentEmail": "Use a different email",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidCode": "That code didn't work. Check it, or request a new one.",
+      "sendFailed": "We couldn't send the code. Try again in a moment."
     }
   },
   "districts": {
@@ -363,5 +376,84 @@
     "batticaloa": "Batticaloa",
     "ampara": "Ampara",
     "trincomalee": "Trincomalee"
+  },
+  "ops": {
+    "title": "Operations",
+    "signedInAs": "Signed in as {email}",
+    "signOut": "Sign out",
+    "all": "All",
+    "noOrders": "No orders here yet.",
+    "saved": "Saved.",
+    "pricesNote": "Changes apply on the next page load. Customers with the item in their cart see the change marked beside it.",
+    "nav": {
+      "orders": "Orders",
+      "payments": "Bank transfers",
+      "stock": "Stock",
+      "prices": "Prices"
+    },
+    "columns": {
+      "number": "Order",
+      "date": "Placed",
+      "customer": "Customer",
+      "phone": "Phone",
+      "district": "District",
+      "total": "Total",
+      "payment": "Payment",
+      "status": "Status",
+      "waiting": "Waiting",
+      "sku": "SKU",
+      "item": "Item",
+      "inStock": "In stock",
+      "lowAt": "Low at",
+      "design": "Design",
+      "jacketMaterial": "Jacket material"
+    },
+    "order": {
+      "back": "All orders",
+      "address": "Address",
+      "email": "Email",
+      "eventDate": "Needed by (advisory)",
+      "acknowledged": "Unstitched acknowledged",
+      "shipment": "Shipment",
+      "lines": "Items",
+      "history": "History",
+      "by": "by {actor}",
+      "nextStep": "Next step",
+      "noNextStep": "No further steps.",
+      "note": "Note (optional)",
+      "courier": "Courier",
+      "tracking": "Tracking number",
+      "drape": "Drape: {drape}"
+    },
+    "transition": {
+      "confirmed": "Confirm order",
+      "confirmPayment": "Payment received — confirm",
+      "packed": "Mark packed",
+      "dispatched": "Mark dispatched",
+      "delivered": "Mark delivered",
+      "cancelled": "Cancel order (returns stock)",
+      "cancelledLate": "Cancel order",
+      "return_requested": "Record return request",
+      "refunded": "Mark refunded",
+      "exchanged": "Mark exchanged"
+    },
+    "stock": {
+      "adjust": "Adjust by",
+      "adjustHint": "e.g. 10 received, -1 damaged",
+      "reason": "Reason",
+      "save": "Save"
+    },
+    "prices": {
+      "matrixHeading": "Saree prices (design × material)",
+      "jacketHeading": "Jacket material prices",
+      "pairingAddOn": "Add-on when paired",
+      "standalone": "Standalone price"
+    },
+    "error": {
+      "invalid": "That wasn't valid. Check the values and try again.",
+      "conflict": "Someone else changed this first. The page now shows the latest.",
+      "negative": "Stock can't go below zero.",
+      "tracking": "Courier and tracking number are required to dispatch."
+    }
   }
 }
