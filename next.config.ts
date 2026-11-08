@@ -25,6 +25,17 @@ const nextConfig: NextConfig = {
     remotePatterns,
   },
   typedRoutes: true,
+  // Preview deployments on *.workers.dev must never be indexed: they would
+  // compete with the real domain in search results.
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: '(?<subdomain>.+)\\.workers\\.dev' }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+    ];
+  },
   // Prisma ships workerd-specific builds; keeping these external lets the
   // OpenNext build pick them for the Worker (opennext.js.org/cloudflare/howtos/db).
   serverExternalPackages: ['@prisma/client', '.prisma/client'],
