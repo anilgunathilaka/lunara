@@ -5,15 +5,27 @@ import { useTranslations } from 'next-intl';
 import { Input } from '@/components/primitives/Input';
 import { Button } from '@/components/primitives/Button';
 import { authClient } from '@/lib/auth/auth-client';
+import { claimOrderAction } from '@/lib/account/actions';
+
+export interface SignInFormProps {
+  /** Same-site path to open after sign-in (already open-redirect checked). */
+  next: string;
+  /** Pre-filled from the order after purchase (docs/1-ux.md §3.4: "pre-filled, as a convenience"). */
+  initialEmail?: string;
+  /** Replaces the default intro line. */
+  intro?: string;
+  /** After sign-in, link this guest order to the account (lib/account/actions.ts). */
+  claim?: { number: string; token: string };
+}
 
 /**
  * Passwordless sign-in: email → 6-digit code (lib/auth/auth.ts). Used by
- * staff now and by customers after purchase (never before — CLAUDE.md).
+ * staff, and by customers after purchase (never before — CLAUDE.md).
  */
-export function SignInClient({ next }: { next: string }) {
+export function SignInForm({ next, initialEmail = '', intro, claim }: SignInFormProps) {
   const t = useTranslations('auth.signIn');
   const [step, setStep] = useState<'email' | 'code'>('email');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +63,13 @@ export function SignInClient({ next }: { next: string }) {
         setError(t('invalidCode'));
         return;
       }
+      if (claim) {
+        const result = await claimOrderAction(claim);
+        if (!result.ok) {
+          setError(t('claimFailed'));
+          return;
+        }
+      }
       // Full navigation so server components see the new session cookie.
       window.location.assign(next);
     } catch {
@@ -62,7 +81,7 @@ export function SignInClient({ next }: { next: string }) {
 
   return step === 'email' ? (
     <form className="flex flex-col gap-4" onSubmit={sendCode} noValidate>
-      <p className="field-message">{t('intro')}</p>
+      <p className="field-message">{intro ?? t('intro')}</p>
       <Input
         label={t('emailLabel')}
         type="email"

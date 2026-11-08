@@ -271,6 +271,17 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Audit | Stock and price changes write an AUDIT_LOG row (actor, entity, before, after). |
 | Not indexed | `noindex` on every ops page. |
 
+3.6 Customer Accounts and Tracking (`/[locale]/account`)
+
+| Rule | Detail |
+| --- | --- |
+| Optional, after purchase | Guest checkout stays the only required path (PRD FR-33). The account is offered on the order page once the order exists, with the order's email pre-filled; sign-in is the same passwordless 6-digit code. A "My orders" link sits in the footer, not the five-item header. |
+| Which orders an account sees | Orders linked to it (`order.userId`), plus orders nobody has linked that carry the account's verified email. Once an order is linked to one account it never appears in another. |
+| Linking | Orders placed while signed in are linked at placement. A guest order is linked by "claiming" it: the claim must present the order's access token, the same proof that opens the guest order page, and only an unlinked order can be claimed. |
+| Tracking | Progress (placed → confirmed → packed → with the courier → delivered) is derived from ORDER_EVENT, never stored twice. Courier and tracking number show once dispatched. The guest order page and the account show the same record from one component, so they cannot disagree. |
+| Privacy | Account pages are `noindex` and dynamic. Someone else's order number returns 404, the same as one that doesn't exist. |
+| Later | Saved designs (with the configurator on real data) and saved addresses. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline

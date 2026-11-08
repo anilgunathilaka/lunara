@@ -70,6 +70,8 @@ export default async function LocaleLayout({
               { href: '/support/returns', label: tFooter('returns') },
               { href: '/support/care-guide', label: tFooter('careGuide') },
               { href: '/support/shipping', label: tFooter('shipping') },
+              // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
+              { href: '/account', label: tFooter('myOrders') },
             ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },

@@ -2004,3 +2004,68 @@ body {
 .ops-status-low {
   color: var(--lun-warning);
 }
+
+/* ── Order tracking and account (docs/4-architecture.md §3.6) ── */
+.order-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.order-timeline-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--lun-ink);
+}
+.order-timeline-marker {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+  margin-top: var(--space-1);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--lun-line);
+  background: var(--lun-surface);
+}
+.order-timeline-step[data-state='done'] .order-timeline-marker {
+  border-color: var(--lun-plum);
+  background: var(--lun-plum);
+}
+.order-timeline-step[data-state='next'] .order-timeline-marker {
+  border-color: var(--lun-plum);
+}
+.order-timeline-step[data-state='upcoming'],
+.order-timeline-step[data-state='skipped'] {
+  color: var(--lun-ink-muted);
+}
+.order-timeline-step[data-state='skipped'] .order-timeline-label {
+  text-decoration: line-through;
+}
+.order-timeline-step[aria-current='step'] .order-timeline-label,
+.order-timeline-step[data-state='next'] .order-timeline-label {
+  font-weight: var(--weight-semibold);
+}
+.order-timeline-time {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.account-offer {
+  padding: var(--space-5);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+}
+.account-order {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: var(--control-height-md);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--lun-line);
+  color: var(--lun-ink);
+  text-decoration: none;
+}
+.account-order-end {
+  align-items: flex-end;
+  text-align: end;
+}

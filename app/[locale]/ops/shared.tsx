@@ -27,13 +27,7 @@ export async function OpsFlash({ searchParams }: { searchParams: Awaited<OpsSear
   return null;
 }
 
-export function formatDateTime(date: Date, locale: string): string {
-  return new Intl.DateTimeFormat(`${locale}-LK`, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'Asia/Colombo',
-  }).format(date);
-}
+export { formatDateTime } from '@/lib/format/date';
 
 /** "3 h", "2 d" — how long a bank transfer has been waiting. */
 export function formatAge(from: Date, now: Date = new Date()): string {

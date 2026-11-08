@@ -143,6 +143,19 @@
       "return_requested": "Return requested",
       "refunded": "Refunded",
       "exchanged": "Exchanged"
+    },
+    "tracking": {
+      "heading": "Order progress",
+      "courierLabel": "Courier and tracking",
+      "cancelled": "This order was cancelled on {date}.",
+      "steps": {
+        "placed": "Order placed",
+        "placedAwaitingPayment": "Order placed — awaiting payment",
+        "confirmed": "Confirmed",
+        "packed": "Packed",
+        "dispatched": "With the courier",
+        "delivered": "Delivered"
+      }
     }
   },
   "layout": {
@@ -161,7 +174,8 @@
       "careGuide": "Cotton care guide",
       "shipping": "Shipping",
       "privacy": "Privacy policy",
-      "terms": "Terms of service"
+      "terms": "Terms of service",
+      "myOrders": "My orders"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -347,7 +361,8 @@
       "useDifferentEmail": "Use a different email",
       "invalidEmail": "Enter a valid email address.",
       "invalidCode": "That code didn't work. Check it, or request a new one.",
-      "sendFailed": "We couldn't send the code. Try again in a moment."
+      "sendFailed": "We couldn't send the code. Try again in a moment.",
+      "claimFailed": "You're signed in, but we couldn't add this order to your account. Contact us on WhatsApp and we'll sort it out."
     }
   },
   "districts": {
@@ -496,5 +511,22 @@
     "deliveredDay14": "Lunara: would you share a photo of your saree? Real photos help other customers trust the colour. Just reply here with a photo — thank you!",
     "deliveredDay45Subject": "A new jacket piece for your saree?",
     "deliveredDay45": "Lunara: new arrivals are in, and our jacket materials can be bought on their own to refresh a saree you already love: {jacketLink}"
+  },
+  "account": {
+    "ordersHeading": "My orders",
+    "orderHeading": "Order {number}",
+    "signedInAs": "Signed in as {email}",
+    "noOrders": "You don't have any orders yet. Orders placed with this email appear here.",
+    "startShopping": "Browse sarees",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "signOut": "Sign out",
+    "saveOrder": {
+      "heading": "Keep track of this order",
+      "body": "Optional: save this order to an account to follow its delivery any time. We'll email you a 6-digit code — no password.",
+      "signedInBody": "You're signed in as {email}. Add this order to your account to follow its delivery.",
+      "addToAccount": "Add to my account",
+      "viewInAccount": "View in My orders",
+      "failed": "We couldn't add this order to your account. Contact us on WhatsApp and we'll sort it out."
+    }
   }
 }

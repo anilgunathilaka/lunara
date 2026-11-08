@@ -1,5 +1,6 @@
 'use server';
 
+import { getCustomer } from '@/lib/account/customer';
 import { getPrisma } from '@/lib/prisma';
 import { placeOrderSchema, quoteRequestSchema } from './cart-ref';
 import { placeOrder, type PlaceOrderOutcome } from './orders';
@@ -25,5 +26,6 @@ export type PlaceOrderActionResult = PlaceOrderOutcome | { ok: false; reason: 'i
 export async function placeOrderAction(input: unknown): Promise<PlaceOrderActionResult> {
   const parsed = placeOrderSchema.safeParse(input);
   if (!parsed.success) return { ok: false, reason: 'invalid' };
-  return placeOrder(parsed.data);
+  const customer = await getCustomer();
+  return placeOrder(parsed.data, customer?.id ?? null);
 }

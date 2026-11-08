@@ -54,7 +54,8 @@ function lineData(resolved: ResolvedLine, quantity: number): Prisma.OrderLineCre
   };
 }
 
-export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderOutcome> {
+/** `userId`: the signed-in customer, if any. Guest is the default path; an account is never required. */
+export async function placeOrder(input: PlaceOrderInput, userId: string | null = null): Promise<PlaceOrderOutcome> {
   const prisma = getPrisma();
   const { details, paymentMethod } = input;
 
@@ -109,6 +110,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderOutc
             estimateMaxDays: quote.estimate!.maxDays,
             locale: input.locale,
             accessTokenHash: hashToken(token),
+            userId,
             lines: { create: lines.map((l) => lineData(l.resolved, l.quantity)) },
             events: { create: { status, actor: 'customer' } },
           },

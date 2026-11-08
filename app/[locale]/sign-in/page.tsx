@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
-import { SignInClient } from './SignInClient';
+import { SignInForm } from '@/components/account/SignInForm';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -32,7 +32,7 @@ export default async function SignInPage({
           <SectionMarker />
           <h1 className="home-section-title">{t('title')}</h1>
         </div>
-        <SignInClient next={safeNext(next, locale)} />
+        <SignInForm next={safeNext(next, locale)} />
       </div>
     </div>
   );
