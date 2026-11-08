@@ -14,6 +14,7 @@ import { useCart, type CartLineItem } from '@/lib/cart/CartContext';
 import { useCartQuote } from '@/lib/cart/useCartQuote';
 import { DELIVERY_FEE_RANGE } from '@/lib/commerce/delivery';
 import { formatAmount, formatPriceLKR } from '@/lib/pricing/format';
+import { FEATURES } from '@/lib/features';
 
 export interface CartPageClientProps {
   emptyMessage: string;
@@ -76,10 +77,14 @@ export function CartPageClient({
     return (
       <EmptyState
         message={emptyMessage}
-        actions={[
-          { href: '/shop', label: shopCuratedLabel },
-          { href: '/design-your-own', label: designYourOwnLabel },
-        ]}
+        actions={
+          FEATURES.designYourOwn
+            ? [
+                { href: '/shop', label: shopCuratedLabel },
+                { href: '/design-your-own', label: designYourOwnLabel },
+              ]
+            : [{ href: '/shop', label: shopCuratedLabel }]
+        }
       />
     );
   }

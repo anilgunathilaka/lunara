@@ -11,6 +11,7 @@ import { SlideOver } from '@/components/layout/SlideOver';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { Link, usePathname } from '@/i18n/navigation';
 import { CartProvider, useCart } from '@/lib/cart/CartContext';
+import { FEATURES } from '@/lib/features';
 
 export interface SiteChromeProps {
   languageLabels: LanguageSelectorProps['labels'];
@@ -67,7 +68,7 @@ function SiteChromeInner({
 
       <Header
         shop={{ href: '/shop', label: navLabels.shop }}
-        designYourOwn={{ href: '/design-your-own', label: navLabels.designYourOwn }}
+        designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
         jacketMaterial={{ href: '/jacket-material', label: navLabels.jacketMaterial }}
         support={{ href: '/support', label: navLabels.support }}
         cartHref="/cart"
@@ -99,7 +100,7 @@ function SiteChromeInner({
 
       <MobileNav
         shop={{ href: '/shop', label: navLabels.shop, icon: ShoppingBag }}
-        design={{ href: '/design-your-own', label: navLabels.designYourOwn, icon: Sparkles }}
+        design={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn, icon: Sparkles } : undefined}
         cart={{ href: '/cart', label: navLabels.cart, icon: Package }}
         cartCount={itemCount}
         onMenuOpen={() => setMenuOpen(true)}
