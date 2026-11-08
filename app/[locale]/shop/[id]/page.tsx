@@ -11,19 +11,18 @@ import { StockState } from '@/components/product/StockState';
 import { ProductCard } from '@/components/product/ProductCard';
 import { Accordion } from '@/components/layout/Accordion';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
-import { getCatalogueProduct, placeholderCatalogue } from '@/content/catalogue/placeholder-catalogue';
+import { getCuratedListing, getCuratedListings } from '@/lib/catalogue/queries';
+import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
 
-export function generateStaticParams() {
-  return placeholderCatalogue.map((product) => ({ id: product.id }));
-}
-
+// Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
 export default async function ProductDetailPage({
   params,
 }: {
   params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const product = getCatalogueProduct(id);
+  // Parallel, not sequential: each read is a round trip to the database.
+  const [product, others] = await Promise.all([getCuratedListing(id), getCuratedListings({ limit: 4 })]);
   if (!product) notFound();
 
   const [tFabric, tOpacity, tJacket, tStock, tGallery, tPdp, tCart, tSlideover, tAccordion] =
@@ -44,7 +43,7 @@ export default async function ProductDetailPage({
   ];
   const materialLabel = product.material === 'plain' ? tFabric('materialPlain') : tFabric('materialSuper');
 
-  const related = placeholderCatalogue.filter((p) => p.id !== product.id).slice(0, 3);
+  const related = others.filter((p) => p.id !== product.id).slice(0, 3);
 
   return (
     <div className="home-section">
@@ -54,13 +53,13 @@ export default async function ProductDetailPage({
             <ProductGallery
               referenceFrameLabel={tGallery('referenceFrame')}
               assets={[
-                { type: 'image', src: '/placeholder/product.jpg', alt: `${product.name}, full drape` },
-                { type: 'image', src: '/placeholder/product.jpg', alt: `${product.name}, pallu detail` },
-                { type: 'image', src: '/placeholder/product.jpg', alt: `${product.name}, border close-up` },
-                { type: 'image', src: '/placeholder/product.jpg', alt: `${product.name}, cotton texture macro` },
+                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, full drape` },
+                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, pallu detail` },
+                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, border close-up` },
+                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, cotton texture macro` },
                 {
                   type: 'image',
-                  src: '/placeholder/product.jpg',
+                  src: PLACEHOLDER_IMAGE,
                   alt: `${product.name}, colour reference frame`,
                   isReferenceFrame: true,
                 },
@@ -98,7 +97,7 @@ export default async function ProductDetailPage({
                 drapeLabel: 'Saree',
                 unitPrice: product.price,
                 quantity: 1,
-                thumbnail: { src: '/placeholder/product.jpg', alt: product.name },
+                thumbnail: { src: PLACEHOLDER_IMAGE, alt: product.name },
                 unstitched: true,
               }}
               addToCartLabel={tPdp('addToCart')}
@@ -187,7 +186,7 @@ export default async function ProductDetailPage({
               <ProductCard
                 key={item.id}
                 href={`/shop/${item.id}`}
-                image={{ src: '/placeholder/product.jpg', alt: item.name }}
+                image={{ src: PLACEHOLDER_IMAGE, alt: item.name }}
                 name={item.name}
                 materialLabel={item.material === 'plain' ? tFabric('materialPlain') : tFabric('materialSuper')}
                 price={item.price}

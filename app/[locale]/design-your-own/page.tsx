@@ -1,4 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { getConfiguratorCatalogue } from '@/lib/catalogue/queries';
 import { DesignYourOwnClient } from './DesignYourOwnClient';
 
 /**
@@ -6,12 +8,16 @@ import { DesignYourOwnClient } from './DesignYourOwnClient';
  * regardless of selection — there is no real photography or server-side
  * compositor yet (docs/4-architecture.md §5), same as the /dev/configurator
  * QA page this was adapted from. Opens pre-loaded (UX-C1), never an empty
- * canvas — devDesigns[0]/'plain'/'teal'/first jacket/'saree' is the
+ * canvas — first design/'plain'/'teal'/first jacket/'saree' is the
  * starting combination.
  */
 export default async function DesignYourOwnPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // Designs, jackets and every price come from the database, resolved on
+  // the server (docs/4-architecture.md §3.3, §7.1).
+  const catalogue = await getConfiguratorCatalogue();
+  if (catalogue.designs.length === 0 || catalogue.jackets.length === 0) notFound();
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');
@@ -31,6 +37,7 @@ export default async function DesignYourOwnPage({ params }: { params: Promise<{ 
     <div className="home-section">
       <div className="home-section-inner">
         <DesignYourOwnClient
+          catalogue={catalogue}
           plainLabel={tFabric('materialPlain')}
           superLabel={tFabric('materialSuper')}
           sareeLabel={tDrape('saree')}

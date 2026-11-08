@@ -98,7 +98,7 @@ Table of Contents
 
 | Limit | Value | Design consequence |
 | --- | --- | --- |
-| CPU per request | 10 ms | Catalogue and policy pages are prerendered (`generateStaticParams`) and served as static assets — no Worker CPU. Worker requests are kept light; anything CPU-heavy (password hashing, image processing) does not run on the Worker. Measured: a warm Hyperdrive query costs ~3–4 ms CPU. |
+| CPU per request | 10 ms | Policy, support and other content pages are prerendered and served as static assets — no Worker CPU. Catalogue pages render per request because price and stock must be live (§3.3), so each loads its data in one query. Worker requests are kept light; anything CPU-heavy (password hashing, image processing) does not run on the Worker. Measured: a warm Hyperdrive query costs ~3–4 ms CPU. |
 | Requests | 100,000 / day (static assets excluded) | Rate-limit `/api/*` at the edge; abuse is an availability risk, not just a cost one. |
 | Hyperdrive queries | 100,000 / day | Pages must not query the database when a prerendered page will do. |
 | Database round trip | ~300 ms (Supabase region: Tokyo) | Prerender wherever possible; dynamic reads are reserved for stock checks, cart, checkout and accounts. |
@@ -228,6 +228,19 @@ share_token · created_at
 | Configured designs survive stock loss | If a saved design's colourway sells out, the design record persists and renders, with the unavailable element flagged and the nearest alternative suggested on the same axis. |
 | Stock is held at colourway level | A design in Super Cotton in emerald is a distinct stock line from the same design in Plain Cotton in emerald. Stock therefore keys on the colourway SKU, which already encodes design and material. |
 | Consistency | Stock decrements are transactional. Concurrent orders on the last unit resolve deterministically, never optimistically. |
+
+3.3 Implementation Rules (Prisma schema)
+
+| Rule | Detail |
+| --- | --- |
+| Money | Integer LKR (whole rupees), never floating point. |
+| Jacket pricing (PRD Q4/Q5) | JACKET_MATERIAL carries two prices: `pairing_add_on` (added to the matrix price whenever that jacket material is paired with a saree; may be 0) and `standalone_price` (the standalone line). Price is per jacket material, not per colourway: colour never affects price (§3.1). |
+| Every colourway is priced | SAREE_COLOURWAY references PRICE_MATRIX on (design_id, material_id) by foreign key, so a colourway cannot exist for a combination that has no price. |
+| One price function | `lib/pricing/resolve.ts` is the only code that turns matrix rows and add-ons into a customer price. Catalogue pages, the configurator and (later) checkout all call it on the server. The client receives prices; it never derives them. |
+| Stock state is derived | STOCK_ITEM stores `quantity` and `threshold` only. `out` when quantity is 0, `low` when quantity ≤ threshold, otherwise `in`. Computed in `lib/stock/state.ts`; never stored, so it can never disagree with quantity. |
+| Curated listing stock | A curated listing is available only if both its saree colourway and its jacket colourway are. Its state is the worse of the two; its "N left" count is the lower quantity. |
+| Live reads | Catalogue pages (home arrivals, shop, product, jacket pages, configurator) read price and stock from Postgres on every request — they are not prerendered, so a price or stock change is visible on the next page load. Each page loads its data in a single query (Prisma `relationJoins`) to keep one database round trip per page. |
+| Seed data | `prisma/seed.ts` loads the placeholder catalogue from `content/catalogue/seed-catalogue.ts`. It is idempotent (upserts) and is run deliberately, like a migration — never by CI or the Worker. |
 
 4. Colour Management Pipeline
 

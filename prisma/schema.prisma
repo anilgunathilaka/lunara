@@ -1,17 +1,18 @@
 // Lunara Sarees — Prisma schema
 //
-// Phase 1 scope: PostgreSQL connection plus Better Auth's core tables
-// (User, Session, Account, Verification), so account creation "after
-// purchase, never before" (PRD FR-33) has somewhere to live.
-//
-// The product data model — SAREE_DESIGN, COTTON_MATERIAL,
-// JACKET_MATERIAL, SAREE_COLOURWAY, JACKET_COLOURWAY, PRICE_MATRIX,
-// STOCK_ITEM, CURATED_LISTING, CONFIGURED_DESIGN and the order lifecycle
-// — is Phase 4 (docs/4-architecture.md §3, §7.2), built once the
-// catalogue's design/colour/jacket counts are confirmed (PRD Q1).
+// - Better Auth's core tables (User, Session, Account, Verification), so
+//   account creation "after purchase, never before" (PRD FR-33) has
+//   somewhere to live.
+// - The catalogue (docs/4-architecture.md §3, implementation rules §3.3):
+//   designs, materials, colourways, PRICE_MATRIX, STOCK_ITEM, curated
+//   listings. CONFIGURED_DESIGN and orders arrive with the configurator
+//   save/share and checkout features.
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  // One SQL query per page load: the Worker is ~300 ms from the database,
+  // so per-relation round trips would multiply page latency (§3.3).
+  previewFeatures = ["relationJoins"]
 }
 
 // Supabase-hosted Postgres (docs/4-architecture.md §2.2).
@@ -84,4 +85,173 @@ model Verification {
   updatedAt  DateTime? @updatedAt
 
   @@map("verification")
+}
+
+// ─── Catalogue (docs/4-architecture.md §3, §3.3) ─────────────────────────
+
+enum Occasion {
+  office
+  everyday
+  festive
+  temple
+}
+
+enum Opacity {
+  opaque
+  semi_sheer
+  sheer
+}
+
+/// A pattern and its placement. Recolourable: colour lives on the
+/// colourway, never here (CLAUDE.md non-negotiable).
+model SareeDesign {
+  id              String     @id
+  name            String
+  patternAssetUrl String?
+  placementMap    Json?
+  occasionTags    Occasion[]
+  active          Boolean    @default(true)
+  sortOrder       Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  prices     PriceMatrix[]
+  colourways SareeColourway[]
+
+  @@map("saree_design")
+}
+
+/// Exactly two rows: 'plain' and 'super'. A table, not an enum, so GSM,
+/// opacity and length stay data (§3.1).
+model CottonMaterial {
+  id                String   @id
+  name              String
+  gsm               Int
+  opacity           Opacity
+  lengthMetres      Decimal  @db.Decimal(4, 2)
+  textureOverlayUrl String?
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  prices     PriceMatrix[]
+  colourways SareeColourway[]
+
+  @@map("cotton_material")
+}
+
+/// THE price source (CLAUDE.md non-negotiable). Saree price for a design in
+/// a material, in whole LKR. The customer price adds the paired jacket
+/// material's add-on — see lib/pricing/resolve.ts, the only place that sums.
+model PriceMatrix {
+  designId   String
+  materialId String
+  price      Int
+  updatedAt  DateTime @updatedAt
+
+  design     SareeDesign      @relation(fields: [designId], references: [id], onDelete: Restrict)
+  material   CottonMaterial   @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  colourways SareeColourway[]
+
+  @@id([designId, materialId])
+  @@map("price_matrix")
+}
+
+/// A design in a material in a colour: one stock line (§3.2).
+model SareeColourway {
+  id                String   @id
+  designId          String
+  materialId        String
+  colourName        String
+  colourHex         String
+  lotId             String
+  referenceFrameUrl String?
+  galleryAssets     String[] @default([])
+  sku               String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  design   SareeDesign    @relation(fields: [designId], references: [id], onDelete: Restrict)
+  material CottonMaterial @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  /// Every colourway is priced: no matrix row, no colourway (§3.3).
+  price    PriceMatrix    @relation(fields: [designId, materialId], references: [designId, materialId], onDelete: Restrict)
+  stock    StockItem      @relation("SareeColourwayStock", fields: [sku], references: [sku], onDelete: Restrict)
+  listings CuratedListing[]
+
+  @@unique([designId, materialId, colourName])
+  @@map("saree_colourway")
+}
+
+/// Jacket material, sold paired (pairingAddOn) or standalone
+/// (standalonePrice). Whole LKR. Always ships unstitched.
+model JacketMaterial {
+  id                String   @id
+  name              String
+  composition       String
+  pieceLengthMetres Decimal  @db.Decimal(4, 2)
+  pairingAddOn      Int      @default(0)
+  standalonePrice   Int
+  textureTileUrl    String?
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  colourways JacketColourway[]
+
+  @@map("jacket_material")
+}
+
+model JacketColourway {
+  id             String   @id
+  materialId     String
+  colourName     String
+  colourHex      String
+  lotId          String
+  swatchUrl      String?
+  textureTileUrl String?
+  sku            String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  material JacketMaterial   @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  stock    StockItem        @relation("JacketColourwayStock", fields: [sku], references: [sku], onDelete: Restrict)
+  listings CuratedListing[]
+
+  @@unique([materialId, colourName])
+  @@map("jacket_colourway")
+}
+
+/// Single source of truth for availability (§3.2). State (in/low/out) is
+/// derived from quantity and threshold, never stored (§3.3).
+model StockItem {
+  sku       String   @id
+  quantity  Int
+  threshold Int      @default(3)
+  updatedAt DateTime @updatedAt
+
+  sareeColourway  SareeColourway?  @relation("SareeColourwayStock")
+  jacketColourway JacketColourway? @relation("JacketColourwayStock")
+
+  @@map("stock_item")
+}
+
+/// A pairing chosen by Lunara. Holds no stock and no price of its own:
+/// both resolve through its colourways (§3.1).
+model CuratedListing {
+  id                String   @id
+  name              String
+  sareeColourwayId  String
+  jacketColourwayId String
+  isFeatured        Boolean  @default(false)
+  active            Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  sareeColourway  SareeColourway  @relation(fields: [sareeColourwayId], references: [id], onDelete: Restrict)
+  jacketColourway JacketColourway @relation(fields: [jacketColourwayId], references: [id], onDelete: Restrict)
+
+  @@index([active, sortOrder])
+  @@map("curated_listing")
 }

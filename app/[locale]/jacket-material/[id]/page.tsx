@@ -6,17 +6,14 @@ import { Divider } from '@/components/primitives/Divider';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState } from '@/components/product/StockState';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
-import { getJacketProduct, placeholderJackets } from '@/content/catalogue/placeholder-jackets';
-import { getCatalogueProduct } from '@/content/catalogue/placeholder-catalogue';
+import { getStandaloneJacket } from '@/lib/catalogue/queries';
+import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
 
-export function generateStaticParams() {
-  return placeholderJackets.map((jacket) => ({ id: jacket.id }));
-}
-
+// Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
 export default async function JacketDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const jacket = getJacketProduct(id);
+  const jacket = await getStandaloneJacket(id);
   if (!jacket) notFound();
 
   const [t, tPdp, tJacket, tStock, tSlideover, tCart] = await Promise.all([
@@ -28,9 +25,7 @@ export default async function JacketDetailPage({ params }: { params: Promise<{ l
     getTranslations('commerce.cart'),
   ]);
 
-  const pairsWith = jacket.pairsWithIds
-    .map((sareeId) => getCatalogueProduct(sareeId))
-    .filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const { pairsWith } = jacket;
 
   return (
     <div className="home-section">
@@ -79,7 +74,7 @@ export default async function JacketDetailPage({ params }: { params: Promise<{ l
                 jacketColourName: jacket.colourName,
                 unitPrice: jacket.price,
                 quantity: 1,
-                thumbnail: { src: '/placeholder/product.jpg', alt: jacket.materialName },
+                thumbnail: { src: PLACEHOLDER_IMAGE, alt: jacket.materialName },
                 unstitched: true,
               }}
               addToCartLabel={tPdp('addToCart')}

@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/primitives/Button';
 import { ProductCard } from '@/components/product/ProductCard';
-import type { CatalogueProduct, Occasion } from '@/content/catalogue/placeholder-catalogue';
+import type { CatalogueProduct, Occasion } from '@/lib/catalogue/types';
 
 type PriceBand = 'all' | 'under8000' | '8000to9000' | 'over9000';
 type MaterialFilter = 'all' | 'plain' | 'super';

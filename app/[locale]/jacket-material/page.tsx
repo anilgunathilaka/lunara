@@ -3,13 +3,14 @@ import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState } from '@/components/product/StockState';
-import { placeholderJackets } from '@/content/catalogue/placeholder-jackets';
+import { getStandaloneJackets } from '@/lib/catalogue/queries';
 
 export default async function JacketMaterialPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('jacketPage');
   const tStock = await getTranslations('product.stock');
+  const jackets = await getStandaloneJackets();
 
   return (
     <div className="home-section">
@@ -23,7 +24,7 @@ export default async function JacketMaterialPage({ params }: { params: Promise<{
         </p>
 
         <div className="home-arrivals-grid">
-          {placeholderJackets.map((jacket) => (
+          {jackets.map((jacket) => (
             <Link key={jacket.id} href={`/jacket-material/${jacket.id}`} className="product-card">
               {/* True sampled fabric colour fills the card — swatch photography
                   will replace this flat fill once shot (OPS-02). */}
