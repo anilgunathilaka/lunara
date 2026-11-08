@@ -19,7 +19,8 @@ export interface Customer {
 }
 
 export const getCustomer = cache(async (): Promise<Customer | null> => {
-  const session = await getAuth().api.getSession({ headers: await headers() });
+  const requestHeaders = await headers(); // first: marks the page per-request, so the build never prerenders it
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
   if (!session) return null;
   return {
     id: session.user.id,

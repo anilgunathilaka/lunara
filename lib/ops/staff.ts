@@ -18,7 +18,8 @@ export interface Staff {
 
 /** The current staff member, or null (not signed in, or not staff). */
 export const getStaff = cache(async (): Promise<Staff | null> => {
-  const session = await getAuth().api.getSession({ headers: await headers() });
+  const requestHeaders = await headers(); // first: marks the page per-request, so the build never prerenders it
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
   if (!session) return null;
   const email = session.user.email.toLowerCase();
   const member = await getPrisma().staffMember.findUnique({ where: { email } });
@@ -27,7 +28,8 @@ export const getStaff = cache(async (): Promise<Staff | null> => {
 
 /** For pages: signed out → sign-in (then back); signed in but not staff → 404. */
 export async function requireStaffPage(locale: string, returnTo: string): Promise<Staff> {
-  const session = await getAuth().api.getSession({ headers: await headers() });
+  const requestHeaders = await headers(); // first: marks the page per-request, so the build never prerenders it
+  const session = await getAuth().api.getSession({ headers: requestHeaders });
   if (!session) {
     redirect({ href: { pathname: '/sign-in', query: { next: returnTo } }, locale });
   }
