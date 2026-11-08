@@ -6,3 +6,4 @@ NEXTJS_ENV=development
 
 BETTER_AUTH_SECRET="generate-a-long-random-string"
 RESEND_API_KEY=""
+EMAIL_FROM="Lunara Sarees <hello@your-verified-domain>"

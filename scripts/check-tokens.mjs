@@ -16,6 +16,8 @@ const SCAN_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.css']);
 const IGNORE_DIRS = new Set([
   'node_modules',
   '.next',
+  '.open-next',
+  '.wrangler',
   '.git',
   'docs',
   'content',
