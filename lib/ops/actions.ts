@@ -332,3 +332,68 @@ export async function galleryPhotoAction(form: FormData): Promise<void> {
     if (removed.key) await getStorage().delete(removed.key).catch(() => undefined);
   });
 }
+
+// ── Reviews (§3.8, PRD FR-46) ─────────────────────────────────────────────
+// Criticism is answered in public, never removed. Hiding needs one of a
+// fixed set of reasons, and every change is audited.
+
+const respondSchema = z.object({
+  locale,
+  id: z.string().min(1).max(100),
+  response: z.string().trim().max(2000),
+});
+
+export async function respondReviewAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const parsed = respondSchema.safeParse(Object.fromEntries(form));
+  const lang = locale.safeParse(form.get('locale')).data ?? 'en';
+  const path = `/${lang}/ops/reviews`;
+  if (!parsed.success) back(path, { error: 'invalid' });
+  const { id, response } = parsed.data;
+
+  await run(path, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      const before = await tx.review.findUnique({ where: { id }, select: { response: true } });
+      if (!before) throw new OpsError('invalid');
+      await tx.review.update({
+        where: { id },
+        data: response
+          ? { response, respondedBy: staff.email, respondedAt: new Date() }
+          : { response: null, respondedBy: null, respondedAt: null },
+      });
+      await tx.auditLog.create({
+        data: { actor: staff.email, action: 'review.respond', entityType: 'review', entityId: id, before: { response: before.response }, after: { response: response || null } },
+      });
+    });
+  });
+}
+
+const visibilitySchema = z.object({
+  locale,
+  id: z.string().min(1).max(100),
+  op: z.enum(['hide', 'show']),
+  reason: z.enum(['personal_data', 'abusive', 'not_about_product']).optional(),
+});
+
+export async function reviewVisibilityAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const parsed = visibilitySchema.safeParse(Object.fromEntries(form));
+  const lang = locale.safeParse(form.get('locale')).data ?? 'en';
+  const path = `/${lang}/ops/reviews`;
+  // Hiding without a reason is refused: a low rating is not a reason.
+  if (!parsed.success || (parsed.data.op === 'hide' && !parsed.data.reason)) back(path, { error: 'invalid' });
+  const { id, op, reason } = parsed.data;
+
+  await run(path, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      const { count } = await tx.review.updateMany({
+        where: { id, status: op === 'hide' ? 'published' : 'hidden' },
+        data: op === 'hide' ? { status: 'hidden', hiddenReason: reason, hiddenBy: staff.email } : { status: 'published', hiddenReason: null, hiddenBy: null },
+      });
+      if (count !== 1) throw new OpsError('conflict');
+      await tx.auditLog.create({
+        data: { actor: staff.email, action: `review.${op}`, entityType: 'review', entityId: id, after: { reason: reason ?? null } },
+      });
+    });
+  });
+}

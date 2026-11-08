@@ -140,3 +140,14 @@ export async function photoRows() {
     })),
   };
 }
+
+/** All reviews for staff, newest first, hidden ones included (§3.8). */
+export async function opsReviews() {
+  const rows = await getPrisma().review.findMany({
+    relationLoadStrategy: 'join',
+    orderBy: { createdAt: 'desc' },
+    take: 200,
+    include: { order: { select: { number: true } }, orderLine: { select: { title: true } } },
+  });
+  return rows.map((row) => ({ ...row, photos: row.photos.map(mediaUrl) }));
+}

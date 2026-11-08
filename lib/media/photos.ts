@@ -13,7 +13,7 @@ import { getStorage } from '@/lib/storage';
 export const MAX_PHOTO_BYTES = 12 * 1024 * 1024;
 export const MAX_GALLERY_PHOTOS = 8;
 
-export type PhotoKind = 'gallery' | 'reference' | 'swatch';
+export type PhotoKind = 'gallery' | 'reference' | 'swatch' | 'review';
 
 const FORMATS = {
   jpg: 'image/jpeg',
@@ -45,8 +45,10 @@ function segment(id: string): string {
  * Worker's CPU budget for nothing.
  */
 export function photoKey(kind: PhotoKind, ownerId: string, ext: PhotoFormat): string {
-  const owner = kind === 'swatch' ? `jackets/${segment(ownerId)}` : `sarees/${segment(ownerId)}`;
   const stamp = `${Date.now().toString(36)}-${randomBytes(4).toString('hex')}`;
+  // Customer review photos live apart from product photography.
+  if (kind === 'review') return `reviews/${segment(ownerId)}/${stamp}.${ext}`;
+  const owner = kind === 'swatch' ? `jackets/${segment(ownerId)}` : `sarees/${segment(ownerId)}`;
   return `${owner}/${kind}/${stamp}.${ext}`;
 }
 

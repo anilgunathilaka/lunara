@@ -7,6 +7,8 @@ import type { GuestOrder } from '@/lib/commerce/orders';
 import { trackingFor } from '@/lib/commerce/tracking';
 import { formatDateTime } from '@/lib/format/date';
 import { formatPriceLKR } from '@/lib/pricing/format';
+import { reviewPath } from '@/lib/reviews/link';
+import { isReviewable } from '@/lib/reviews/reviews';
 
 /**
  * One order as the customer sees it: status, progress, delivery, payment
@@ -88,6 +90,12 @@ export async function OrderRecord({ order }: { order: GuestOrder }) {
             tracking.cancelledAt ? tTracking('cancelled', { date: formatDateTime(tracking.cancelledAt, locale) }) : undefined
           }
         />
+        {isReviewable(order.status) && (
+          // The same signed link the after-delivery message carries (§3.8).
+          <a href={reviewPath(order.number, locale)} className="btn focus-ring btn-secondary btn-md" style={{ alignSelf: 'flex-start' }}>
+            {tTracking('writeReview')}
+          </a>
+        )}
       </section>
 
       {order.paymentMethod === 'bank_transfer' && awaitingPayment && (

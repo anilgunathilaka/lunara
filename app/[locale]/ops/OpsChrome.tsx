@@ -12,6 +12,7 @@ const SECTIONS = [
   { href: '/ops/stock', key: 'stock' },
   { href: '/ops/prices', key: 'prices' },
   { href: '/ops/photos', key: 'photos' },
+  { href: '/ops/reviews', key: 'reviews' },
 ] as const;
 
 export function OpsNav() {
