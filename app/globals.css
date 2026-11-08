@@ -2183,3 +2183,10 @@ body {
   padding-block: var(--space-2);
   resize: vertical;
 }
+
+/* ── Ops: insights (docs/4-architecture.md §3.9) ── */
+.insight-note {
+  display: block;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}

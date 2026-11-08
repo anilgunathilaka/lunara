@@ -307,6 +307,17 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Rating | 1 to 5, checked by the app and by a database constraint. Product pages show the count and average of published reviews. |
 | Privacy | RLS on `review`, no policies (§2.2). Review pages are `noindex`. |
 
+3.9 Insights (`/[locale]/ops/insights`, PRD §8)
+
+| Rule | Detail |
+| --- | --- |
+| From recorded facts | Metrics are computed from orders, order lines, ORDER_EVENT and reviews already stored. No tracking script, no cookies, no third-party analytics. |
+| In SQL | Each figure is one aggregate query run in parallel; the Worker never loops over every order (CPU budget, §2.3). |
+| Counts beside shares | Every percentage shows its counts ("40% (2 of 5)"), so a small sample is not read as a trend. |
+| North star | Repeat purchase within 6 and 12 months, customers matched by phone. Only customers whose first order is old enough count; until then it says "not measurable yet". Always all-time. |
+| Definitions | Delivered revenue: totals of orders that reached the customer and were not refunded. Super Cotton upgrade: Super share of saree units. On-time dispatch: dispatched on the day of confirmation or the next, Colombo time (target above 98%). Photo reviews per 100 delivered orders. Returns by saree colour. COD by district. |
+| Honest gaps | Shown as "not measured yet", with what is missing: configurator funnel and toggle use (needs the live configurator), colour complaints and return reasons (no reason captured), COD refusals (no "refused" outcome after dispatch), WhatsApp response time (outside the system), cost per order (costs not recorded). |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
