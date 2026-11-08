@@ -28,18 +28,18 @@
   // be verified before real product photography ships (§2.2, §4).
   "images": { "binding": "IMAGES" },
 
-  // Media storage (lib/storage). R2 must first be enabled in the Cloudflare
-  // dashboard and the bucket created (`npx wrangler r2 bucket create
-  // lunara-media`); then uncomment. Until then lib/storage has no driver in
-  // production — nothing uploads media yet.
-  // "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "lunara-media" }],
+  // Media storage (lib/storage, R2 binding driver). Bucket `lunara-media`,
+  // served publicly from its r2.dev URL (R2_PUBLIC_BASE_URL below) until a
+  // custom media domain is attached.
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "lunara-media" }],
 
   // Public origin of the app. Change when a custom domain is attached.
   // Add EMAIL_FROM here once a sending domain is verified in Resend, e.g.
   //   "EMAIL_FROM": "Lunara Sarees <hello@lunarasarees.lk>"
   // Without it, sign-in codes cannot be emailed in production.
   "vars": {
-    "BETTER_AUTH_URL": "https://lunara.lunarasarees.workers.dev"
+    "BETTER_AUTH_URL": "https://lunara.lunarasarees.workers.dev",
+    "R2_PUBLIC_BASE_URL": "https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev"
   },
 
   "observability": { "enabled": true }
