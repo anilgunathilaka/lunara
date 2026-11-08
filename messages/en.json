@@ -412,7 +412,8 @@
       "prices": "Prices",
       "messages": "Messages",
       "photos": "Photos",
-      "reviews": "Reviews"
+      "reviews": "Reviews",
+      "insights": "Insights"
     },
     "columns": {
       "number": "Order",
@@ -542,6 +543,81 @@
       "hide": "Hide",
       "show": "Show again",
       "hiddenBecause": "Hidden: {reason}"
+    },
+    "insights": {
+      "intro": "The success measures from the PRD (§8), from recorded orders and reviews. Every share shows its counts: with few orders, read them as counts, not trends.",
+      "periodLabel": "Period",
+      "period": {
+        "30": "Last 30 days",
+        "90": "Last 90 days",
+        "365": "Last 12 months",
+        "all": "All time"
+      },
+      "since": "Orders placed since {date}.",
+      "noData": "No data yet",
+      "share": "{percent}% ({part} of {whole})",
+      "per100": "{value} per 100 delivered orders",
+      "outOf5": "{value} out of 5",
+      "northStar": "North star: customers who come back",
+      "repeatAt": "Repeat purchase within {months} months",
+      "repeatTooEarly": "Not measurable yet — no customer’s first order is {months} months old",
+      "repeatNote": "Customers are matched by phone number. All-time, whatever period is selected.",
+      "salesHeading": "Orders and revenue",
+      "ordersPlaced": "Orders placed",
+      "cancelled": "Cancelled",
+      "delivered": "Delivered",
+      "deliveredRevenue": "Delivered revenue",
+      "deliveredRevenueNote": "Order totals that reached the customer and were not refunded. The PRD judges growth on this, not on orders placed.",
+      "codShare": "Cash on delivery",
+      "bankShare": "Bank transfer",
+      "productHeading": "What customers choose",
+      "superUpgrade": "Super Cotton upgrade rate",
+      "superUpgradeNote": "Saree units in Super Cotton. Very low means the price step is too big or not well explained.",
+      "jacketAttachment": "Orders with standalone jacket material",
+      "jacketAttachmentNote": "{units} jacket pieces sold on their own.",
+      "osariya": "Kandyan Osariya drape (Design Your Own orders)",
+      "osariyaNote": "Ordered units only; how often the toggle is tried is measured once the configurator is live.",
+      "designsHeading": "Design popularity (units)",
+      "design": "Design",
+      "units": "Units",
+      "qualityHeading": "Promises kept",
+      "onTimeDispatch": "On-time dispatch",
+      "onTimeDispatchNote": "Dispatched on the day the order was confirmed or the next day (Colombo time). Target: above 98%.",
+      "photoReviews": "Photo reviews",
+      "photoReviewsNote": "{withPhotos} with photos of {reviews} published reviews; {delivered} delivered orders.",
+      "averageRating": "Average rating",
+      "returnsHeading": "Returns by colour",
+      "colourway": "Saree",
+      "deliveredOrders": "Delivered orders",
+      "returned": "Returned",
+      "returnsNote": "The reason for a return is not recorded yet, so colour problems cannot be told apart from change of mind.",
+      "codHeading": "Cash on delivery by district",
+      "district": "District",
+      "codOrders": "COD orders",
+      "codNote": "Refusals at the door cannot be recorded yet: a dispatched order cannot be marked refused. Until then, watch cancellations.",
+      "notYetHeading": "Not measured yet",
+      "notYet": {
+        "configurator": {
+          "metric": "Configurator engagement, completion, toggle use and abandonment after a price rise",
+          "why": "measured when Design Your Own runs on real data."
+        },
+        "colourComplaints": {
+          "metric": "Colour complaint rate",
+          "why": "needs a reason recorded with each complaint or return."
+        },
+        "codRefusal": {
+          "metric": "COD refusal rate by district",
+          "why": "needs a \"refused at delivery\" outcome for dispatched orders."
+        },
+        "whatsapp": {
+          "metric": "WhatsApp first-response time",
+          "why": "WhatsApp is answered outside this system."
+        },
+        "costPerOrder": {
+          "metric": "Cost per delivered and paid order",
+          "why": "needs delivery, return and marketing costs recorded."
+        }
+      }
     }
   },
   "notifications": {
