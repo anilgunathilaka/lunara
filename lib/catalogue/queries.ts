@@ -25,14 +25,14 @@ import {
  *   lib/stock/state, the single sources for both.
  */
 
-const listingInclude = {
+export const listingInclude = {
   sareeColourway: { include: { design: true, material: true, price: true, stock: true } },
   jacketColourway: { include: { material: true, stock: true } },
 } satisfies Prisma.CuratedListingInclude;
 
 type ListingRow = Prisma.CuratedListingGetPayload<{ include: typeof listingInclude }>;
 
-const activeListing = {
+export const activeListing = {
   active: true,
   sareeColourway: { design: { active: true }, material: { active: true } },
   jacketColourway: { material: { active: true } },
@@ -92,7 +92,7 @@ export async function getCuratedListing(id: string): Promise<CatalogueProduct | 
   return row ? toProduct(row) : null;
 }
 
-const jacketInclude = {
+export const jacketInclude = {
   material: true,
   stock: true,
 } satisfies Prisma.JacketColourwayInclude;
@@ -114,7 +114,7 @@ function toJacket(row: JacketRow): JacketProduct {
   };
 }
 
-const activeJacket = { material: { active: true } } satisfies Prisma.JacketColourwayWhereInput;
+export const activeJacket = { material: { active: true } } satisfies Prisma.JacketColourwayWhereInput;
 const jacketOrder = [{ material: { sortOrder: 'asc' } }, { id: 'asc' }] satisfies Prisma.JacketColourwayOrderByWithRelationInput[];
 
 export async function getStandaloneJackets(): Promise<JacketProduct[]> {

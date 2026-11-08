@@ -242,6 +242,23 @@ share_token · created_at
 | Live reads | Catalogue pages (home arrivals, shop, product, jacket pages, configurator) read price and stock from Postgres on every request — they are not prerendered, so a price or stock change is visible on the next page load. Each page loads its data in a single query (Prisma `relationJoins`) to keep one database round trip per page. |
 | Seed data | `prisma/seed.ts` loads the placeholder catalogue from `content/catalogue/seed-catalogue.ts`. It is idempotent (upserts) and is run deliberately, like a migration — never by CI or the Worker. |
 
+3.4 Orders (Phase 1 checkout)
+
+ORDER: number (`LUN-` + 6 characters, unambiguous alphabet) · status (§7.2) · payment_method · customer name, phone, optional email · address · district · optional advisory event date · `unstitched_acknowledged_at` (NOT NULL — an order cannot exist without the acknowledgement) · subtotal, delivery_fee, cod_fee, total (whole LKR, frozen at placement) · delivery estimate range · locale · hashed guest access token.
+ORDER_LINE: kind (`listing` | `configured` | `jacket`) · the ids it was resolved from · the SKUs it consumed · a snapshot of the names shown to the customer · unit_price (frozen) · quantity · drape (configured lines only; rendering-only, §3.1).
+ORDER_EVENT: one row per status change, with the actor — the order's history and the source for tracking and notifications.
+
+| Rule | Detail |
+| --- | --- |
+| The server is the only authority | The client sends only references (listing id, jacket colourway id, or design + material + colour + jacket colourway) and quantities. Every price, fee and SKU is resolved on the server at quote time and again at placement. |
+| Price changes are attributed, never silent | Placement carries the total the customer last saw. If the server total differs, the order is NOT placed: the client receives the new quote with each changed line marked (old → new price) and the customer confirms again. |
+| Stock is taken at placement | Inside the order transaction, each SKU is decremented with a conditional update (`quantity >= n`); if any SKU is short the whole order rolls back and the affected lines are reported. Deterministic, never optimistic (§3.2). Reservation at add-to-cart (§3.2) follows when the cart moves server-side; until then the cart lives on the device. |
+| Configured lines need a real stock line | A configured design is orderable only when its design + material + colour resolves to a SAREE_COLOURWAY. Otherwise the line is reported unavailable. |
+| Guest access | The confirmation and tracking pages are reached with the order number plus a random token from the confirmation link; only the token's SHA-256 is stored. |
+| Limits | At most 10 lines and 5 of any line per order, so a single request cannot drain stock. Edge rate limiting (§2.3) is the second layer. |
+
+Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
+
 4. Colour Management Pipeline
 
 Colour is a contractual property of this product. The pipeline below exists so that what is captured, what is displayed, and what is delivered stay in agreement.

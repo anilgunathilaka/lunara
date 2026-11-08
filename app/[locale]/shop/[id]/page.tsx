@@ -89,6 +89,7 @@ export default async function ProductDetailPage({
             <AddToCartFlow
               disabled={product.stockState === 'out'}
               item={{
+                ref: { kind: 'listing', listingId: product.id },
                 designName: product.name,
                 materialLabel,
                 sareeColourName: product.colourName,

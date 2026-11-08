@@ -55,9 +55,9 @@ model Session {
 }
 
 model Account {
-  id           String @id @default(cuid())
-  accountId    String
-  providerId   String
+  id         String @id @default(cuid())
+  accountId  String
+  providerId String
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -171,11 +171,11 @@ model SareeColourway {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  design   SareeDesign    @relation(fields: [designId], references: [id], onDelete: Restrict)
-  material CottonMaterial @relation(fields: [materialId], references: [id], onDelete: Restrict)
+  design   SareeDesign      @relation(fields: [designId], references: [id], onDelete: Restrict)
+  material CottonMaterial   @relation(fields: [materialId], references: [id], onDelete: Restrict)
   /// Every colourway is priced: no matrix row, no colourway (§3.3).
-  price    PriceMatrix    @relation(fields: [designId, materialId], references: [designId, materialId], onDelete: Restrict)
-  stock    StockItem      @relation("SareeColourwayStock", fields: [sku], references: [sku], onDelete: Restrict)
+  price    PriceMatrix      @relation(fields: [designId, materialId], references: [designId, materialId], onDelete: Restrict)
+  stock    StockItem        @relation("SareeColourwayStock", fields: [sku], references: [sku], onDelete: Restrict)
   listings CuratedListing[]
 
   @@unique([designId, materialId, colourName])
@@ -254,4 +254,113 @@ model CuratedListing {
 
   @@index([active, sortOrder])
   @@map("curated_listing")
+}
+
+// ─── Orders (docs/4-architecture.md §3.4, §7.2) ──────────────────────────
+
+enum OrderStatus {
+  placed
+  payment_pending
+  confirmed
+  packed
+  dispatched
+  delivered
+  cancelled
+  return_requested
+  refunded
+  exchanged
+}
+
+enum PaymentMethod {
+  cod
+  bank_transfer
+  lankaqr
+  card
+}
+
+enum OrderLineKind {
+  listing
+  configured
+  jacket
+}
+
+enum Drape {
+  saree
+  osariya
+}
+
+model Order {
+  id                       String        @id @default(cuid())
+  number                   String        @unique
+  status                   OrderStatus
+  paymentMethod            PaymentMethod
+  customerName             String
+  phone                    String
+  email                    String?
+  addressLine              String
+  district                 String
+  eventDate                DateTime?     @db.Date
+  /// NOT NULL: no order exists without the explicit acknowledgement.
+  unstitchedAcknowledgedAt DateTime
+  subtotal                 Int
+  deliveryFee              Int
+  codFee                   Int
+  total                    Int
+  estimateMinDays          Int
+  estimateMaxDays          Int
+  locale                   String
+  /// SHA-256 (hex) of the guest access token; the token itself is never stored.
+  accessTokenHash          String
+  userId                   String?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  lines  OrderLine[]
+  events OrderEvent[]
+
+  @@index([status, createdAt])
+  @@index([phone])
+  @@map("order")
+}
+
+model OrderLine {
+  id                 String        @id @default(cuid())
+  orderId            String
+  kind               OrderLineKind
+  listingId          String?
+  designId           String?
+  materialId         String?
+  sareeColourwayId   String?
+  jacketColourwayId  String
+  sareeSku           String?
+  jacketSku          String
+  drape              Drape?
+  /// Snapshot of what the customer saw, kept even if the catalogue changes.
+  title              String
+  materialName       String?
+  sareeColourName    String?
+  jacketMaterialName String
+  jacketColourName   String
+  unitPrice          Int
+  quantity           Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_line")
+}
+
+model OrderEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  note      String?
+  /// 'customer', 'system', or a staff identifier.
+  actor     String
+  createdAt DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId, createdAt])
+  @@map("order_event")
 }

@@ -35,9 +35,6 @@ export default async function CartPage({ params }: { params: Promise<{ locale: s
           unstitchedLabel={tJacket('shipsUnstitched')}
           subtotalLabel={tSummary('subtotal')}
           deliveryFeeLabel={tSummary('deliveryFee')}
-          codFeeLabel={tSummary('codFee')}
-          codWaivedLabel={tSummary('codWaived')}
-          totalLabel={tSummary('total')}
           checkoutLabel={t('checkout')}
           continueShoppingLabel={t('continueShopping')}
           removedToastMessage={tToast('removed')}

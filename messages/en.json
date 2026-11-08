@@ -55,7 +55,7 @@
     },
     "payment": {
       "cod": "Cash on delivery",
-      "codDetail": "+LKR 350 COD fee — waived when you pay online",
+      "codDetail": "+LKR {fee} COD fee — waived when you pay online",
       "bankTransfer": "Bank transfer",
       "bankTransferDetail": "Pay directly to our account, no extra fee",
       "lankaqr": "LankaQR",
@@ -66,7 +66,10 @@
     "delivery": {
       "estimateRange": "3–5 working days",
       "dispatchCutoff": "Order before 2pm for same-day dispatch",
-      "feeLabel": "Delivery fee"
+      "feeLabel": "Delivery fee",
+      "estimateDays": "{min}–{max} working days",
+      "chooseDistrict": "Choose your district to see the exact fee and delivery time.",
+      "feeRange": "LKR {min}–{max}, depending on your district"
     },
     "checkout": {
       "stepIndicator": "Step {current} of {total}",
@@ -87,10 +90,59 @@
       "eventDateNote": "Advisory only — this helps us pack in time but isn't a guaranteed delivery date.",
       "confirmedHeading": "Order confirmed",
       "confirmedOrderNumberLabel": "Order number",
-      "confirmedBody": "We've sent your confirmation by SMS and WhatsApp, with your order number and delivery estimate.",
       "confirmedUnstitchedReminder": "Remember: your jacket material ships unstitched. Your printed care and returns cards will arrive in the parcel.",
       "backHome": "Back to home",
-      "continueShopping": "Keep shopping"
+      "continueShopping": "Keep shopping",
+      "emailLabel": "Email (optional)",
+      "phoneHint": "Sri Lankan mobile, e.g. 077 123 4567",
+      "phoneInvalid": "Enter a Sri Lankan mobile number, e.g. 077 123 4567.",
+      "networkError": "That didn't go through. Your details are saved — try again, or send this to us on WhatsApp.",
+      "retry": "Try again",
+      "sendOnWhatsApp": "Send on WhatsApp",
+      "whatsappOrderIntro": "Hello Lunara, I'd like to place this order:",
+      "invalidDetails": "Some details need another look. Check them and try again.",
+      "fixCart": "Some items need your attention before you continue."
+    },
+    "quote": {
+      "priceChanged": "Price updated — was {old}",
+      "unavailable": "No longer available. Remove it to continue.",
+      "insufficient": "Only {count} left. Lower the quantity to continue.",
+      "totalChanged": "Something changed since you last looked — the updated items are marked. Check the new total, then place your order.",
+      "loading": "Checking prices and stock…",
+      "failed": "We couldn't check prices just now."
+    },
+    "confirmed": {
+      "pendingHeading": "Order received — awaiting payment",
+      "body": "We'll confirm your order on WhatsApp or by phone at {phone}. Keep this page — it's your order record.",
+      "bookmark": "Bookmark this page to check your order later.",
+      "statusLabel": "Status",
+      "paymentLabel": "Payment",
+      "deliverToLabel": "Delivering to",
+      "estimateLabel": "Estimated delivery",
+      "itemsHeading": "Items",
+      "quantity": "Qty {count}",
+      "codNote": "Please have {total} ready for the courier.",
+      "bankHeading": "Bank transfer details",
+      "bankBody": "Transfer {total} and use {number} as the reference. We confirm your order as soon as the payment arrives.",
+      "bankName": "Bank",
+      "branch": "Branch",
+      "accountName": "Account name",
+      "accountNumber": "Account number",
+      "bankPlaceholderWarning": "Our bank details are not published yet. Please don't transfer money — we'll contact you with the details.",
+      "notFound": "We couldn't find that order. Check the link from your confirmation, or contact us on WhatsApp.",
+      "contactWhatsApp": "Message us on WhatsApp"
+    },
+    "orderStatus": {
+      "placed": "Placed",
+      "payment_pending": "Awaiting payment",
+      "confirmed": "Confirmed",
+      "packed": "Packed",
+      "dispatched": "Dispatched",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled",
+      "return_requested": "Return requested",
+      "refunded": "Refunded",
+      "exchanged": "Exchanged"
     }
   },
   "layout": {
@@ -284,5 +336,32 @@
       "body": "Your sign-in code is {code}. It expires in {minutes} minutes.",
       "ignore": "If you didn't ask for this code, you can ignore this email. Never share this code with anyone."
     }
+  },
+  "districts": {
+    "colombo": "Colombo",
+    "gampaha": "Gampaha",
+    "kalutara": "Kalutara",
+    "kandy": "Kandy",
+    "matale": "Matale",
+    "nuwara-eliya": "Nuwara Eliya",
+    "galle": "Galle",
+    "matara": "Matara",
+    "hambantota": "Hambantota",
+    "kurunegala": "Kurunegala",
+    "puttalam": "Puttalam",
+    "anuradhapura": "Anuradhapura",
+    "polonnaruwa": "Polonnaruwa",
+    "badulla": "Badulla",
+    "monaragala": "Monaragala",
+    "ratnapura": "Ratnapura",
+    "kegalle": "Kegalle",
+    "jaffna": "Jaffna",
+    "kilinochchi": "Kilinochchi",
+    "mannar": "Mannar",
+    "vavuniya": "Vavuniya",
+    "mullaitivu": "Mullaitivu",
+    "batticaloa": "Batticaloa",
+    "ampara": "Ampara",
+    "trincomalee": "Trincomalee"
   }
 }

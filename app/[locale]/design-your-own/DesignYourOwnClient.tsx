@@ -139,6 +139,16 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
     if (price === undefined) return;
     const drapeLabel = drape === 'saree' ? props.sareeLabel : props.osariyaLabel;
     const id = addItem({
+      // The server decides whether this combination is a real, stocked
+      // colourway; colours are still sample data (see import note above).
+      ref: {
+        kind: 'configured',
+        designId,
+        materialId: material,
+        colourName: selectedColour?.label ?? '',
+        jacketColourwayId: jacketId,
+        drape,
+      },
       designName: selectedDesign.name,
       materialLabel: material === 'plain' ? props.plainLabel : props.superLabel,
       sareeColourName: selectedColour?.label ?? '',

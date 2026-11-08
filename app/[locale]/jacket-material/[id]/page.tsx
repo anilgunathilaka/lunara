@@ -68,6 +68,7 @@ export default async function JacketDetailPage({ params }: { params: Promise<{ l
             <AddToCartFlow
               disabled={jacket.stockState === 'out'}
               item={{
+                ref: { kind: 'jacket', jacketColourwayId: jacket.id },
                 designName: jacket.materialName,
                 materialLabel: jacket.composition,
                 jacketMaterialName: jacket.materialName,
