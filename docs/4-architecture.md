@@ -360,6 +360,21 @@ Preview: composited approximation, labelled as such
 
 5. The 360° Preview Pipeline
 
+5.0 Decision (2026-11-09): 3D model in the browser
+
+PRD §4.4 now records the founder's decision: the preview is a 3D model rendered on the customer's device with WebGL (three.js), replacing server-side compositing of photographed frames. Sections 5.1 to 5.3 below describe the earlier frame-compositing design and are kept for the record; where they conflict, this section wins.
+
+| Rule | Detail |
+| --- | --- |
+| Model | One 3D model (glTF binary, `.glb`) whose garment parts are separate, named meshes: `Saree` (body and pleats), `Pallu`, `Jacket`, and optionally `Frill`. Parts used by only one drape carry the suffix `_saree` or `_osariya` and are shown only for that drape. Until a model exists, a built-in placeholder figure with the same parts is used, so nothing else changes when the model arrives. |
+| Painting | Saree and pallu: the design's pattern (its tintable asset, or a built-in pattern until one is uploaded), multiplied by the saree colour, with the material's weave and sheen (Plain: matte, open weave; Super: finer weave, soft sheen). Jacket: the jacket colour, with its swatch photograph as a tiled texture when one exists. Colour is a tint, so any design renders in any colour. |
+| Rotation | By hand only (drag, swipe, arrow keys, the rotate buttons), one-to-one with input; never auto-played (UX-C8). Vertical tilt is limited so the model is always upright. |
+| Cost | No server work: the page ships plain data and the model file. The 3D library loads only on this page. The renderer draws only when something changes. |
+| Honesty | The HonestyNote stays beside the preview (FR-22); alt text names the selection and says it is a rendered approximation. |
+| Degrades, never blocks | No WebGL, a failed load or a renderer error swaps to the static fallback with FallbackNotice (§5.4). Choosing and buying never depend on the preview. |
+| Buyable vs viewable | Any combination can be previewed. Only a combination that exists as a stocked saree colourway can be added to the cart; the colour picker shows the others disabled, never hidden (UX-C5). |
+
+
 The most demanding component in the system. The approach follows the layered-compositing decision recorded in PRD Section 4.4.
 
 5.1 Asset Production
@@ -419,7 +434,8 @@ Because designs are recolourable, colour costs nothing in capture: it is a tint 
 | Option | Assessment | Verdict |
 | --- | --- | --- |
 | Client-side canvas compositing | Zero server cost and instant response after load, but requires shipping base frames, masks and shading maps to the device. At N frames × multiple layers this is far beyond the mobile payload budget. | Rejected on payload |
-| Server-side compositing with CDN cache | Server composites on demand and caches the result at the edge. First request for a combination is slower; every subsequent one is a static fetch. Payload to device is a plain image sequence. | SELECTED |
+| Client-side 3D model (WebGL) | One model file plus small textures; every combination and every angle rendered on the device. | SELECTED 2026-11-09 (§5.0) |
+| Server-side compositing with CDN cache | Server composites on demand and caches the result at the edge. First request for a combination is slower; every subsequent one is a static fetch. Payload to device is a plain image sequence. | Superseded by §5.0: not possible within the Workers Free CPU budget |
 | Full pre-render of all combinations | Every combination rendered ahead of time. Storage becomes very large and every new material triggers a full re-render. | Rejected on storage and agility |
 | Hybrid: pre-render popular, composite the rest | Pre-render curated and historically popular pairings; composite the long tail on demand. | Recommended optimisation once usage data exists |
 

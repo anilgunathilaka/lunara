@@ -255,6 +255,8 @@ onRenderFailure     → triggers FallbackNotice
 
 >
 
+Since 2026-11-09 (docs/4-architecture.md §5.0) the preview is a 3D model drawn in the browser by ConfiguratorViewer; it receives the selection (pattern, saree colour, material, jacket, drape) instead of a frame URL, and a rotation angle replaces frameIndex. The requirements below are unchanged.
+
 | Requirement | Specification | UX rule |
 | --- | --- | --- |
 | Update latency | Under 500ms from selection to rendered change. | UX-C4 |

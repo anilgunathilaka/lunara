@@ -2190,3 +2190,20 @@ body {
   font: var(--type-body-s) var(--font-body);
   color: var(--lun-ink-muted);
 }
+
+/* ── Configurator 3D preview (docs/4-architecture.md §5.0) ── */
+.configurator-viewer-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.configurator-viewer-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+  background: var(--lun-surface);
+}

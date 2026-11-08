@@ -248,6 +248,12 @@
     "devOnly": {
       "simulateFailure": "Simulate renderer failure",
       "restoreRenderer": "Restore renderer"
+    },
+    "viewer": {
+      "label": "Rendered 3D preview, not a photograph: {design} design in {colour}, {material}, with {jacket} jacket material, {drape} drape. Drag or use the arrow keys to turn it.",
+      "loading": "Setting up your canvas",
+      "notOffered": "You can preview this, but {colour} in {material} isn’t available to order in this design yet. Choose a colour that isn’t greyed out, or the other cotton.",
+      "outOfStock": "This combination is out of stock right now. Choose another colour or jacket material."
     }
   },
   "home": {

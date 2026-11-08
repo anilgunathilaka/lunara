@@ -1,18 +1,32 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { getConfiguratorCatalogue } from '@/lib/catalogue/queries';
-import { DesignYourOwnClient } from './DesignYourOwnClient';
+import { CONFIGURATOR_MODEL_URL } from '@/lib/configurator/model';
+import { DesignYourOwnClient, type InitialSelection } from './DesignYourOwnClient';
 
 /**
- * Path B (docs/1-ux.md Flow B). PreviewCanvas shows a static placeholder
- * regardless of selection — there is no real photography or server-side
- * compositor yet (docs/4-architecture.md §5), same as the /dev/configurator
- * QA page this was adapted from. Opens pre-loaded (UX-C1), never an empty
- * canvas — first design/'plain'/'teal'/first jacket/'saree' is the
- * starting combination.
+ * Path B (docs/1-ux.md Flow B). The preview is a 3D model drawn in the
+ * browser (docs/4-architecture.md §5.0). Opens pre-loaded (UX-C1), never an
+ * empty canvas: on a stocked combination, or on the one a shared link names
+ * (?d=design&m=material&c=colour&j=jacket&dr=drape, UX-C12).
  */
-export default async function DesignYourOwnPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function DesignYourOwnPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { locale } = await params;
+  const query = await searchParams;
+  const one = (key: string) => (typeof query[key] === 'string' ? (query[key] as string).slice(0, 100) : undefined);
+  const initial: InitialSelection = {
+    designId: one('d'),
+    material: one('m') === 'super' ? 'super' : one('m') === 'plain' ? 'plain' : undefined,
+    colourName: one('c'),
+    jacketId: one('j'),
+    drape: one('dr') === 'osariya' ? 'osariya' : one('dr') === 'saree' ? 'saree' : undefined,
+  };
   setRequestLocale(locale);
   // Designs, jackets and every price come from the database, resolved on
   // the server (docs/4-architecture.md §3.3, §7.1).
@@ -38,6 +52,8 @@ export default async function DesignYourOwnPage({ params }: { params: Promise<{ 
       <div className="home-section-inner">
         <DesignYourOwnClient
           catalogue={catalogue}
+          initial={initial}
+          modelUrl={CONFIGURATOR_MODEL_URL}
           plainLabel={tFabric('materialPlain')}
           superLabel={tFabric('materialSuper')}
           sareeLabel={tDrape('saree')}

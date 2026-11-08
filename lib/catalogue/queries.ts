@@ -7,6 +7,7 @@ import { resolvePairedPrice, resolveStandaloneJacketPrice } from '@/lib/pricing/
 import { availabilityOf, combinedAvailability } from '@/lib/stock/state';
 import {
   PLACEHOLDER_IMAGE,
+  colourwayKey,
   deltaKey,
   quoteKey,
   type CatalogueProduct,
@@ -159,7 +160,7 @@ export async function getStandaloneJacket(id: string): Promise<JacketProductDeta
 export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue> {
   await connection();
   const prisma = getPrisma();
-  const [designRows, jacketRows] = await Promise.all([
+  const [designRows, jacketRows, colourwayRows, materialRows] = await Promise.all([
     prisma.sareeDesign.findMany({
       relationLoadStrategy: 'join',
       where: { active: true },
@@ -172,6 +173,13 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
       include: jacketInclude,
       orderBy: jacketOrder,
     }),
+    prisma.sareeColourway.findMany({
+      relationLoadStrategy: 'join',
+      where: { design: { active: true }, material: { active: true } },
+      include: { stock: true },
+      orderBy: [{ colourName: 'asc' }],
+    }),
+    prisma.cottonMaterial.findMany({ select: { id: true, textureOverlayUrl: true } }),
   ]);
 
   const quotes: Record<string, number> = {};
@@ -183,7 +191,12 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
     const superCotton = design.prices.find((p) => p.materialId === 'super');
     // A design is offered only when it is priced in both materials.
     if (!plain || !superCotton) continue;
-    designs.push({ id: design.id, name: design.name, thumbnailUrl: mediaUrlOr(design.patternAssetUrl, PLACEHOLDER_IMAGE) });
+    designs.push({
+      id: design.id,
+      name: design.name,
+      thumbnailUrl: mediaUrlOr(design.patternAssetUrl, PLACEHOLDER_IMAGE),
+      patternUrl: design.patternAssetUrl ? mediaUrl(design.patternAssetUrl) : null,
+    });
 
     for (const jacket of jacketRows) {
       const addOn = jacket.material.pairingAddOn;
@@ -202,8 +215,27 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
     colourName: row.colourName,
     swatchHex: row.colourHex,
     thumbnailUrl: mediaUrlOr(row.swatchUrl, PLACEHOLDER_IMAGE),
+    textureUrl: row.textureTileUrl ? mediaUrl(row.textureTileUrl) : row.swatchUrl ? mediaUrl(row.swatchUrl) : null,
     stockState: availabilityOf(row.stock).state,
   }));
 
-  return { designs, jackets, quotes, materialDeltas };
+  // The palette is every colour in the range; buyability is per colourway.
+  const palette = new Map<string, string>();
+  const colourways: ConfiguratorCatalogue['colourways'] = {};
+  for (const row of colourwayRows) {
+    if (!palette.has(row.colourName)) palette.set(row.colourName, row.colourHex);
+    const availability = availabilityOf(row.stock);
+    (colourways[colourwayKey(row.designId, toMaterialId(row.materialId))] ??= []).push({
+      colourName: row.colourName,
+      stockState: availability.state,
+      quantity: availability.quantity,
+    });
+  }
+  const colours = [...palette].map(([name, hex]) => ({ name, hex }));
+  const texture = (id: MaterialId) => {
+    const key = materialRows.find((m) => m.id === id)?.textureOverlayUrl;
+    return key ? mediaUrl(key) : null;
+  };
+
+  return { designs, jackets, colours, colourways, materialTextures: { plain: texture('plain'), super: texture('super') }, quotes, materialDeltas };
 }

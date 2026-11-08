@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { PreviewCanvas } from '@/components/configurator/PreviewCanvas';
 import { HonestyNote } from '@/components/configurator/HonestyNote';
 import { DesignPicker } from '@/components/configurator/DesignPicker';
 import { MaterialSelector, type MaterialValue } from '@/components/configurator/MaterialSelector';
@@ -17,15 +18,29 @@ import { Button } from '@/components/primitives/Button';
 import { SlideOver } from '@/components/layout/SlideOver';
 import { useCart } from '@/lib/cart/CartContext';
 import type { PriceChangeCause } from '@/components/configurator/PriceAttribution';
-import { deltaKey, quoteKey, type ConfiguratorCatalogue } from '@/lib/catalogue/types';
-// Colours are still sample data: per-colour stock for every design ×
-// material needs the real range (PRD Q1) and arrives with the configurator
-// data rebuild. Designs, jackets and prices below are live.
-import { devColours } from '@/content/dev/configurator-samples';
+import { colourwayKey, deltaKey, quoteKey, type ConfiguratorCatalogue } from '@/lib/catalogue/types';
+
+// The 3D library loads only here, after the page is interactive (docs/4-architecture.md §5.0).
+const ConfiguratorViewer = dynamic(
+  () => import('@/components/configurator/ConfiguratorViewer').then((m) => m.ConfiguratorViewer),
+  { ssr: false },
+);
+
+/** A starting selection, e.g. from a shared link (UX-C12). Every field is checked against the catalogue. */
+export interface InitialSelection {
+  designId?: string;
+  material?: MaterialValue;
+  colourName?: string;
+  jacketId?: string;
+  drape?: DrapeValue;
+}
 
 export interface DesignYourOwnClientProps {
-  /** Designs, jackets and server-resolved prices (docs/4-architecture.md §7.1). */
+  /** Designs, colours, jackets, stock and server-resolved prices (docs/4-architecture.md §7.1). */
   catalogue: ConfiguratorCatalogue;
+  initial: InitialSelection;
+  /** A real .glb once one exists; null shows the built-in figure (lib/configurator/model.ts). */
+  modelUrl: string | null;
   plainLabel: string;
   superLabel: string;
   sareeLabel: string;
@@ -62,20 +77,48 @@ export interface DesignYourOwnClientProps {
   swatchesToastMessage: string;
 }
 
-const FRAME_COUNT = 8;
 const SAVED_DESIGNS_KEY = 'lunara.savedDesigns.v1';
 
+/** Opens on a combination that can actually be bought, unless a shared link asks for another (UX-C1). */
+function startingSelection(catalogue: ConfiguratorCatalogue, initial: InitialSelection) {
+  const { designs, jackets, colours, colourways } = catalogue;
+  let designId = designs[0]!.id;
+  let material: MaterialValue = 'plain';
+  let colourName = colours[0]?.name ?? '';
+  search: for (const design of designs) {
+    for (const m of ['plain', 'super'] as const) {
+      const stocked = colourways[colourwayKey(design.id, m)]?.find((c) => c.stockState !== 'out');
+      if (stocked) {
+        designId = design.id;
+        material = m;
+        colourName = stocked.colourName;
+        break search;
+      }
+    }
+  }
+  return {
+    designId: designs.some((d) => d.id === initial.designId) ? initial.designId! : designId,
+    material: initial.material ?? material,
+    colourName: colours.some((c) => c.name === initial.colourName) ? initial.colourName! : colourName,
+    jacketId: jackets.some((j) => j.id === initial.jacketId)
+      ? initial.jacketId!
+      : (jackets.find((j) => j.stockState !== 'out') ?? jackets[0]!).id,
+    drape: initial.drape ?? ('saree' as DrapeValue),
+  };
+}
+
 export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
-  const { designs, jackets, quotes, materialDeltas } = props.catalogue;
+  const { designs, jackets, colours, colourways, quotes, materialDeltas } = props.catalogue;
   const { addItem, items, setQuantity, removeItem } = useCart();
+  const t = useTranslations('configurator.viewer');
 
   // The page guarantees at least one design and one jacket.
-  const [designId, setDesignId] = useState<string>(designs[0]!.id);
-  const [material, setMaterial] = useState<MaterialValue>('plain');
-  const [colourId, setColourId] = useState('teal');
-  const [jacketId, setJacketId] = useState<string>(jackets[0]!.id);
-  const [drape, setDrape] = useState<DrapeValue>('saree');
-  const [frameIndex, setFrameIndex] = useState(0);
+  const [start] = useState(() => startingSelection(props.catalogue, props.initial));
+  const [designId, setDesignId] = useState<string>(start.designId);
+  const [material, setMaterial] = useState<MaterialValue>(start.material);
+  const [colourName, setColourName] = useState(start.colourName);
+  const [jacketId, setJacketId] = useState<string>(start.jacketId);
+  const [drape, setDrape] = useState<DrapeValue>(start.drape);
   const [rendererBroken, setRendererBroken] = useState(false);
 
   const [previousPrice, setPreviousPrice] = useState<number>();
@@ -90,16 +133,30 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
   const price = quotes[quoteKey(designId, material, jacketId)];
   const priceDelta = materialDeltas[deltaKey(designId, jacketId)] ?? 0;
   const selectedDesign = designs.find((d) => d.id === designId) ?? designs[0]!;
-  const selectedColour = devColours.find((c) => c.id === colourId);
+  const selectedColour = colours.find((c) => c.name === colourName) ?? colours[0];
   const selectedJacket = jackets.find((j) => j.id === jacketId) ?? jackets[0]!;
+  const materialLabel = material === 'plain' ? props.plainLabel : props.superLabel;
 
-  const colourItems = devColours.map((c) => ({
-    id: c.id,
-    colourHex: c.colourHex,
-    label: c.label,
-    materialName: c.materialName,
-    availability: 'available' as const,
-  }));
+  // Buyable only as a stocked colourway (docs/4-architecture.md §5.0); every
+  // colour still shows, unavailable ones disabled, never hidden (UX-C5).
+  const stocked = colourways[colourwayKey(designId, material)] ?? [];
+  const colourway = stocked.find((c) => c.colourName === colourName);
+  const colourItems = colours.map((c) => {
+    const row = stocked.find((x) => x.colourName === c.name);
+    const availability: 'available' | 'disabled' | 'low-stock' =
+      !row || row.stockState === 'out' ? 'disabled' : row.stockState === 'low' ? 'low-stock' : 'available';
+    return { id: c.name, colourHex: c.hex, label: c.name, materialName: materialLabel, availability };
+  });
+  const buyable =
+    price !== undefined && !!colourway && colourway.stockState !== 'out' && selectedJacket.stockState !== 'out';
+  const drapeLabel = drape === 'saree' ? props.sareeLabel : props.osariyaLabel;
+  const viewerLabel = t('label', {
+    design: selectedDesign.name,
+    colour: selectedColour?.name ?? '',
+    material: materialLabel,
+    jacket: selectedJacket.name,
+    drape: drapeLabel,
+  });
 
   const jacketOptions = jackets.map((j) => ({
     id: j.id,
@@ -132,26 +189,23 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
   // UX-C3: drape switch preserves design, material, colour and jacket.
   function handleDrapeChange(nextDrape: DrapeValue) {
     setDrape(nextDrape);
-    setFrameIndex(0);
   }
 
   function handleAddToCart() {
-    if (price === undefined) return;
-    const drapeLabel = drape === 'saree' ? props.sareeLabel : props.osariyaLabel;
+    if (price === undefined || !buyable) return;
     const id = addItem({
-      // The server decides whether this combination is a real, stocked
-      // colourway; colours are still sample data (see import note above).
+      // The server re-checks that this is a real, stocked colourway and prices it.
       ref: {
         kind: 'configured',
         designId,
         materialId: material,
-        colourName: selectedColour?.label ?? '',
+        colourName,
         jacketColourwayId: jacketId,
         drape,
       },
       designName: selectedDesign.name,
-      materialLabel: material === 'plain' ? props.plainLabel : props.superLabel,
-      sareeColourName: selectedColour?.label ?? '',
+      materialLabel,
+      sareeColourName: colourName,
       jacketMaterialName: selectedJacket.materialName,
       jacketColourName: selectedJacket.colourName,
       drapeLabel,
@@ -169,7 +223,7 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
     try {
       const raw = window.localStorage.getItem(SAVED_DESIGNS_KEY);
       const saved = raw ? JSON.parse(raw) : [];
-      saved.push({ designId, material, colourId, jacketId, drape, savedAt: Date.now() });
+      saved.push({ designId, material, colourName, jacketId, drape, savedAt: Date.now() });
       window.localStorage.setItem(SAVED_DESIGNS_KEY, JSON.stringify(saved));
     } catch {
       // Storage unavailable — the save simply doesn't persist this session.
@@ -177,9 +231,16 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
     setToastMessage(props.savedToastMessage);
   }
 
+  /** The link reopens this exact combination (UX-C12), no account needed. */
+  function shareUrl(): string {
+    const url = new URL(window.location.href);
+    url.search = new URLSearchParams({ d: designId, m: material, c: colourName, j: jacketId, dr: drape }).toString();
+    return url.toString();
+  }
+
   async function handleShare() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(shareUrl());
     } catch {
       // Clipboard unavailable — the toast still confirms the intent.
     }
@@ -196,17 +257,31 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
     <div className="flex flex-col gap-6 pb-24 lg:flex-row lg:items-start lg:pb-0">
       <div className="flex flex-1 flex-col gap-3">
         {rendererBroken ? (
-          <FallbackNotice message={props.fallbackMessage} />
+          // Degrades, never blocks (§5.4): every picker and the cart keep working.
+          <>
+            <FallbackNotice message={props.fallbackMessage} />
+            <div className="preview-canvas">
+              {/* eslint-disable-next-line @next/next/no-img-element -- static fallback image */}
+              <img src={selectedDesign.thumbnailUrl} alt={viewerLabel} className="preview-canvas-frame" />
+            </div>
+          </>
         ) : (
-          <PreviewCanvas
-            frameUrl={selectedDesign.thumbnailUrl}
-            frameAlt={`${selectedDesign.name}, frame ${frameIndex + 1} of ${FRAME_COUNT}`}
-            frameCount={FRAME_COUNT}
-            frameIndex={frameIndex}
-            onRotate={setFrameIndex}
-            onRenderFailure={() => setRendererBroken(true)}
+          <ConfiguratorViewer
+            selection={{
+              designId,
+              patternUrl: selectedDesign.patternUrl,
+              sareeHex: selectedColour?.hex ?? '',
+              material,
+              jacketHex: selectedJacket.swatchHex,
+              jacketTextureUrl: selectedJacket.textureUrl,
+              drape,
+            }}
+            modelUrl={props.modelUrl}
+            label={viewerLabel}
+            loadingLabel={t('loading')}
             rotateLeftLabel={props.rotateLeftLabel}
             rotateRightLabel={props.rotateRightLabel}
+            onFailure={() => setRendererBroken(true)}
           />
         )}
         <HonestyNote
@@ -260,8 +335,8 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
           <h2 className="field-label">{props.colourHeading}</h2>
           <ColourPicker
             colours={colourItems}
-            selectedColourId={colourId}
-            onSelect={setColourId}
+            selectedColourId={colourName}
+            onSelect={setColourName}
             disabledAnnouncement={props.disabledAnnouncement}
             lowStockAnnouncement={props.lowStockAnnouncement}
           />
@@ -278,6 +353,15 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
             disabledAnnouncement={props.disabledAnnouncement}
           />
         </div>
+
+        {!buyable && (
+          // Says why, beside the choices, rather than a silently disabled button.
+          <p className="field-message" role="status">
+            {colourway?.stockState === 'out' || selectedJacket.stockState === 'out'
+              ? t('outOfStock')
+              : t('notOffered', { colour: colourName, material: materialLabel })}
+          </p>
+        )}
       </div>
 
       <ConfiguratorBar
@@ -285,7 +369,7 @@ export function DesignYourOwnClient(props: DesignYourOwnClientProps) {
         previousPrice={previousPrice}
         cause={cause}
         causeLabel={causeLabel}
-        canAddToCart={price !== undefined && selectedJacket.stockState !== 'out'}
+        canAddToCart={buyable}
         onAddToCart={handleAddToCart}
         onSave={handleSave}
         onShare={handleShare}

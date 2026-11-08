@@ -302,6 +302,8 @@ Per design, the additional asset requirement is a tileable pattern asset produce
 
 [DECISION REQUIRED] The composited preview cannot be covered by the colour-accuracy guarantee, because it is a rendering rather than a photograph. Section 6.1 scopes the guarantee to product page photography only. This must be communicated honestly in the configurator itself (FR-22), or the brand's best feature will become its largest source of colour complaints.
 
+DECISION (2026-11-09, founder): the preview is a real 3D model rendered in the customer's browser, not a set of composited photographs. The customer turns the model 360° by hand; the selected design (tinted to the selected colour), material and jacket are painted onto its saree, pallu and jacket parts live. Reasons: it gives true all-angle viewing (FR-16) at no running cost, where server-side compositing is not possible on the hosting budget; and adding a design still needs only a pattern asset, never a new model. The model starts as a built-in placeholder figure and is replaced by an AI-generated 3D model when one exists. It remains an approximation: FR-22 and Section 6.1 apply unchanged. Physics-based garment simulation stays deferred to Phase 3–4.
+
 4.5 Standalone Jacket Material — Requirements
 
 | ID | Requirement | Priority |
