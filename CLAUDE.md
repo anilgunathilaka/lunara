@@ -66,7 +66,8 @@ lives in `lib/tokens.css`, sourced from docs/2-ui.md §8.
 
 ## Tech stack
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 ·
-PostgreSQL (Supabase-hosted) · Prisma ORM · Better Auth · React Hook Form · Zod ·
+Cloudflare Workers via OpenNext (Wrangler) · PostgreSQL (Supabase-hosted, via
+Hyperdrive) · Prisma ORM 7 (adapter-pg) · Better Auth (passwordless) · React Hook Form · Zod ·
 Server Actions · Route Handlers · Sharp · Framer Motion · Lucide
 Icons · Resend · React Email · Cloudflare R2 (local storage in dev) ·
 next-intl (Sinhala / Tamil / English) · ESLint · Prettier.
