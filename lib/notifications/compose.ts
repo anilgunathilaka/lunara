@@ -4,6 +4,8 @@ import type { NotificationChannel, NotificationStatus, Prisma } from '@prisma/cl
 import { routing, type AppLocale } from '@/i18n/routing';
 import { BANK_TRANSFER } from '@/lib/commerce/business';
 import { formatPriceLKR } from '@/lib/pricing/format';
+import { reviewLink } from '@/lib/reviews/link';
+import { siteUrl } from '@/lib/site';
 import en from '@/messages/en.json';
 import si from '@/messages/si.json';
 import ta from '@/messages/ta.json';
@@ -55,10 +57,8 @@ export function isNotifiable(status: string): status is NotifiableEvent {
   return Object.hasOwn(ROUTES, status);
 }
 
-/** Public origin for links in messages (wrangler var on the Worker, .env locally). */
-export function siteUrl(): string {
-  return (process.env.BETTER_AUTH_URL ?? 'http://localhost:3000').replace(/\/+$/, '');
-}
+/** Re-exported for existing callers; defined in lib/site.ts so lib/reviews can use it too. */
+export { siteUrl };
 
 export interface OrderForMessages {
   id: string;
@@ -103,6 +103,7 @@ export function composeNotifications(
     careLink: `${site}/${locale}/support/care-guide`,
     returnsLink: `${site}/${locale}/support/returns`,
     jacketLink: `${site}/${locale}/jacket-material`,
+    reviewLink: reviewLink(order.number, locale),
   };
 
   function render(template: Template): { subject: string | null; body: string } {

@@ -9,6 +9,8 @@ import { JacketBlock } from '@/components/product/JacketBlock';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState } from '@/components/product/StockState';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ReviewList } from '@/components/reviews/ReviewList';
+import { listingReviews } from '@/lib/reviews/reviews';
 import { Accordion } from '@/components/layout/Accordion';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
 import { getCuratedListing, getCuratedListings } from '@/lib/catalogue/queries';
@@ -22,7 +24,11 @@ export default async function ProductDetailPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   // Parallel, not sequential: each read is a round trip to the database.
-  const [product, others] = await Promise.all([getCuratedListing(id), getCuratedListings({ limit: 4 })]);
+  const [product, others, reviewData] = await Promise.all([
+    getCuratedListing(id),
+    getCuratedListings({ limit: 4 }),
+    listingReviews(id),
+  ]);
   if (!product) notFound();
 
   const [tFabric, tOpacity, tJacket, tStock, tGallery, tPdp, tCart, tSlideover, tAccordion] =
@@ -169,12 +175,18 @@ export default async function ProductDetailPage({
             },
             {
               id: 'reviews',
-              title: tPdp('reviewsHeading'),
-              content: (
-                <div className="home-proof-placeholder">
-                  <p>{tPdp('reviewsNone')}</p>
-                </div>
-              ),
+              title:
+                reviewData.summary.count > 0 && reviewData.summary.average !== null
+                  ? tPdp('reviewsHeadingSummary', { count: reviewData.summary.count, average: reviewData.summary.average.toFixed(1) })
+                  : tPdp('reviewsHeading'),
+              content:
+                reviewData.reviews.length > 0 ? (
+                  <ReviewList reviews={reviewData.reviews} />
+                ) : (
+                  <div className="home-proof-placeholder">
+                    <p>{tPdp('reviewsNone')}</p>
+                  </div>
+                ),
             },
           ]}
         />

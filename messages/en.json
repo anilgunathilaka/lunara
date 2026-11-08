@@ -158,7 +158,8 @@
         "packed": "Packed",
         "dispatched": "With the courier",
         "delivered": "Delivered"
-      }
+      },
+      "writeReview": "Write a review"
     }
   },
   "layout": {
@@ -314,7 +315,8 @@
     "relatedHeading": "You might also like",
     "outOfStockLabel": "This colourway is out of stock.",
     "viewCart": "View cart",
-    "keepShopping": "Keep shopping"
+    "keepShopping": "Keep shopping",
+    "reviewsHeadingSummary": "Reviews ({count}) · {average} out of 5"
   },
   "jacketPage": {
     "title": "Jacket Material",
@@ -409,7 +411,8 @@
       "stock": "Stock",
       "prices": "Prices",
       "messages": "Messages",
-      "photos": "Photos"
+      "photos": "Photos",
+      "reviews": "Reviews"
     },
     "columns": {
       "number": "Order",
@@ -523,6 +526,22 @@
         "locked": "The reference frame is already set and cannot be replaced.",
         "network": "Connection lost while uploading {name}. Try again."
       }
+    },
+    "reviews": {
+      "intro": "Every review is from a delivered order. Reply in public to criticism; never hide a review for being negative. Hide only for one of the listed reasons.",
+      "none": "No reviews yet.",
+      "responseLabel": "Public reply from Lunara",
+      "publishResponse": "Publish reply",
+      "updateResponse": "Update reply",
+      "reasonLabel": "Reason to hide",
+      "reason": {
+        "personal_data": "Contains personal information",
+        "abusive": "Abusive or offensive language",
+        "not_about_product": "Not about the product"
+      },
+      "hide": "Hide",
+      "show": "Show again",
+      "hiddenBecause": "Hidden: {reason}"
     }
   },
   "notifications": {
@@ -543,7 +562,7 @@
     "deliveredDay1": "Lunara: we hope you love your saree! Cotton care tips: {careLink}. Returns policy: {returnsLink}. Your jacket material is unstitched — take it to your tailor to have it made.",
     "deliveredDay3": "Lunara: how is your order {number}? If anything isn't right, reply here — we're happy to help.",
     "deliveredDay14Subject": "Share a photo of your Lunara saree?",
-    "deliveredDay14": "Lunara: would you share a photo of your saree? Real photos help other customers trust the colour. Just reply here with a photo — thank you!",
+    "deliveredDay14": "Lunara: how is your saree? A photo and a few words help other customers trust the colour. Share them here: {reviewLink} — thank you!",
     "deliveredDay45Subject": "A new jacket piece for your saree?",
     "deliveredDay45": "Lunara: new arrivals are in, and our jacket materials can be bought on their own to refresh a saree you already love: {jacketLink}"
   },
@@ -562,6 +581,46 @@
       "addToAccount": "Add to my account",
       "viewInAccount": "View in My orders",
       "failed": "We couldn't add this order to your account. Contact us on WhatsApp and we'll sort it out."
+    }
+  },
+  "reviews": {
+    "write": {
+      "heading": "Review your order",
+      "intro": "Order {number}. Tell other customers what the saree is really like — the colour, the feel of the cotton, the jacket material.",
+      "notYet": "You can write a review once your order has arrived.",
+      "thanks": "Thank you — your review is published.",
+      "alreadyReviewed": "You have reviewed this item.",
+      "ratingOf": "{rating} out of 5",
+      "ratingLabel": "Your rating",
+      "ratingWords": {
+        "1": "Poor",
+        "2": "Fair",
+        "3": "Good",
+        "4": "Very good",
+        "5": "Excellent"
+      },
+      "bodyLabel": "Your review",
+      "bodyHint": "At least 10 characters. Honest reviews, good or bad, are published as written.",
+      "photosLabel": "Photos (optional, up to {max})",
+      "nameLabel": "Name shown with your review",
+      "publicNote": "Shown publicly with your district ({district}) and your photos. Your phone number and address are never shown.",
+      "submit": "Publish review",
+      "helpWhatsApp": "Need help? Message us on WhatsApp",
+      "error": {
+        "invalid": "Please choose a rating and write at least 10 characters.",
+        "link": "We couldn't find this order. Use the link from your message.",
+        "notYet": "You can write a review once your order has arrived.",
+        "exists": "This item already has a review.",
+        "photoFormat": "Photos must be JPEG, PNG or WebP.",
+        "photoSize": "Each photo must be 8 MB or smaller.",
+        "photoCount": "Please choose up to {max} photos."
+      }
+    },
+    "show": {
+      "ratingOf": "{rating} out of 5",
+      "verified": "Verified purchase",
+      "photoAlt": "Photo by {name}, {n}",
+      "responseFrom": "Reply from Lunara"
     }
   }
 }

@@ -321,6 +321,7 @@ model Order {
   lines         OrderLine[]
   events        OrderEvent[]
   notifications Notification[]
+  reviews       Review[]
 
   @@index([status, createdAt])
   @@index([phone])
@@ -348,7 +349,8 @@ model OrderLine {
   unitPrice          Int
   quantity           Int
 
-  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order  Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  review Review?
 
   @@index([orderId])
   @@map("order_line")
@@ -447,4 +449,46 @@ model Notification {
   @@index([status, dueAt])
   @@index([orderId])
   @@map("notification")
+}
+
+// ─── Reviews (docs/4-architecture.md §3.8, PRD FR-46) ─────────────────────
+
+enum ReviewStatus {
+  published
+  /// Only for a recorded reason (personal data, abuse, not about the product),
+  /// never for being critical (FR-46).
+  hidden
+}
+
+/// A verified review: one per order line, only for a delivered order.
+model Review {
+  id           String       @id @default(cuid())
+  orderId      String
+  orderLineId  String       @unique
+  /// Copied from the line so product pages read reviews without joining orders.
+  listingId    String?
+  rating       Int
+  body         String
+  /// First name and district, as the customer chose to show them.
+  displayName  String
+  district     String
+  /// Storage keys (lib/media/photos.ts), at most 3.
+  photos       String[]     @default([])
+  locale       String
+  status       ReviewStatus @default(published)
+  hiddenReason String?
+  hiddenBy     String?
+  /// A public reply from Lunara, shown under the review.
+  response     String?
+  respondedBy  String?
+  respondedAt  DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  order     Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderLine OrderLine @relation(fields: [orderLineId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, status, createdAt])
+  @@index([status, createdAt])
+  @@map("review")
 }

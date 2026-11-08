@@ -294,6 +294,19 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Audit | Every upload, removal, cover change and swatch replacement writes an AUDIT_LOG row. A replaced swatch's object is kept. |
 | Shop | Product cards show the cover; the product page shows the gallery, then the reference frame labelled as such. Until a colourway is photographed, a single placeholder is shown with alt text saying so. Images are shown as-is: no filter, overlay or tint. |
 
+3.8 Reviews (PRD FR-46, FR-49)
+
+| Rule | Detail |
+| --- | --- |
+| Verified only | A review can be written only from a delivered order (also after a return or refund: unhappy customers must be able to review), one per order line, enforced by a unique key. |
+| Signed link, no account | The day-14 message and the order page carry `/[locale]/review/[number]?s=…`, where `s` is an HMAC of the order number with the server secret. Nothing is stored; the link cannot be forged; a wrong link is a 404. |
+| Works without JavaScript | The form is a plain multipart post to `POST /api/reviews`, which answers with a redirect. The runtime's native form parser handles the photos. |
+| Photos | Up to 3, 8 MB each, JPEG/PNG/WebP sniffed from the bytes, stored untouched in R2 under `reviews/`. If the review fails to save, its photos are deleted. |
+| Public, named, honest | Shown with the first name the customer chose, district, date and "Verified purchase". Phone and address are never shown. Reviews publish immediately and are never filtered by rating; the home page shows the newest, photo reviews first. |
+| Criticism is answered, not removed | Staff reply publicly under the review. Hiding needs one of three recorded reasons (personal information, abusive language, not about the product); a low rating is not one. Replies and hide/show are audited. |
+| Rating | 1 to 5, checked by the app and by a database constraint. Product pages show the count and average of published reviews. |
+| Privacy | RLS on `review`, no policies (§2.2). Review pages are `noindex`. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline

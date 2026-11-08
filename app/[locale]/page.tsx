@@ -7,6 +7,8 @@ import { SectionMarker } from '@/components/brand/SectionMarker';
 import { MotifDivider } from '@/components/brand/MotifDivider';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
+import { latestReviews } from '@/lib/reviews/reviews';
+import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 
 // Rendered per request: "New arrivals" shows live price and stock
@@ -14,7 +16,8 @@ import { whatsappLink } from '@/lib/commerce/business';
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const arrivals = await getCuratedListings({ featuredOnly: true, limit: 6 });
+  // Parallel: each read is a round trip to the database.
+  const [arrivals, reviews] = await Promise.all([getCuratedListings({ featuredOnly: true, limit: 6 }), latestReviews(3)]);
   const t = await getTranslations('home');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
@@ -163,9 +166,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <MotifDivider />
       </div>
 
-      {/* Proof — customer photo reviews. Never fabricated: no verified
-          reviews exist yet (FR-46), so this states that plainly rather
-          than inventing a name and a quote. */}
+      {/* Proof — verified customer photo reviews (FR-46), newest first and
+          never filtered by rating. Until the first one exists, this says so
+          plainly rather than inventing a name and a quote. */}
       <section className="home-section">
         <div className="home-section-inner">
           <div className="home-section-header">
@@ -174,9 +177,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <h2 className="home-section-title">{t('proof.heading')}</h2>
             </div>
           </div>
-          <div className="home-proof-placeholder">
-            <p>{t('proof.placeholderNote')}</p>
-          </div>
+          {reviews.length > 0 ? (
+            <div style={{ marginTop: 'var(--space-5)', maxWidth: '68ch' }}>
+              <ReviewList reviews={reviews} showItem />
+            </div>
+          ) : (
+            <div className="home-proof-placeholder">
+              <p>{t('proof.placeholderNote')}</p>
+            </div>
+          )}
         </div>
       </section>
     </>
