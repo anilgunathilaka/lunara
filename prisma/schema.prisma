@@ -14,9 +14,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Supabase-hosted Postgres (docs/4-architecture.md §2.2).
+//   DATABASE_URL — pooled, transaction mode (port 6543, ?pgbouncer=true);
+//                  used by the app at runtime.
+//   DIRECT_URL   — direct connection (port 5432); used by `prisma migrate`.
+// For a plain local Postgres, set both to the same URL.
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {

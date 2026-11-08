@@ -78,10 +78,19 @@ Table of Contents
 | Frontend | Next.js with React, server-rendered catalogue, client-side configurator | SSR gives fast first paint and SEO on catalogue pages — critical for the high-intent local search terms identified in the market research. The configurator is inherently interactive and runs client-side. |
 | Styling | CSS custom properties with a utility layer | Tokens from Document 2 map directly to custom properties, making the lint rule against raw values enforceable. |
 | Commerce | Headless commerce platform or a bespoke Node service | Either is viable. The decision hinges on whether COD, LankaQR and bank-transfer reconciliation can be modelled cleanly — see Section 9. |
-| Database | PostgreSQL | Relational integrity matters here. Stock consistency across two purchase paths is a transactional problem, not a document-store problem. |
-| Media | CDN with on-the-fly image transformation | 25+ materials × colourways × 6 assets is a large library that must be served at multiple sizes with colour management intact. |
+| Database | PostgreSQL, hosted on Supabase, accessed only through Prisma | Relational integrity matters here. Stock consistency across two purchase paths is a transactional problem, not a document-store problem. Supabase is used as managed Postgres only — its Auth, Storage and client-side data APIs are not used (see §2.2). |
+| Auth | Better Auth (Prisma adapter, same database) | Optional account layer offered after purchase, never before (PRD FR-33). Session and user tables live in the same Postgres as orders, so no second identity store is kept in sync. |
+| Media | Cloudflare R2 object storage behind a CDN with on-the-fly image transformation | 25+ materials × colourways × 6 assets is a large library that must be served at multiple sizes with colour management intact. R2 has no egress charge, which matters for an image-heavy catalogue and frame sequences. Local filesystem storage substitutes in development. |
 | Rendering | Server-side compositor with an aggressive cache | See Section 5. Client-side compositing is rejected on payload grounds for the target device. |
 | Messaging | WhatsApp Business API plus a local SMS gateway | Both are required by Document 1. Email is supplementary and never the sole channel. |
+
+2.2 Provider Constraints
+
+| Provider | Constraint |
+| --- | --- |
+| Supabase | Two connection strings. The app runtime uses the pooled (transaction-mode, port 6543) URL as `DATABASE_URL` with `pgbouncer=true`; migrations use the direct (port 5432) URL as `DIRECT_URL`. Supabase Auth, Storage, Realtime and the auto-generated REST/GraphQL APIs stay disabled or unused — all data access goes through server code and Prisma, so stock and price keep one source of truth. |
+| Cloudflare R2 | S3-compatible API, accessed from server code only; credentials never reach the client. Originals are stored byte-for-byte (no processing on upload), so the embedded colour profile is preserved at rest. Any delivery-time transform must preserve that profile (§4) — verified by the publication-gate check, not assumed from provider defaults. |
+| Local dev | With no R2 credentials set, storage writes to `.blob-storage/` on disk (git-ignored). Same interface as R2, so no calling code branches on environment. |
 
 3. Data Model
 
