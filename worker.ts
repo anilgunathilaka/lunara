@@ -21,7 +21,7 @@ const worker = {
 
   async scheduled(_controller: unknown, env: Env, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
     if (!env.CRON_SECRET) return; // not configured: nothing to do
-    const origin = env.BETTER_AUTH_URL ?? 'https://lunara.lunarasarees.workers.dev';
+    const origin = env.BETTER_AUTH_URL ?? 'https://lunarasarees.com';
     ctx.waitUntil(
       env.WORKER_SELF_REFERENCE.fetch(
         new Request(`${origin}/api/internal/notifications`, {
