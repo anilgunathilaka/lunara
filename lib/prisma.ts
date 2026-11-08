@@ -22,8 +22,16 @@ import { cache } from 'react';
  * and pass the client down.
  */
 
+/**
+ * Interactive transactions (order placement, ops changes) make several round
+ * trips. Prisma's 5 s default turns a slow-but-working link into a failed
+ * order; these limits still bound how long stock rows stay locked.
+ */
+const TRANSACTION_OPTIONS = { maxWait: 10_000, timeout: 20_000 } as const;
+
 function createClient(connectionString: string, perRequest: boolean): PrismaClient {
   return new PrismaClient({
+    transactionOptions: TRANSACTION_OPTIONS,
     // maxUses: 1 — on the Worker a pooled connection must not be reused
     // beyond its request; Hyperdrive does the real pooling.
     adapter: new PrismaPg(perRequest ? { connectionString, maxUses: 1 } : { connectionString }),

@@ -1,12 +1,13 @@
 // Cloudflare Workers deployment for Lunara (docs/4-architecture.md §2.1–2.3).
 // Built by OpenNext: `npm run preview` (local workerd) / `npm run deploy`.
 // Secrets are NOT set here — use `npx wrangler secret put <NAME>`:
-//   BETTER_AUTH_SECRET, RESEND_API_KEY
+//   BETTER_AUTH_SECRET, RESEND_API_KEY, CRON_SECRET
 // Hyperdrive replaces DATABASE_URL on the Worker; never set DB URLs here.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "lunara",
-  "main": ".open-next/worker.js",
+  // worker.ts wraps OpenNext's .open-next/worker.js and adds the cron handler.
+  "main": "worker.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 
@@ -41,6 +42,9 @@
     "BETTER_AUTH_URL": "https://lunara.lunarasarees.workers.dev",
     "R2_PUBLIC_BASE_URL": "https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev"
   },
+
+  // Notifications: send due and retrying messages (docs/4-architecture.md §6.1).
+  "triggers": { "crons": ["*/10 * * * *"] },
 
   "observability": { "enabled": true }
 }

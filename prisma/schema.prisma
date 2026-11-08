@@ -318,8 +318,9 @@ model Order {
   createdAt                DateTime      @default(now())
   updatedAt                DateTime      @updatedAt
 
-  lines  OrderLine[]
-  events OrderEvent[]
+  lines         OrderLine[]
+  events        OrderEvent[]
+  notifications Notification[]
 
   @@index([status, createdAt])
   @@index([phone])
@@ -399,4 +400,51 @@ model AuditLog {
 
   @@index([entityType, entityId, createdAt])
   @@map("audit_log")
+}
+
+// ─── Notifications (docs/4-architecture.md §6.1) ─────────────────────────
+
+enum NotificationChannel {
+  whatsapp
+  sms
+  email
+}
+
+enum NotificationStatus {
+  /// Automatic channel, waiting to be (re)tried.
+  pending
+  /// No provider for this channel: staff send it from ops.
+  manual
+  sent
+  /// Gave up after retries; shown in ops.
+  failed
+  /// Order moved on before this was due (e.g. cancelled before a follow-up).
+  cancelled
+}
+
+/// Transactional outbox: written with the order change that causes it.
+model Notification {
+  id        String              @id @default(cuid())
+  orderId   String
+  event     String
+  channel   NotificationChannel
+  recipient String
+  locale    String
+  subject   String?
+  body      String
+  status    NotificationStatus
+  attempts  Int                 @default(0)
+  /// Not sent before this time (follow-ups are scheduled days ahead).
+  dueAt     DateTime            @default(now())
+  lastError String?
+  sentAt    DateTime?
+  sentBy    String?
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status, dueAt])
+  @@index([orderId])
+  @@map("notification")
 }

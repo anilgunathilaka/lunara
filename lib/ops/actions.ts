@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import type { OrderStatus } from '@prisma/client';
+import { composeNotifications, isNotifiable } from '@/lib/notifications/compose';
+import { deliverSoon } from '@/lib/notifications/deliver';
 import { getPrisma } from '@/lib/prisma';
 import { requireStaffAction } from './staff';
 import { ORDER_STATUSES, RESTOCK_ON_CANCEL_FROM, canTransition } from './transitions';
@@ -92,7 +94,40 @@ export async function transitionOrderAction(form: FormData): Promise<void> {
       await tx.orderEvent.create({
         data: { orderId: order.id, status: to, actor: staff.email, note: note || null },
       });
+
+      // Outbox (§6.1). A cancelled order must not keep sending earlier messages.
+      if (to === 'cancelled') {
+        await tx.notification.updateMany({
+          where: { orderId: order.id, status: { in: ['pending', 'manual'] } },
+          data: { status: 'cancelled' },
+        });
+      }
+      if (isNotifiable(to)) {
+        const updated = await tx.order.findUniqueOrThrow({ where: { id: order.id } });
+        await tx.notification.createMany({ data: composeNotifications(to, updated) });
+      }
     });
+    deliverSoon();
+  });
+}
+
+// ── Notifications sent by hand (no WhatsApp/SMS provider yet, §6.1) ──────
+
+const markSentSchema = z.object({ locale, id: z.string().min(1).max(100) });
+
+export async function markNotificationSentAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const parsed = markSentSchema.safeParse(Object.fromEntries(form));
+  const lang = locale.safeParse(form.get('locale')).data ?? 'en';
+  const path = `/${lang}/ops/messages`;
+  if (!parsed.success) back(path, { error: 'invalid' });
+
+  await run(path, async () => {
+    const { count } = await getPrisma().notification.updateMany({
+      where: { id: parsed.data.id, status: { in: ['manual', 'failed'] } },
+      data: { status: 'sent', sentAt: new Date(), sentBy: staff.email },
+    });
+    if (count !== 1) throw new OpsError('conflict');
   });
 }
 

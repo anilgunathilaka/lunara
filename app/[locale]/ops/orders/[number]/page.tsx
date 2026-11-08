@@ -26,7 +26,7 @@ export default async function OpsOrderPage({
   const order = await getOrderDetail(number);
   if (!order) notFound();
 
-  const [t, tCol, tStep, tStatus, tPayment, tSummary, tDistricts, tDrape] = await Promise.all([
+  const [t, tCol, tStep, tStatus, tPayment, tSummary, tDistricts, tDrape, tMessages, tNotify] = await Promise.all([
     getTranslations('ops.order'),
     getTranslations('ops.columns'),
     getTranslations('ops.transition'),
@@ -35,6 +35,8 @@ export default async function OpsOrderPage({
     getTranslations('commerce.summary'),
     getTranslations('districts'),
     getTranslations('configurator.drape'),
+    getTranslations('ops.messages'),
+    getTranslations('ops.notificationStatus'),
   ]);
   const query = await searchParams;
   const nextSteps = ALLOWED_TRANSITIONS[order.status];
@@ -172,6 +174,23 @@ export default async function OpsOrderPage({
             </form>
           ))
         )}
+      </section>
+
+      <section className="flex flex-col gap-3" aria-labelledby="messages-heading">
+        <h3 id="messages-heading" className="field-label">
+          {tMessages('notificationsHeading')}
+        </h3>
+        <ol className="spec-list">
+          {order.notifications.map((n) => (
+            <li key={n.id} className="spec-row">
+              <span>
+                {n.event} · {n.channel.toUpperCase()} · {tNotify(n.status)}
+                {n.sentBy ? ` · ${t('by', { actor: n.sentBy })}` : ''}
+              </span>
+              <span className="spec-row-term">{formatDateTime(n.sentAt ?? n.dueAt, locale)}</span>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="flex flex-col gap-3" aria-labelledby="history-heading">

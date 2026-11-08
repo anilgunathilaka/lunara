@@ -3,6 +3,8 @@ import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 import { normaliseSriLankanMobile, type PlaceOrderInput } from './cart-ref';
+import { composeNotifications, siteUrl } from '@/lib/notifications/compose';
+import { deliverSoon } from '@/lib/notifications/deliver';
 import { buildQuote, demandBySku, type CartQuote, type ResolvedLine } from './quote';
 
 /**
@@ -87,7 +89,7 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderOutc
           if (count !== 1) throw new StockShortError(sku);
         }
 
-        await tx.order.create({
+        const order = await tx.order.create({
           data: {
             number,
             status,
@@ -111,7 +113,12 @@ export async function placeOrder(input: PlaceOrderInput): Promise<PlaceOrderOutc
             events: { create: { status, actor: 'customer' } },
           },
         });
+
+        // Outbox (docs/4-architecture.md §6.1): recorded with the order itself.
+        const confirmationLink = `${siteUrl()}/${input.locale}/checkout/confirmed?order=${number}&t=${encodeURIComponent(token)}`;
+        await tx.notification.createMany({ data: composeNotifications('placed', order, { confirmationLink }) });
       });
+      deliverSoon();
       return { ok: true, number, token };
     } catch (error) {
       if (error instanceof StockShortError) {

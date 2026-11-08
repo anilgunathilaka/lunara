@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth/auth-client';
 
 const SECTIONS = [
   { href: '/ops', key: 'orders' },
+  { href: '/ops/messages', key: 'messages' },
   { href: '/ops/payments', key: 'payments' },
   { href: '/ops/stock', key: 'stock' },
   { href: '/ops/prices', key: 'prices' },

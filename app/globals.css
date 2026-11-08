@@ -1988,6 +1988,16 @@ body {
   width: calc(var(--space-9) * 1.5);
   min-height: var(--control-height-md);
 }
+.ops-message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--lun-line);
+}
+.ops-message-body {
+  white-space: pre-wrap;
+}
 .ops-status-out {
   color: var(--lun-danger);
 }

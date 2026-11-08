@@ -389,7 +389,8 @@
       "orders": "Orders",
       "payments": "Bank transfers",
       "stock": "Stock",
-      "prices": "Prices"
+      "prices": "Prices",
+      "messages": "Messages"
     },
     "columns": {
       "number": "Order",
@@ -454,6 +455,46 @@
       "conflict": "Someone else changed this first. The page now shows the latest.",
       "negative": "Stock can't go below zero.",
       "tracking": "Courier and tracking number are required to dispatch."
+    },
+    "messages": {
+      "intro": "WhatsApp and SMS messages to send by hand until those services are connected. Open, send, then mark as sent.",
+      "none": "Nothing to send right now.",
+      "openWhatsApp": "Open in WhatsApp",
+      "openSms": "Open in SMS",
+      "markSent": "Mark as sent",
+      "failedHeading": "Emails that failed",
+      "channel": "Channel",
+      "message": "Message",
+      "notificationsHeading": "Messages to the customer"
+    },
+    "notificationStatus": {
+      "pending": "Sending",
+      "manual": "To send by hand",
+      "sent": "Sent",
+      "failed": "Failed",
+      "cancelled": "Not needed"
     }
+  },
+  "notifications": {
+    "placedCodSubject": "Order {number} placed",
+    "placedCod": "Lunara: thank you, {name}! Order {number} is placed — {total}, cash on delivery. Delivery takes {estimate} after dispatch. Your jacket material ships unstitched. Your order: {link}",
+    "placedBankSubject": "Order {number} — payment details",
+    "placedBank": "Lunara: thank you, {name}! Order {number} is placed — {total}. Please transfer {total} using the reference {number} to: {bank}. We confirm your order as soon as the payment arrives. Your jacket material ships unstitched. Your order: {link}",
+    "placedBankDetailsToFollow": "Lunara: thank you, {name}! Order {number} is placed — {total}. We will send you our bank details here shortly; please do not transfer money before then. Your jacket material ships unstitched. Your order: {link}",
+    "confirmedSubject": "Order {number} confirmed",
+    "confirmed": "Lunara: order {number} is confirmed. We'll let you know when it's packed.",
+    "packedSubject": "Order {number} packed",
+    "packed": "Lunara: order {number} is packed and will be dispatched shortly.",
+    "dispatchedSubject": "Order {number} is on its way",
+    "dispatched": "Lunara: order {number} is on its way with {courier}, tracking number {tracking}. Expect it in {estimate}.",
+    "dispatchedCod": "Lunara: order {number} is on its way with {courier}, tracking number {tracking}. Expect it in {estimate}. Please have {total} ready for the courier.",
+    "cancelledSubject": "Order {number} cancelled",
+    "cancelled": "Lunara: order {number} has been cancelled. If you didn't ask for this, reply here and we'll help.",
+    "deliveredDay1": "Lunara: we hope you love your saree! Cotton care tips: {careLink}. Returns policy: {returnsLink}. Your jacket material is unstitched — take it to your tailor to have it made.",
+    "deliveredDay3": "Lunara: how is your order {number}? If anything isn't right, reply here — we're happy to help.",
+    "deliveredDay14Subject": "Share a photo of your Lunara saree?",
+    "deliveredDay14": "Lunara: would you share a photo of your saree? Real photos help other customers trust the colour. Just reply here with a photo — thank you!",
+    "deliveredDay45Subject": "A new jacket piece for your saree?",
+    "deliveredDay45": "Lunara: new arrivals are in, and our jacket materials can be bought on their own to refresh a saree you already love: {jacketLink}"
   }
 }

@@ -25,6 +25,7 @@ export async function listOrders(status?: OrderStatus) {
 const orderDetailInclude = {
   lines: { orderBy: { id: 'asc' } },
   events: { orderBy: { createdAt: 'asc' } },
+  notifications: { orderBy: [{ dueAt: 'asc' }, { channel: 'asc' }] },
 } satisfies Prisma.OrderInclude;
 
 export async function getOrderDetail(number: string) {
@@ -32,6 +33,17 @@ export async function getOrderDetail(number: string) {
     relationLoadStrategy: 'join',
     where: { number },
     include: orderDetailInclude,
+  });
+}
+
+/** Due messages staff must send by hand, plus automatic ones that gave up (§6.1). */
+export async function messageQueue() {
+  return getPrisma().notification.findMany({
+    relationLoadStrategy: 'join',
+    where: { OR: [{ status: 'manual', dueAt: { lte: new Date() } }, { status: 'failed' }] },
+    orderBy: { dueAt: 'asc' },
+    take: 200,
+    include: { order: { select: { number: true, customerName: true } } },
   });
 }
 

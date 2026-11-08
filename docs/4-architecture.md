@@ -439,6 +439,16 @@ Templates exist in all three languages. Language is selected from the customer's
 
 Delivery failures retry with backoff and are logged. A customer who receives no notification is a support ticket and a trust failure.
 
+Implementation (`lib/notifications/`):
+
+| Rule | Detail |
+| --- | --- |
+| Transactional outbox | NOTIFICATION rows are written in the SAME transaction as the order change that causes them, with the message already rendered in the order's language. An order can never change state without its messages being recorded, and a failed send never rolls back an order. |
+| Routing | placed → WhatsApp + SMS (+ email if given); confirmed, packed → WhatsApp (+ email); dispatched → WhatsApp + SMS (+ email); cancelled → WhatsApp + SMS (+ email); delivered → follow-ups due at d+1 (WhatsApp), d+3 (WhatsApp), d+14 (WhatsApp + email), d+45 (email). Bank-transfer orders' placed message carries the transfer instructions (or, while the bank details are placeholders, says they will follow). Out-for-delivery waits for courier integration. |
+| Providers | Email: Resend, sent automatically. WhatsApp Business API and SMS: no provider yet, so those rows are `manual` — the ops "Messages" queue shows each due message with one-tap WhatsApp / SMS links pre-filled with the text, and staff mark it sent. Adding a provider later flips those channels to automatic without changing the outbox. |
+| Delivery and retry | After commit the Worker attempts due automatic rows at once (`waitUntil`). A Cron Trigger (every 10 minutes) calls `/api/internal/notifications` with `CRON_SECRET` to send anything due or failed. Retries back off exponentially (2, 4, 8, 16 minutes); after 5 failed attempts a row is `failed` and shown in ops. |
+| Links | The placed message includes the customer's private confirmation link (order number + token, §3.4). Later messages reference the order number. |
+
 7. Commerce Logic
 
 7.1 Pricing
