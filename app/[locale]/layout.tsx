@@ -6,6 +6,7 @@ import { routing } from '@/i18n/routing';
 import { fontVariableClassName } from '@/lib/fonts';
 import { SiteChrome } from '@/components/layout/SiteChrome';
 import '../globals.css';
+import { whatsappLink } from '@/lib/commerce/business';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -62,7 +63,7 @@ export default async function LocaleLayout({
               menu: tNav('menu'),
             }}
             closeLabel={tSlideover('close')}
-            whatsappHref="https://wa.me/94000000000"
+            whatsappHref={whatsappLink()}
             whatsappLabel={tLayout('whatsapp')}
             footerSupportLinks={[
               { href: '/support', label: tFooter('support') },

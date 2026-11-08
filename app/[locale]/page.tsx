@@ -8,6 +8,7 @@ import { MotifDivider } from '@/components/brand/MotifDivider';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
 import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
+import { whatsappLink } from '@/lib/commerce/business';
 
 // Rendered per request: "New arrivals" shows live price and stock
 // (docs/4-architecture.md §3.3).
@@ -72,7 +73,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Icon icon={Truck} />
           <span className="home-trust-item-text">{t('trust.dispatch')}</span>
         </div>
-        <a href="https://wa.me/94000000000" target="_blank" rel="noopener noreferrer" className="home-trust-item">
+        <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="home-trust-item">
           <Icon icon={MessageCircle} />
           <span className="home-trust-item-text">{t('trust.whatsapp')}</span>
         </a>

@@ -10,6 +10,7 @@ import { SlideOver } from '@/components/layout/SlideOver';
 import { Accordion } from '@/components/layout/Accordion';
 import { Button } from '@/components/primitives/Button';
 import type { LanguageSelectorProps } from '@/components/layout/LanguageSelector';
+import { whatsappLink } from '@/lib/commerce/business';
 
 export interface LayoutQaClientProps {
   languageLabels: LanguageSelectorProps['labels'];
@@ -52,7 +53,7 @@ export function LayoutQaClient({
             cartHref="/dev/cart"
             cartLabel={navLabels.cart}
             cartCount={2}
-            whatsappHref="https://wa.me/94000000000"
+            whatsappHref={whatsappLink()}
             whatsappLabel={whatsappLabel}
             languageLabels={languageLabels}
           />
@@ -119,7 +120,7 @@ export function LayoutQaClient({
         <p className="field-message">{navLabels.support}</p>
       </SlideOver>
 
-      <WhatsAppAction href="https://wa.me/94000000000" label={whatsappLabel} variant="floating" />
+      <WhatsAppAction href={whatsappLink()} label={whatsappLabel} variant="floating" />
     </div>
   );
 }

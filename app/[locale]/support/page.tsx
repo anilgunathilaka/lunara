@@ -5,6 +5,7 @@ import { Divider } from '@/components/primitives/Divider';
 import { Accordion } from '@/components/layout/Accordion';
 import { Icon } from '@/components/primitives/Icon';
 import { Link } from '@/i18n/navigation';
+import { whatsappLink } from '@/lib/commerce/business';
 
 export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -57,7 +58,7 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
           <h2 className="checkout-step-title">{t('contactHeading')}</h2>
           <p className="field-message">{t('contactBody')}</p>
           <a
-            href="https://wa.me/94000000000"
+            href={whatsappLink()}
             target="_blank"
             rel="noopener noreferrer"
             className="btn focus-ring btn-primary btn-md"
