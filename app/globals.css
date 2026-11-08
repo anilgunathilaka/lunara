@@ -2069,3 +2069,43 @@ body {
   align-items: flex-end;
   text-align: end;
 }
+
+/* ── Ops: product photos (docs/4-architecture.md §3.7) ── */
+.ops-photo-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  border-bottom: 1px solid var(--lun-line);
+}
+.ops-photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+/* No filter, overlay or tint: the photo is shown as stored. */
+.ops-photo {
+  position: relative;
+  display: block;
+  width: calc(var(--space-9) + var(--space-5));
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-s);
+  background: var(--lun-ground);
+}
+.ops-photo img {
+  object-fit: cover;
+}
+.ops-upload {
+  align-self: flex-start;
+  cursor: pointer;
+}
+.ops-upload[aria-disabled='true'] {
+  opacity: var(--opacity-disabled);
+  cursor: progress;
+}
+.ops-upload-input:focus-visible + .ops-upload {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -32,11 +33,23 @@ export default async function JacketDetailPage({ params }: { params: Promise<{ l
       <div className="home-section-inner flex flex-col gap-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           <div className="lg:flex-1">
-            <div
-              className="gallery-main"
-              style={{ backgroundColor: jacket.swatchHex }}
-              aria-label={`${jacket.materialName}, ${jacket.colourName}`}
-            />
+            {jacket.swatchImageUrl ? (
+              // The photograph as captured: no filter, overlay or tint.
+              <div className="gallery-main">
+                <Image
+                  src={jacket.swatchImageUrl}
+                  alt={`${jacket.materialName}, ${jacket.colourName}`}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                />
+              </div>
+            ) : (
+              <div
+                className="gallery-main"
+                style={{ backgroundColor: jacket.swatchHex }}
+                aria-label={`${jacket.materialName}, ${jacket.colourName}`}
+              />
+            )}
           </div>
 
           <div className="flex flex-col gap-4 lg:w-[380px]">

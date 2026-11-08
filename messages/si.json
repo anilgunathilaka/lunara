@@ -32,7 +32,10 @@
       "left": "ඉතිරි ඇත්තේ {count}යි"
     },
     "gallery": {
-      "referenceFrame": "වර්ණ යොමුව"
+      "referenceFrame": "වර්ණ යොමුව",
+      "photoAlt": "{name}, ඡායාරූපය {n}",
+      "referenceAlt": "{name}, සංස්කරණය නොකළ දිවා ආලෝක වර්ණ යොමුව",
+      "placeholderAlt": "{name} හි ඡායාරූපය ඉක්මනින්"
     }
   },
   "commerce": {
@@ -405,7 +408,8 @@
       "payments": "බැංකු මාරු",
       "stock": "තොග",
       "prices": "මිල ගණන්",
-      "messages": "පණිවිඩ"
+      "messages": "පණිවිඩ",
+      "photos": "ඡායාරූප"
     },
     "columns": {
       "number": "ඇණවුම",
@@ -488,6 +492,37 @@
       "sent": "යැව්වා",
       "failed": "අසාර්ථකයි",
       "cancelled": "අවශ්‍ය නැත"
+    },
+    "photos": {
+      "intro": "ඡායාරූප upload කළ ආකාරයෙන්ම ගබඩා වේ: ප්‍රමාණය වෙනස් කිරීම්, filters හෝ වර්ණ වෙනස්කම් නැත. sRGB JPEG, PNG හෝ WebP, එකක් 12 MB දක්වා, එක් වර්ණයකට gallery ඡායාරූප {max} දක්වා upload කරන්න. පළමු gallery ඡායාරූපය සාප්පුවේ පෙන්වන ප්‍රධාන රූපයයි.",
+      "sareesHeading": "සාරි වර්ණ",
+      "jacketsHeading": "ජැකට් රෙදි වර්ණ",
+      "galleryLabel": "Gallery ({max} න් {count})",
+      "noPhotos": "තවම ඡායාරූප නැත — සාප්පුවේ placeholder එකක් පෙන්වයි.",
+      "photoAlt": "{name}, ඡායාරූපය {n}",
+      "cover": "ප්‍රධාන රූපය",
+      "makeCover": "ප්‍රධාන රූපය කරන්න",
+      "remove": "ඉවත් කරන්න",
+      "addPhotos": "ඡායාරූප එක් කරන්න",
+      "referenceLabel": "වර්ණ යොමු රූපය",
+      "referenceHint": "වර්ණ ඉලක්කය සමඟ, සංස්කරණය නොකළ දිවා ආලෝක ඡායාරූපයක්. එය එක් වරක් පමණක් සැකසිය හැක.",
+      "referenceLocked": "සකසා අගුලු දමා ඇත: නව රෙදි තොගයකට නව වර්ණ වාර්තාවක් අවශ්‍යයි.",
+      "referenceAlt": "{name}, වර්ණ යොමු රූපය",
+      "uploadReference": "වර්ණ යොමු රූපය upload කරන්න",
+      "swatchAlt": "{name}, swatch",
+      "uploadSwatch": "Swatch ඡායාරූපය upload කරන්න",
+      "replaceSwatch": "Swatch ඡායාරූපය වෙනස් කරන්න",
+      "uploading": "Upload වෙමින්… {total} න් {done} ක් අවසන්",
+      "uploaded": "{count, plural, one {ඡායාරූප # ක් upload විය.} other {ඡායාරූප # ක් upload විය.}}",
+      "error": {
+        "invalid": "{name} upload කිරීමට නොහැකි විය. නැවත උත්සාහ කරන්න.",
+        "notFound": "මෙම වර්ණය තවදුරටත් නැත. පිටුව නැවත load කරන්න.",
+        "tooLarge": "{name} 12 MB ට වඩා විශාලයි.",
+        "format": "{name} JPEG, PNG හෝ WebP ඡායාරූපයක් නොවේ.",
+        "full": "මෙම gallery එකේ උපරිම ඡායාරූප ගණන දැනටමත් ඇත.",
+        "locked": "වර්ණ යොමු රූපය දැනටමත් සකසා ඇති අතර එය වෙනස් කළ නොහැක.",
+        "network": "{name} upload වෙමින් තිබියදී සම්බන්ධතාවය නැති විය. නැවත උත්සාහ කරන්න."
+      }
     }
   },
   "notifications": {

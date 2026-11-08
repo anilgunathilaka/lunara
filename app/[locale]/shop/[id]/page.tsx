@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Divider } from '@/components/primitives/Divider';
-import { ProductGallery } from '@/components/product/ProductGallery';
+import { ProductGallery, type GalleryAsset } from '@/components/product/ProductGallery';
 import { FabricBlock } from '@/components/product/FabricBlock';
 import { JacketBlock } from '@/components/product/JacketBlock';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
@@ -45,6 +45,19 @@ export default async function ProductDetailPage({
 
   const related = others.filter((p) => p.id !== product.id).slice(0, 3);
 
+  // Real photographs once uploaded (§3.7): gallery in staff order, then the
+  // unretouched reference frame. Until then, one honest placeholder.
+  const photos: GalleryAsset[] = product.gallery.map((src, i) => ({
+    type: 'image',
+    src,
+    alt: tGallery('photoAlt', { name: product.name, n: i + 1 }),
+  }));
+  if (product.referenceFrameUrl) {
+    photos.push({ type: 'image', src: product.referenceFrameUrl, alt: tGallery('referenceAlt', { name: product.name }), isReferenceFrame: true });
+  }
+  const galleryAssets: GalleryAsset[] =
+    photos.length > 0 ? photos : [{ type: 'image', src: PLACEHOLDER_IMAGE, alt: tGallery('placeholderAlt', { name: product.name }) }];
+
   return (
     <div className="home-section">
       <div className="home-section-inner flex flex-col gap-8">
@@ -52,18 +65,7 @@ export default async function ProductDetailPage({
           <div className="lg:flex-1">
             <ProductGallery
               referenceFrameLabel={tGallery('referenceFrame')}
-              assets={[
-                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, full drape` },
-                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, pallu detail` },
-                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, border close-up` },
-                { type: 'image', src: PLACEHOLDER_IMAGE, alt: `${product.name}, cotton texture macro` },
-                {
-                  type: 'image',
-                  src: PLACEHOLDER_IMAGE,
-                  alt: `${product.name}, colour reference frame`,
-                  isReferenceFrame: true,
-                },
-              ]}
+              assets={galleryAssets}
             />
           </div>
 
@@ -98,7 +100,7 @@ export default async function ProductDetailPage({
                 drapeLabel: 'Saree',
                 unitPrice: product.price,
                 quantity: 1,
-                thumbnail: { src: PLACEHOLDER_IMAGE, alt: product.name },
+                thumbnail: { src: product.imageUrl, alt: product.name },
                 unstitched: true,
               }}
               addToCartLabel={tPdp('addToCart')}
@@ -187,7 +189,7 @@ export default async function ProductDetailPage({
               <ProductCard
                 key={item.id}
                 href={`/shop/${item.id}`}
-                image={{ src: PLACEHOLDER_IMAGE, alt: item.name }}
+                image={{ src: item.imageUrl, alt: item.name }}
                 name={item.name}
                 materialLabel={item.material === 'plain' ? tFabric('materialPlain') : tFabric('materialSuper')}
                 price={item.price}

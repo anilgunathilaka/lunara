@@ -27,6 +27,12 @@ export interface CatalogueProduct {
   jacketPieceLengthMetres: number;
   stockState: StockStateValue;
   quantity?: number;
+  /** Cover photo: the first gallery photo, or the placeholder until one exists. */
+  imageUrl: string;
+  /** Gallery photos in display order; empty until photographed (§3.7). */
+  gallery: string[];
+  /** The unretouched daylight colour reference (§4), once photographed. */
+  referenceFrameUrl: string | null;
 }
 
 /** A jacket colourway on the standalone line (PRD FR-29 to FR-32). */
@@ -40,6 +46,8 @@ export interface JacketProduct {
   price: number;
   stockState: StockStateValue;
   quantity?: number;
+  /** Swatch photograph, once uploaded; pages fall back to the colour block. */
+  swatchImageUrl: string | null;
 }
 
 export interface JacketProductDetail extends JacketProduct {
@@ -73,5 +81,5 @@ export function deltaKey(designId: string, jacketId: string): string {
   return `${designId}|${jacketId}`;
 }
 
-/** Until product photography exists (OPS-02), every image is this placeholder. */
+/** Shown wherever a product has no photograph yet (OPS-02). */
 export const PLACEHOLDER_IMAGE = '/placeholder/product.jpg';

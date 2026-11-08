@@ -282,6 +282,18 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Privacy | Account pages are `noindex` and dynamic. Someone else's order number returns 404, the same as one that doesn't exist. |
 | Later | Saved designs (with the configurator on real data) and saved addresses. |
 
+3.7 Product Photos (`/[locale]/ops/photos`)
+
+| Rule | Detail |
+| --- | --- |
+| What is photographed | Per saree colourway: gallery photos (up to 8, staff-ordered; the first is the cover in the shop) and the colour reference frame (§4). Per jacket colourway: a swatch photo. Pattern assets and texture tiles for the configurator come with it (§5). |
+| Stored as uploaded | Bytes go to R2 untouched: no resize, re-encode or metadata strip, so the embedded colour profile survives (§4). The format is identified from the file's own bytes (JPEG, PNG, WebP only; 12 MB max), never from its name. |
+| Upload path | `POST /api/ops/media` with the file as the raw request body: no multipart parsing, so a phone photo costs the Worker almost no CPU. Staff only, same-origin only. One new random key per upload, so cached copies never go stale. |
+| Keys, not URLs | The database stores the storage key; the public URL is resolved on read. Moving media to a custom domain changes one variable, not data. |
+| Reference frame is write-once | It can be set only when empty, enforced in the database write itself, and there is no remove or replace. A new fabric lot means a new colourway record (§4 Lot change). |
+| Audit | Every upload, removal, cover change and swatch replacement writes an AUDIT_LOG row. A replaced swatch's object is kept. |
+| Shop | Product cards show the cover; the product page shows the gallery, then the reference frame labelled as such. Until a colourway is photographed, a single placeholder is shown with alt text saying so. Images are shown as-is: no filter, overlay or tint. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
