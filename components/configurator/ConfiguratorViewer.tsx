@@ -35,7 +35,7 @@ const TURN_PER_PIXEL = 0.012;
 const TURN_PER_STEP = Math.PI / 8;
 const MODEL_HEIGHT = 1.7;
 
-type Part = 'saree' | 'pallu' | 'jacket' | 'frill';
+type Part = 'saree' | 'skirt' | 'pallu' | 'jacket' | 'frill';
 
 interface Engine {
   three: typeof THREE_NS;
@@ -62,9 +62,11 @@ function classify(object: THREE_NS.Object3D): { part: Part | null; drape: 'saree
       ? 'frill'
       : /jacket|blouse/.test(name)
         ? 'jacket'
-        : /saree|skirt/.test(name)
-          ? 'saree'
-          : null;
+        : /skirt/.test(name)
+          ? 'skirt'
+          : /saree/.test(name)
+            ? 'saree'
+            : null;
   const drape = /_osariya\b|osariya/.test(name) ? 'osariya' : /_saree\b/.test(name) ? 'saree' : null;
   return { part, drape };
 }
@@ -153,6 +155,7 @@ export function ConfiguratorViewer({
           new THREE.MeshPhysicalMaterial({ side: THREE.DoubleSide, roughness: 0.9 });
         const materials: Record<Part, THREE_NS.MeshPhysicalMaterial> = {
           saree: cloth(),
+          skirt: cloth(),
           pallu: cloth(),
           frill: cloth(),
           jacket: cloth(),
@@ -348,6 +351,7 @@ async function paint(engine: Engine, selection: ViewerSelection): Promise<void> 
   const common = { designId: selection.designId, colourHex: selection.sareeHex, material: selection.material, pattern };
   const body = texture(drawFabric({ ...common, part: 'body' }));
   const pallu = texture(drawFabric({ ...common, part: 'pallu' }));
+  const column = texture(drawFabric({ ...common, part: 'column' }));
   const jacketTexture = texture(drawJacket(selection.jacketHex, jacketPhoto), 3);
   jacketTexture.wrapT = THREE.RepeatWrapping;
   jacketTexture.repeat.set(3, 3);
@@ -357,6 +361,7 @@ async function paint(engine: Engine, selection: ViewerSelection): Promise<void> 
   const sheen = new THREE.Color(sheenOf(selection.sareeHex));
   for (const [material, map] of [
     [materials.saree, body],
+    [materials.skirt, column],
     [materials.frill, body],
     [materials.pallu, pallu],
   ] as const) {
@@ -376,6 +381,6 @@ async function paint(engine: Engine, selection: ViewerSelection): Promise<void> 
   for (const { mesh, drape } of engine.drapeOnly) mesh.visible = drape === selection.drape;
 
   engine.textures.forEach((t) => t.dispose());
-  engine.textures = [body, pallu, jacketTexture];
+  engine.textures = [body, pallu, column, jacketTexture];
   engine.render();
 }

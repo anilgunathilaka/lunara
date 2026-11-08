@@ -366,7 +366,7 @@ PRD §4.4 now records the founder's decision: the preview is a 3D model rendered
 
 | Rule | Detail |
 | --- | --- |
-| Model | One 3D model (glTF binary, `.glb`) whose garment parts are separate, named meshes: `Saree` (body and pleats), `Pallu`, `Jacket`, and optionally `Frill`. Parts used by only one drape carry the suffix `_saree` or `_osariya` and are shown only for that drape. Until a model exists, a built-in placeholder figure with the same parts is used, so nothing else changes when the model arrives. |
+| Model | One 3D model (glTF binary, `.glb`) whose garment parts are separate, named meshes: `Saree` (body and pleats), `Pallu`, `Jacket`, and for Kandyan Osariya `Skirt` (the straight skirt, border down the front) and `Frill` (waist and hip frill, bordered). Parts used by only one drape carry the suffix `_saree` or `_osariya` and are shown only for that drape. Until a model exists, a built-in placeholder figure with the same parts is used, so nothing else changes when the model arrives. |
 | Painting | Saree and pallu: the design's pattern (its tintable asset, or a built-in pattern until one is uploaded), multiplied by the saree colour, with the material's weave and sheen (Plain: matte, open weave; Super: finer weave, soft sheen). Jacket: the jacket colour, with its swatch photograph as a tiled texture when one exists. Colour is a tint, so any design renders in any colour. |
 | Rotation | By hand only (drag, swipe, arrow keys, the rotate buttons), one-to-one with input; never auto-played (UX-C8). Vertical tilt is limited so the model is always upright. |
 | Cost | No server work: the page ships plain data and the model file. The 3D library loads only on this page. The renderer draws only when something changes. |

@@ -9,7 +9,8 @@
  */
 
 export type Material = 'plain' | 'super';
-export type FabricPart = 'body' | 'pallu';
+/** body: flared skirt and frill; column: the straight Osariya skirt; pallu: the shoulder drape. */
+export type FabricPart = 'body' | 'column' | 'pallu';
 
 const SIZE = 1024;
 
@@ -239,11 +240,22 @@ export function drawFabric({ designId, colourHex, material, part, pattern }: Fab
     ctx.drawImage(pattern, 0, 0, SIZE, SIZE);
     ctx.globalCompositeOperation = 'source-over';
   } else {
-    motifFor(designId)(ctx, hsl(motifTone(base), 0.85), part === 'pallu' ? 0.75 : 1);
+    // The column skirt wraps once around the body, so its motifs are drawn smaller.
+    motifFor(designId)(ctx, hsl(motifTone(base), 0.85), part === 'pallu' ? 0.75 : part === 'column' ? 0.5 : 1);
   }
   weave(ctx, base, material);
 
-  if (part === 'body') {
+  if (part === 'column') {
+    // Kandyan Osariya: the border runs down the front (u = 0, the texture's
+    // edges, which meet at the centre front) and along the hem.
+    borderBand(ctx, SIZE - SIZE * 0.1, SIZE * 0.1, base, designId);
+    ctx.save();
+    ctx.translate(SIZE, 0);
+    ctx.rotate(Math.PI / 2);
+    borderBand(ctx, 0, SIZE * 0.045, base, designId);
+    borderBand(ctx, SIZE - SIZE * 0.045, SIZE * 0.045, base, designId);
+    ctx.restore();
+  } else if (part === 'body') {
     // Hem border at the bottom; a narrow one at the waist.
     borderBand(ctx, SIZE - SIZE * (designId === 'border' ? 0.2 : 0.12), SIZE * (designId === 'border' ? 0.2 : 0.12), base, designId);
     borderBand(ctx, 0, SIZE * 0.035, base, designId);

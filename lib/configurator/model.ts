@@ -4,7 +4,8 @@
  * null → the built-in placeholder figure (lib/configurator/mannequin.ts).
  * To use a real model: put the .glb in public/models/ (or R2, with CORS
  * allowing this site) and set its URL here. Its garment parts must be
- * separate meshes named Saree, Pallu (or Pallu_saree / Pallu_osariya),
- * Jacket and optionally Frill_osariya; everything else is shown as modelled.
+ * separate meshes named Saree (or Saree_saree), Pallu (or Pallu_saree /
+ * Pallu_osariya), Jacket, and for Kandyan Osariya Skirt_osariya and
+ * Frill_osariya; everything else is shown as modelled.
  */
 export const CONFIGURATOR_MODEL_URL: string | null = null;

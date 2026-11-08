@@ -6,11 +6,21 @@ import * as THREE from 'three';
  * code so the preview works before a real model exists. Its garment parts
  * use the same names a real .glb must use, so the viewer treats both alike:
  *
- *   Saree          pleated body of the saree
- *   Pallu_saree    pallu over the left shoulder, falling at the back
- *   Pallu_osariya  Kandyan Osariya: pallu over the left shoulder, falling in front
- *   Frill_osariya  Kandyan Osariya waist frill
- *   Jacket         the jacket (shown made up; it ships as unstitched material)
+ *   Saree_saree    standard drape: pleated, flared body of the saree
+ *   Pallu_saree    standard drape: pallu over the left shoulder, falling behind
+ *   Skirt_osariya  Kandyan Osariya: straight, column-shaped skirt to the floor,
+ *                  with the saree's border running down the front
+ *   Frill_osariya  Kandyan Osariya: full frill around the waist and hips,
+ *                  bordered at its edge
+ *   Pallu_osariya  Kandyan Osariya: from the right waist across the chest,
+ *                  over the left shoulder, falling straight down the back
+ *                  to the floor
+ *   Jacket         the jacket (shown made up; it ships as unstitched
+ *                  material), sleeves to the elbow
+ *
+ * The Osariya shape follows the founder's reference photographs
+ * (2026-11-09). It is a simplified figure, not a validated model of the
+ * garment: docs/4-architecture.md §5.0.
  *
  * Units are metres, y up, the figure faces +z.
  */
@@ -28,6 +38,39 @@ const TORSO: [number, number][] = [
   [0.12, 1.43],
   [0.05, 1.46],
 ];
+
+/** Piecewise-linear radius along height, from [radius, y] points ordered by rising y. */
+function profileAt(points: [number, number][], y: number): number {
+  if (y <= points[0]![1]) return points[0]![0];
+  for (let i = 1; i < points.length; i += 1) {
+    const [r1, y1] = points[i]!;
+    const [r0, y0] = points[i - 1]!;
+    if (y <= y1) return r0 + ((r1 - r0) * (y - y0)) / (y1 - y0);
+  }
+  return points[points.length - 1]![0];
+}
+
+/** Osariya skirt: fitted at the waist, over the hips, then a straight column, touching the floor. */
+const OSARIYA_SKIRT: [number, number][] = [
+  [0.19, 0.015],
+  [0.168, 0.07],
+  [0.166, 0.3],
+  [0.172, 0.6],
+  [0.18, 0.84],
+  [0.162, 0.94],
+  [0.146, 1.0],
+];
+const FRILL_TOP = 1.035;
+const FRILL_BOTTOM = 0.79;
+/** The frill flares from the waist to just below the hips. */
+function frillRadius(t: number): number {
+  return 0.152 + 0.15 * t ** 0.7;
+}
+function osariyaClearance(y: number): number {
+  if (y > FRILL_TOP) return torsoRadius(y) + 0.022;
+  if (y >= FRILL_BOTTOM - 0.02) return frillRadius(Math.min(1, (FRILL_TOP - y) / (FRILL_TOP - FRILL_BOTTOM))) + 0.04;
+  return profileAt(OSARIYA_SKIRT, y) + 0.03;
+}
 
 function torsoRadius(y: number): number {
   if (y <= TORSO[0]![1]) return 0.14;
@@ -84,7 +127,11 @@ function flaredSurface(
 }
 
 /** A flat strip of cloth along a path, kept clear of the body. */
-function ribbon(points: THREE.Vector3[], width: number, steps = 120): THREE.BufferGeometry {
+function ribbon(
+  points: THREE.Vector3[],
+  width: number,
+  { steps = 120, clearance = (y: number) => torsoRadius(y) + 0.022 } = {},
+): THREE.BufferGeometry {
   const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
   const positions: number[] = [];
   const uvs: number[] = [];
@@ -99,9 +146,9 @@ function ribbon(points: THREE.Vector3[], width: number, steps = 120): THREE.Buff
     if (side.lengthSq() < 1e-6) side = new THREE.Vector3().crossVectors(tangent, up).normalize();
     for (const s of [-0.5, 0.5]) {
       const q = p.clone().addScaledVector(side, s * width);
-      // Push outwards until clear of the torso (in the body's own, un-squashed space).
+      // Push outwards until clear of the body and garments beneath (in the body's own, un-squashed space).
       const flat = Math.hypot(q.x, q.z / Z_SCALE);
-      const clear = torsoRadius(q.y) + 0.022;
+      const clear = clearance(q.y);
       if (flat < clear && flat > 1e-6) {
         const k = clear / flat;
         q.x *= k;
@@ -133,8 +180,8 @@ function limb(from: THREE.Vector3, to: THREE.Vector3, radius: number, material: 
 
 function sleeve(from: THREE.Vector3, to: THREE.Vector3, material: THREE.Material): THREE.Mesh {
   const dir = to.clone().sub(from).normalize();
-  const length = 0.15;
-  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.046, length, 24, 1, true), material);
+  const length = 0.26;
+  const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.056, 0.044, length, 24, 1, true), material);
   mesh.position.copy(from).addScaledVector(dir, length / 2 + 0.01);
   mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
   return mesh;
@@ -185,7 +232,7 @@ export function buildMannequin(bodyMaterial: THREE.Material): Mannequin {
       ),
       cloth,
     ),
-    'Saree',
+    'Saree_saree',
   );
 
   // ── Pallu, standard drape: across the front, over the left shoulder, falling behind ──
@@ -193,13 +240,13 @@ export function buildMannequin(bodyMaterial: THREE.Material): Mannequin {
     new THREE.Mesh(
       ribbon(
         [
-          new THREE.Vector3(0.14, 1.0, 0.1),
-          new THREE.Vector3(0.07, 1.16, 0.12),
-          new THREE.Vector3(-0.05, 1.3, 0.11),
-          new THREE.Vector3(-0.15, 1.42, 0.02),
-          new THREE.Vector3(-0.16, 1.32, -0.1),
-          new THREE.Vector3(-0.13, 1.05, -0.15),
-          new THREE.Vector3(-0.12, 0.62, -0.19),
+          new THREE.Vector3(-0.14, 1.0, 0.1),
+          new THREE.Vector3(-0.07, 1.16, 0.12),
+          new THREE.Vector3(0.05, 1.3, 0.11),
+          new THREE.Vector3(0.15, 1.42, 0.02),
+          new THREE.Vector3(0.16, 1.32, -0.1),
+          new THREE.Vector3(0.13, 1.05, -0.15),
+          new THREE.Vector3(0.12, 0.62, -0.19),
         ],
         0.26,
       ),
@@ -208,34 +255,53 @@ export function buildMannequin(bodyMaterial: THREE.Material): Mannequin {
     'Pallu_saree',
   );
 
-  // ── Kandyan Osariya: waist frill, and a pallu over the left shoulder falling in front ──
+  // ── Kandyan Osariya (reference photos, 2026-11-09) ──
+  // A straight column skirt to the floor, its border running down the front.
   add(
     new THREE.Mesh(
-      flaredSurface(1.01, 0.84, (t, theta) => 0.152 + 0.1 * t + 0.016 * t * Math.sin(theta * 22), { rings: 16, uRepeat: 4 }),
+      flaredSurface(1.0, 0.015, (t) => profileAt(OSARIYA_SKIRT, 1.0 + (0.015 - 1.0) * t), { rings: 64 }),
+      cloth,
+    ),
+    'Skirt_osariya',
+  );
+  // The full frill around waist and hips, gathered into soft folds, bordered at its edge.
+  add(
+    new THREE.Mesh(
+      flaredSurface(
+        FRILL_TOP,
+        FRILL_BOTTOM,
+        (t, theta) => frillRadius(t) + (0.006 + 0.024 * t) * Math.sin(theta * 18) + 0.006 * t * Math.sin(theta * 47),
+        { rings: 24, segments: 192, uRepeat: 4 },
+      ),
       cloth,
     ),
     'Frill_osariya',
   );
+  // The pallu: from the right waist across the chest, over the left shoulder,
+  // then straight down the back to the floor.
   add(
     new THREE.Mesh(
       ribbon(
         [
-          new THREE.Vector3(0.13, 1.02, -0.09),
-          new THREE.Vector3(0.02, 1.2, -0.12),
-          new THREE.Vector3(-0.12, 1.36, -0.06),
-          new THREE.Vector3(-0.16, 1.42, 0.03),
-          new THREE.Vector3(-0.13, 1.28, 0.12),
-          new THREE.Vector3(-0.11, 1.05, 0.15),
-          new THREE.Vector3(-0.1, 0.8, 0.17),
+          new THREE.Vector3(-0.13, 1.06, 0.11),
+          new THREE.Vector3(-0.05, 1.18, 0.14),
+          new THREE.Vector3(0.07, 1.31, 0.12),
+          new THREE.Vector3(0.155, 1.43, 0.02),
+          new THREE.Vector3(0.15, 1.35, -0.1),
+          new THREE.Vector3(0.14, 1.12, -0.16),
+          new THREE.Vector3(0.15, 0.8, -0.24),
+          new THREE.Vector3(0.14, 0.4, -0.165),
+          new THREE.Vector3(0.15, 0.02, -0.19),
         ],
-        0.24,
+        0.3,
+        { steps: 180, clearance: osariyaClearance },
       ),
       cloth,
     ),
     'Pallu_osariya',
   );
 
-  // ── Jacket: a short fitted jacket with short sleeves ──
+  // ── Jacket: a short fitted jacket, sleeves to the elbow ──
   const jacket = add(
     new THREE.Mesh(
       lathe(
