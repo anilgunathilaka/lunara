@@ -111,7 +111,7 @@ Moving to Workers Paid ($5/month) lifts the CPU and request caps without code ch
 | --- | --- |
 | CI is the deploy path | GitHub Actions (`.github/workflows/ci.yml`). Every pull request and push: install, lint (ESLint + token lint), Worker build (which includes `next build` and its type check). Push to `main`: the same, then deploy to the `lunara` Worker. Any branch can be deployed manually ("Run workflow"). |
 | No `.env` in a Worker build | OpenNext copies any `.env*` file in the project root into the Worker bundle. `npm run build:worker` refuses to build if one exists (`.env.example` excepted) and fails if the built bundle contains any env value. CI checkouts never contain `.env`, so a developer machine deploys only by exception, from a clean checkout. |
-| Domain | `lunarasarees.com` (Cloudflare zone) is the public origin, attached to the Worker as a Custom Domain in `wrangler.jsonc`; `www` is attached and redirected to the apex. `BETTER_AUTH_URL` names it, so sign-in, email links and message links all use it. The `workers.dev` address stays reachable as a preview and is sent `X-Robots-Tag: noindex`. Email is sent from `hello@lunarasarees.com`, verified in Resend. |
+| Domain | `lunarasarees.com` (Cloudflare zone) is the public origin, attached to the Worker as a Custom Domain in `wrangler.jsonc`; `www` is attached and redirected to the apex. `BETTER_AUTH_URL` names it, so sign-in, email links and message links all use it. The `workers.dev` address is switched off (Wrangler disables it once routes are set); if it is re-enabled, it is sent `X-Robots-Tag: noindex`. Email is sent from `hello@lunarasarees.com`, verified in Resend. |
 | Where configuration lives | Public values: `vars` in `wrangler.jsonc`. Secrets (`BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `CRON_SECRET`): Worker secrets via `wrangler secret put`, set once and kept across deploys. Database credentials: the Hyperdrive config only. CI holds just `CLOUDFLARE_API_TOKEN` (secret) and `CLOUDFLARE_ACCOUNT_ID` (variable). |
 | Migrations are not deployed | CI never runs `prisma migrate`. Schema changes are applied deliberately from a developer machine (`DIRECT_URL`), before the code that needs them is merged. |
 | Cost | Free: GitHub Actions minutes on the repo's plan, Workers Free for the deploy itself. |
@@ -281,6 +281,18 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Tracking | Progress (placed → confirmed → packed → with the courier → delivered) is derived from ORDER_EVENT, never stored twice. Courier and tracking number show once dispatched. The guest order page and the account show the same record from one component, so they cannot disagree. |
 | Privacy | Account pages are `noindex` and dynamic. Someone else's order number returns 404, the same as one that doesn't exist. |
 | Later | Saved designs (with the configurator on real data) and saved addresses. |
+
+3.7 Product Photos (`/[locale]/ops/photos`)
+
+| Rule | Detail |
+| --- | --- |
+| What is photographed | Per saree colourway: gallery photos (up to 8, staff-ordered; the first is the cover in the shop) and the colour reference frame (§4). Per jacket colourway: a swatch photo. Pattern assets and texture tiles for the configurator come with it (§5). |
+| Stored as uploaded | Bytes go to R2 untouched: no resize, re-encode or metadata strip, so the embedded colour profile survives (§4). The format is identified from the file's own bytes (JPEG, PNG, WebP only; 12 MB max), never from its name. |
+| Upload path | `POST /api/ops/media` with the file as the raw request body: no multipart parsing, so a phone photo costs the Worker almost no CPU. Staff only, same-origin only. One new random key per upload, so cached copies never go stale. |
+| Keys, not URLs | The database stores the storage key; the public URL is resolved on read. Moving media to a custom domain changes one variable, not data. |
+| Reference frame is write-once | It can be set only when empty, enforced in the database write itself, and there is no remove or replace. A new fabric lot means a new colourway record (§4 Lot change). |
+| Audit | Every upload, removal, cover change and swatch replacement writes an AUDIT_LOG row. A replaced swatch's object is kept. |
+| Shop | Product cards show the cover; the product page shows the gallery, then the reference frame labelled as such. Until a colourway is photographed, a single placeholder is shown with alt text saying so. Images are shown as-is: no filter, overlay or tint. |
 
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 

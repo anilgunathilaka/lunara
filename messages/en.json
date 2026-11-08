@@ -32,7 +32,10 @@
       "left": "{count} left"
     },
     "gallery": {
-      "referenceFrame": "Colour reference"
+      "referenceFrame": "Colour reference",
+      "photoAlt": "{name}, photo {n}",
+      "referenceAlt": "{name}, unretouched daylight colour reference",
+      "placeholderAlt": "Photograph of {name} coming soon"
     }
   },
   "commerce": {
@@ -405,7 +408,8 @@
       "payments": "Bank transfers",
       "stock": "Stock",
       "prices": "Prices",
-      "messages": "Messages"
+      "messages": "Messages",
+      "photos": "Photos"
     },
     "columns": {
       "number": "Order",
@@ -488,6 +492,37 @@
       "sent": "Sent",
       "failed": "Failed",
       "cancelled": "Not needed"
+    },
+    "photos": {
+      "intro": "Photos are stored exactly as uploaded: no resizing, filters or colour changes. Upload sRGB JPEG, PNG or WebP, up to 12 MB each, up to {max} gallery photos per colour. The first gallery photo is the cover shown in the shop.",
+      "sareesHeading": "Saree colours",
+      "jacketsHeading": "Jacket material colours",
+      "galleryLabel": "Gallery ({count} of {max})",
+      "noPhotos": "No photos yet — the shop shows a placeholder.",
+      "photoAlt": "{name}, photo {n}",
+      "cover": "Cover",
+      "makeCover": "Make cover",
+      "remove": "Remove",
+      "addPhotos": "Add photos",
+      "referenceLabel": "Colour reference frame",
+      "referenceHint": "One unretouched daylight photo with the colour target in frame. It can be set only once.",
+      "referenceLocked": "Set, and locked: a new fabric lot needs a new colourway record.",
+      "referenceAlt": "{name}, colour reference frame",
+      "uploadReference": "Upload reference frame",
+      "swatchAlt": "{name}, swatch",
+      "uploadSwatch": "Upload swatch photo",
+      "replaceSwatch": "Replace swatch photo",
+      "uploading": "Uploading… {done} of {total} done",
+      "uploaded": "{count, plural, one {# photo uploaded.} other {# photos uploaded.}}",
+      "error": {
+        "invalid": "{name} couldn't be uploaded. Try again.",
+        "notFound": "This colour no longer exists. Reload the page.",
+        "tooLarge": "{name} is larger than 12 MB.",
+        "format": "{name} is not a JPEG, PNG or WebP photo.",
+        "full": "This gallery already has the maximum number of photos.",
+        "locked": "The reference frame is already set and cannot be replaced.",
+        "network": "Connection lost while uploading {name}. Try again."
+      }
     }
   },
   "notifications": {

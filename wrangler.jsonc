@@ -37,7 +37,7 @@
   // lunarasarees.com (zone on this Cloudflare account) serves the Worker;
   // Cloudflare creates the DNS records and certificate on deploy. www is
   // attached too and redirected to the apex by a zone Redirect Rule.
-  // The workers.dev address keeps working as a noindexed preview.
+  // With routes set, Wrangler turns the workers.dev address off.
   "routes": [
     { "pattern": "lunarasarees.com", "custom_domain": true },
     { "pattern": "www.lunarasarees.com", "custom_domain": true }

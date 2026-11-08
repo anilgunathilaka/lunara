@@ -11,6 +11,7 @@ const SECTIONS = [
   { href: '/ops/payments', key: 'payments' },
   { href: '/ops/stock', key: 'stock' },
   { href: '/ops/prices', key: 'prices' },
+  { href: '/ops/photos', key: 'photos' },
 ] as const;
 
 export function OpsNav() {

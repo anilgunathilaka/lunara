@@ -1,5 +1,6 @@
 import 'server-only';
 import type { OrderStatus, Prisma } from '@prisma/client';
+import { mediaUrl } from '@/lib/media/photos';
 import { getPrisma } from '@/lib/prisma';
 import { availabilityOf } from '@/lib/stock/state';
 
@@ -104,4 +105,38 @@ export async function priceTables() {
     prisma.jacketMaterial.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
   ]);
   return { designs, materials, jackets };
+}
+
+/** Every colourway with its photos, for the Photos page (§3.7). Keys resolved to URLs here. */
+export async function photoRows() {
+  const prisma = getPrisma();
+  const [sarees, jackets] = await Promise.all([
+    prisma.sareeColourway.findMany({
+      relationLoadStrategy: 'join',
+      include: { design: { select: { name: true } }, material: { select: { name: true } } },
+      orderBy: [{ design: { sortOrder: 'asc' } }, { designId: 'asc' }, { materialId: 'asc' }, { colourName: 'asc' }],
+    }),
+    prisma.jacketColourway.findMany({
+      relationLoadStrategy: 'join',
+      include: { material: { select: { name: true } } },
+      orderBy: [{ material: { sortOrder: 'asc' } }, { id: 'asc' }],
+    }),
+  ]);
+  return {
+    sarees: sarees.map((row) => ({
+      id: row.id,
+      sku: row.sku,
+      name: `${row.design.name} · ${row.material.name} · ${row.colourName}`,
+      colourHex: row.colourHex,
+      gallery: row.galleryAssets.map((key) => ({ key, url: mediaUrl(key) })),
+      referenceFrame: row.referenceFrameUrl ? mediaUrl(row.referenceFrameUrl) : null,
+    })),
+    jackets: jackets.map((row) => ({
+      id: row.id,
+      sku: row.sku,
+      name: `${row.material.name} · ${row.colourName}`,
+      colourHex: row.colourHex,
+      swatch: row.swatchUrl ? mediaUrl(row.swatchUrl) : null,
+    })),
+  };
 }

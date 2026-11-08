@@ -8,6 +8,7 @@ import type { OrderStatus } from '@prisma/client';
 import { composeNotifications, isNotifiable } from '@/lib/notifications/compose';
 import { deliverSoon } from '@/lib/notifications/deliver';
 import { getPrisma } from '@/lib/prisma';
+import { getStorage } from '@/lib/storage';
 import { requireStaffAction } from './staff';
 import { ORDER_STATUSES, RESTOCK_ON_CANCEL_FROM, canTransition } from './transitions';
 
@@ -279,5 +280,55 @@ export async function updateJacketPricesAction(form: FormData): Promise<void> {
         },
       });
     });
+  });
+}
+
+// ── Photos (§3.7) ─────────────────────────────────────────────────────────
+// Uploads go through the /api/ops/media route (raw bytes). Removing and
+// ordering gallery photos are plain form posts. The reference frame has no
+// remove or replace action: it is write-once (§4).
+
+const galleryPhotoSchema = z.object({
+  locale,
+  id: z.string().min(1).max(100),
+  key: z.string().min(1).max(512),
+  op: z.enum(['remove', 'cover']),
+});
+
+export async function galleryPhotoAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const parsed = galleryPhotoSchema.safeParse(Object.fromEntries(form));
+  const lang = locale.safeParse(form.get('locale')).data ?? 'en';
+  const path = `/${lang}/ops/photos`;
+  if (!parsed.success) back(path, { error: 'invalid' });
+  const { id, key, op } = parsed.data;
+  const removed: { key?: string } = {};
+
+  await run(path, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      const row = await tx.sareeColourway.findUnique({ where: { id }, select: { galleryAssets: true } });
+      if (!row || !row.galleryAssets.includes(key)) throw new OpsError('conflict');
+      const rest = row.galleryAssets.filter((k) => k !== key);
+      const next = op === 'remove' ? rest : [key, ...rest];
+      // Compare-and-set on the whole list: a concurrent change makes this a conflict, not a lost edit.
+      const { count } = await tx.sareeColourway.updateMany({
+        where: { id, galleryAssets: { equals: row.galleryAssets } },
+        data: { galleryAssets: next },
+      });
+      if (count !== 1) throw new OpsError('conflict');
+      await tx.auditLog.create({
+        data: {
+          actor: staff.email,
+          action: op === 'remove' ? 'photo.remove' : 'photo.cover',
+          entityType: 'saree_colourway',
+          entityId: id,
+          before: { galleryAssets: row.galleryAssets },
+          after: { galleryAssets: next },
+        },
+      });
+      if (op === 'remove') removed.key = key;
+    });
+    // After commit: the database no longer points at it. Best effort; an orphan costs only storage.
+    if (removed.key) await getStorage().delete(removed.key).catch(() => undefined);
   });
 }

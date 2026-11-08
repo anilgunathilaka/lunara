@@ -7,7 +7,6 @@ import { SectionMarker } from '@/components/brand/SectionMarker';
 import { MotifDivider } from '@/components/brand/MotifDivider';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
-import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
 import { whatsappLink } from '@/lib/commerce/business';
 
 // Rendered per request: "New arrivals" shows live price and stock
@@ -93,7 +92,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <ProductCard
                 key={item.id}
                 href={`/shop/${item.id}`}
-                image={{ src: PLACEHOLDER_IMAGE, alt: item.name }}
+                image={{ src: item.imageUrl, alt: item.name }}
                 name={item.name}
                 materialLabel={materialLabel[item.material]}
                 price={item.price}

@@ -1,6 +1,7 @@
 import 'server-only';
 import { connection } from 'next/server';
 import type { Prisma } from '@prisma/client';
+import { mediaUrl, mediaUrlOr } from '@/lib/media/photos';
 import { getPrisma } from '@/lib/prisma';
 import { resolvePairedPrice, resolveStandaloneJacketPrice } from '@/lib/pricing/resolve';
 import { availabilityOf, combinedAvailability } from '@/lib/stock/state';
@@ -65,6 +66,9 @@ function toProduct(row: ListingRow): CatalogueProduct {
     jacketPieceLengthMetres: jacket.material.pieceLengthMetres.toNumber(),
     stockState: availability.state,
     quantity: availability.quantity,
+    imageUrl: mediaUrlOr(saree.galleryAssets[0], PLACEHOLDER_IMAGE),
+    gallery: saree.galleryAssets.map(mediaUrl),
+    referenceFrameUrl: saree.referenceFrameUrl ? mediaUrl(saree.referenceFrameUrl) : null,
   };
 }
 
@@ -111,6 +115,7 @@ function toJacket(row: JacketRow): JacketProduct {
     price: resolveStandaloneJacketPrice({ standalonePrice: row.material.standalonePrice }),
     stockState: availability.state,
     quantity: availability.quantity,
+    swatchImageUrl: row.swatchUrl ? mediaUrl(row.swatchUrl) : null,
   };
 }
 
@@ -178,7 +183,7 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
     const superCotton = design.prices.find((p) => p.materialId === 'super');
     // A design is offered only when it is priced in both materials.
     if (!plain || !superCotton) continue;
-    designs.push({ id: design.id, name: design.name, thumbnailUrl: design.patternAssetUrl ?? PLACEHOLDER_IMAGE });
+    designs.push({ id: design.id, name: design.name, thumbnailUrl: mediaUrlOr(design.patternAssetUrl, PLACEHOLDER_IMAGE) });
 
     for (const jacket of jacketRows) {
       const addOn = jacket.material.pairingAddOn;
@@ -196,7 +201,7 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
     materialName: row.material.name,
     colourName: row.colourName,
     swatchHex: row.colourHex,
-    thumbnailUrl: row.swatchUrl ?? PLACEHOLDER_IMAGE,
+    thumbnailUrl: mediaUrlOr(row.swatchUrl, PLACEHOLDER_IMAGE),
     stockState: availabilityOf(row.stock).state,
   }));
 

@@ -143,7 +143,7 @@ export function ShopClient({
             <ProductCard
               key={product.id}
               href={`/shop/${product.id}`}
-              image={{ src: '/placeholder/product.jpg', alt: product.name }}
+              image={{ src: product.imageUrl, alt: product.name }}
               name={product.name}
               materialLabel={materialLabels[product.material]}
               price={product.price}
