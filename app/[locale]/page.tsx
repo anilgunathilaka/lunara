@@ -10,6 +10,7 @@ import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { FEATURES } from '@/lib/features';
 import { HeroShowcase, type HeroSlide } from '@/components/home/HeroShowcase';
+import { HERO_BANNERS } from '@/lib/home/hero';
 import { ProductRail } from '@/components/home/ProductRail';
 import { Reveal } from '@/components/motion/Reveal';
 
@@ -38,15 +39,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
   // Featured sarees for the hero card; until there are any, the hero photograph.
-  const heroSlides: HeroSlide[] =
+  // Founder banners first, then featured sarees, five slides at most.
+  const bannerSlides: HeroSlide[] = HERO_BANNERS.map((banner) => ({
+    href: '/shop',
+    image: { src: banner.src, alt: t(`hero.banners.${banner.altKey}`), focus: banner.focus, unoptimized: true },
+    title: t('hero.shopCurated'),
+  }));
+  const productSlides: HeroSlide[] =
     arrivals.length > 0
-      ? arrivals.slice(0, 5).map((item) => ({
+      ? arrivals.slice(0, Math.max(0, 5 - bannerSlides.length)).map((item) => ({
           href: `/shop/${item.id}`,
           image: { src: item.imageUrl, alt: item.name },
           title: item.name,
           caption: materialLabel[item.material],
         }))
-      : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
+      : bannerSlides.length > 0
+        ? []
+        : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
+  const heroSlides: HeroSlide[] = [...bannerSlides, ...productSlides];
 
   // Real review proof only: initials of the latest reviewers and the true
   // count and average. Nothing is shown until there are reviews.

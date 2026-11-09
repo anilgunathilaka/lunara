@@ -2233,6 +2233,10 @@ body {
 .hero-slide-image {
   object-fit: cover;
 }
+/* Subject on the right of a wide banner: a narrow crop keeps it in frame. */
+.hero-slide-image-end {
+  object-position: 85% 50%;
+}
 /* Invisible timer: its animation ending advances the slide. */
 .hero-card-timer {
   position: absolute;

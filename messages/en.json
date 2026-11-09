@@ -288,6 +288,9 @@
       "card": {
         "scroll": "Scroll",
         "proof": "Rated {average} out of 5 by {count, plural, one {# customer} other {# customers}}."
+      },
+      "banners": {
+        "banner1Alt": "Two pink and white cotton sarees on wooden hangers against a sunlit cream wall"
       }
     },
     "trust": {
