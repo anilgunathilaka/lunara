@@ -1232,6 +1232,7 @@ body {
   grid-column: 1;
   grid-row: 1;
   justify-self: start;
+  align-self: stretch;
 }
 .site-header-actions {
   grid-column: 3;
@@ -1329,9 +1330,14 @@ body {
   font-weight: var(--weight-semibold);
 }
 /* A header item with a menu: the link, then a chevron that opens the panel. */
+/* The item reaches from the header's top edge to its bottom edge, so the
+   pointer stays inside it all the way down to the panel's bridge. */
 .site-header-item {
   display: flex;
   align-items: center;
+  align-self: stretch;
+  margin-block: calc(var(--space-3) * -1);
+  padding-block: var(--space-3);
 }
 .site-header-item.is-open .site-header-link::after {
   transform: scaleX(1);
@@ -1366,7 +1372,8 @@ body {
   top: calc(100% + var(--space-3));
   left: 50%;
   translate: -50% 0;
-  width: min(1100px, calc(100% - var(--space-5) * 2));
+  /* The page container width (docs/2-ui.md §7.4). */
+  width: min(var(--container-max), calc(100% - var(--space-6) * 2));
   display: flex;
   flex-direction: column;
   min-height: 460px;
@@ -1379,13 +1386,16 @@ body {
 .site-mega[hidden] {
   display: none;
 }
-/* An invisible bridge over the gap, so the pointer can travel down into the panel. */
+/* An invisible bridge over the gap, so the pointer can travel down into the
+   panel. It runs on past the rounded top corners (inside the top padding,
+   where nothing sits), so a pointer coming down at the far left or right
+   never slips out through a corner. */
 .site-mega::before {
   content: '';
   position: absolute;
   inset-inline: 0;
-  bottom: 100%;
-  height: calc(var(--space-3) * 2);
+  top: calc(var(--space-3) * -2);
+  height: calc(var(--space-3) * 2 + var(--radius-panel));
 }
 @keyframes mega-in {
   from {
