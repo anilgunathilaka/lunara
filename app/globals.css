@@ -1355,125 +1355,206 @@ body {
 }
 
 /*
- * Menu panel: hangs under the header across its full width, the same edges
- * as the hero card. Fades in; its words rise into place one after another.
+ * Menu panel (docs/2-ui.md §7.2; founder decision 2026-11-09, after
+ * bedrock-one-nu.vercel.app): a rounded --lun-plum-deep panel centred under
+ * the header. Large entries on the left; the active one's tag, description
+ * and links in the middle; its photographs on the right; a hairline foot.
+ * Opaque, never a blur or tint over what lies behind it.
  */
 .site-mega {
   position: absolute;
-  top: 100%;
-  inset-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
-  border: 1px solid var(--lun-line);
-  border-top: 0;
-  background: var(--lun-surface);
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity var(--motion-menu),
-    visibility 0s linear var(--motion-menu-duration);
+  top: calc(100% + var(--space-3));
+  left: 50%;
+  translate: -50% 0;
+  width: min(1100px, calc(100% - var(--space-5) * 2));
+  display: flex;
+  flex-direction: column;
+  min-height: 460px;
+  padding: var(--space-7) var(--space-7) var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  animation: mega-in var(--motion-panel) both;
 }
-/* An invisible bridge over the header's lower padding, so the pointer can travel down into the panel. */
+.site-mega[hidden] {
+  display: none;
+}
+/* An invisible bridge over the gap, so the pointer can travel down into the panel. */
 .site-mega::before {
   content: '';
   position: absolute;
   inset-inline: 0;
   bottom: 100%;
-  height: var(--space-3);
+  height: calc(var(--space-3) * 2);
 }
-.site-header-item.is-open .site-mega {
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity var(--motion-menu),
-    visibility 0s;
+@keyframes mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
-.site-mega-columns {
+.site-mega-body {
+  flex: 1;
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 17rem);
-  padding-block: var(--space-6);
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--space-7);
+  padding-bottom: var(--space-6);
 }
-.site-mega-column {
-  padding-inline: var(--space-6);
+@media (min-width: 1024px) {
+  .site-mega-body {
+    grid-template-columns: 220px minmax(0, 1fr) 320px;
+  }
+  .site-mega-body-no-media {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
 }
-.site-mega-column + .site-mega-column {
-  border-inline-start: 1px solid var(--lun-line);
+/* Left: the large entries. */
+.site-mega-cats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
-.site-mega-heading {
+.site-mega-cat {
+  display: inline-flex;
+  font: var(--type-display-m) var(--font-body);
+  font-weight: var(--weight-light);
+  line-height: 1.25;
+  color: var(--lun-surface);
+  text-decoration: none;
+  transition: color var(--motion-pane);
+}
+.site-mega-cat:lang(si),
+.site-mega-cat:lang(ta) {
+  font: var(--type-body-l) var(--font-body);
+}
+/* The active entry in the accent: gold-pale on plum, never gold on white. */
+.site-mega-cat.is-active {
+  color: var(--lun-gold-pale);
+}
+/* Middle: the active entry's words, rising in each time it changes. */
+.site-mega-pane {
+  animation: mega-pane-in var(--motion-pane) both;
+}
+@keyframes mega-pane-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-1) * 1.5));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.site-mega-tag {
   margin: 0 0 var(--space-3);
-  font: var(--type-heading) var(--font-body);
-  font-weight: var(--weight-medium);
-  color: var(--lun-ink);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--lun-surface) 62%, transparent);
 }
-.site-mega-list {
+.site-mega-desc {
+  max-width: 340px;
+  margin: 0 0 var(--space-5);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-light);
+  line-height: 1.55;
+}
+.site-mega-links {
   display: grid;
-  gap: var(--space-2);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-6);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .site-mega-link {
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink-muted);
-  text-decoration: none;
-  transition: color var(--motion-standard);
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0.02em;
+  color: var(--lun-surface);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: var(--space-1);
+  transition: text-decoration-color var(--motion-pane);
 }
 .site-mega-link:hover,
 .site-mega-link:focus-visible {
-  color: var(--lun-plum);
-  text-decoration: underline;
-  text-underline-offset: var(--space-1);
+  text-decoration-color: currentColor;
 }
-.site-mega-heading,
-.site-mega-list > li {
-  opacity: 0;
-  transform: translateY(var(--space-2));
-  transition:
-    opacity var(--motion-menu),
-    transform var(--motion-menu);
+/* Right: two columns of photographs, staggered heights. Shown from 1024px. */
+.site-mega-media {
+  display: none;
 }
-.site-header-item.is-open .site-mega-heading,
-.site-header-item.is-open .site-mega-list > li {
-  opacity: 1;
-  transform: none;
-  transition-delay: calc(var(--i, 0) * var(--motion-stagger));
+@media (min-width: 1024px) {
+  .site-mega-media {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    min-height: 300px;
+  }
 }
-/* The promise card on the right: plum ground, the emblem, a door to the shop. */
-.site-mega-promo {
+.site-mega-media-col {
+  display: grid;
+  gap: var(--space-2);
+}
+.site-mega-media-col:first-child {
+  grid-template-rows: 1.2fr 1fr;
+}
+.site-mega-media-col:last-child {
+  grid-template-rows: 1fr 1.2fr;
+}
+.site-mega-media-col:only-child,
+.site-mega-media-col:has(> :only-child) {
+  grid-template-rows: 1fr;
+}
+.site-mega-media-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-l);
+  background: var(--lun-plum);
+}
+.site-mega-media-frame img {
+  object-fit: cover;
+}
+/* Foot: a hairline, a line of ours and a door. */
+.site-mega-foot {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  min-height: 16rem;
-  padding: var(--space-6);
-  background: var(--lun-plum-deep);
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--lun-plum-light);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-light);
+}
+.site-mega-foot p {
+  margin: 0;
+}
+.site-mega-foot-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--lun-surface);
   text-decoration: none;
+  transition: color var(--motion-pane);
 }
-.site-mega-promo-emblem {
-  width: var(--space-7);
-  height: auto;
-  margin-bottom: auto;
-}
-.site-mega-promo-title {
-  font: var(--type-display-m) var(--font-display);
-  letter-spacing: var(--type-display-m-tracking);
-}
-.site-mega-promo-cta {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  background: var(--lun-gold-pale);
-  color: var(--lun-plum-deep);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  transition: background var(--motion-standard);
-}
-.site-mega-promo:hover .site-mega-promo-cta {
-  background: var(--lun-surface);
+.site-mega-foot-link:hover,
+.site-mega-foot-link:focus-visible {
+  color: var(--lun-gold-pale);
 }
 .site-header-actions {
   display: flex;
