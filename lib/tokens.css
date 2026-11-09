@@ -139,6 +139,8 @@
   --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
   --motion-header: 500ms var(--motion-menu-ease);
   --motion-announcement-interval: 5000ms;
+  /* Words rising into place as a section scrolls into view (docs/2-ui.md §7.4). */
+  --motion-section: 800ms var(--motion-menu-ease);
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
@@ -212,5 +214,6 @@
     --motion-stagger: 0ms;
     --motion-menu-duration: 0ms;
     --motion-header: 0ms;
+    --motion-section: 0ms;
   }
 }

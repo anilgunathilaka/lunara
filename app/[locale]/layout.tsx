@@ -133,6 +133,13 @@ export default async function LocaleLayout({
               // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
               { href: '/account/start', label: tFooter('myOrders') },
             ]}
+            footerHeadings={{ support: tFooter('support'), policies: tFooter('policiesHeading') }}
+            footerTrust={[
+              { key: 'unstitched', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { key: 'dispatch', label: tTrust('dispatch'), href: '/support/shipping' },
+              { key: 'returns', label: tTrust('returns'), href: '/support/returns' },
+              { key: 'colour', label: tTrust('colourPromise'), href: '/support/care-guide' },
+            ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },
               { href: '/policies/terms', label: tFooter('terms') },

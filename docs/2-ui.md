@@ -362,6 +362,7 @@ Motion is used to make state changes legible, never to decorate. The configurato
 | --motion-menu | 300ms cubic-bezier(0.33, 0, 0, 1) | Header menu panel fade (§7.2). |
 | --motion-header | 500ms cubic-bezier(0.33, 0, 0, 1) | Announcement slide; header hairline (§7.2). |
 | --motion-announcement-interval | 5000ms | Time each announcement stays (§7.2). |
+| --motion-section | 800ms cubic-bezier(0.33, 0, 0, 1) | Words rising into place on scroll (§7.4). |
 
 7.1 Motion Rules
 
@@ -390,6 +391,16 @@ The one decorative exception: the home hero and the header announce the brand on
 7.3 Page Background (founder decision 2026-11-09)
 
 Every page background is --lun-surface (white). --lun-ground keeps its sampled value (brand colours are never adjusted) but is no longer used as a page or section background.
+
+7.4 Site Sections and Footer (founder decision 2026-11-09, after theirnibs.com)
+
+The founder asked for the whole site to follow theirnibs.com in layout and motion, with Lunara's own content and colours. Pages are rebuilt in waves; the home page and footer come first.
+
+- Home after the hero, in order: New arrivals as a rail of cards that scrolls sideways and snaps (four across from 1024px, three from 768px, one and a bit on phones), with View all and round arrow buttons; ways in as four photograph tiles over solid --lun-gold-pale label bars with an arrow (Plain Cotton, Super Cotton — opening /shop?material=… — Jacket Material, the care guide); the two drapes as two photographs edge to edge, each with its name in white with the plum halo and a gold-pale button; the drape promise set large; reviews; a --lun-gold-pale panel beside a photograph (getting the jacket stitched); and a centred word from us (WhatsApp).
+- Footer: a band of the four facts with icons on gold-pale at 35% over white, then Support and Policies columns and the business details on --lun-gold-pale, closed by a --lun-gold-deep hairline and the copyright line. Text on gold-pale is --lun-ink, never --lun-ink-muted (contrast).
+- Section titles: --type-display-l in the display face, --lun-plum-deep. Product names on cards (English) in the display face.
+- Motion: headings and words rise softly into place as they scroll into view (--motion-section). Text only: photographs never fade, slide or scale on their own (§7.1). Content is never hidden without JavaScript, and nothing moves under prefers-reduced-motion. The product rail moves only when the customer moves it.
+- Not taken from the reference: dimming the page behind menus, and fading photographs in as they load (§7.1).
 
 8. Token Reference
 

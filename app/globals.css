@@ -723,6 +723,11 @@ body {
   text-transform: uppercase;
   color: var(--lun-ink-muted);
 }
+.product-card-name:lang(en) {
+  font: var(--type-heading) var(--font-display);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum-deep);
+}
 .product-card-jacket-row {
   display: flex;
   align-items: center;
@@ -1463,36 +1468,106 @@ body {
 }
 
 /*
- * Footer — docs/3-components.md §6.2. --lun-plum-deep ground.
+ * Footer — docs/3-components.md §6.2; layout per docs/2-ui.md §7.4 (founder
+ * decision 2026-11-09, after theirnibs.com): a band of the four facts with
+ * their icons, then link columns and the business details on a
+ * --lun-gold-pale ground. Text on gold-pale is --lun-ink, never muted grey.
  */
+.site-trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-4);
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  list-style: none;
+  background: color-mix(in srgb, var(--lun-gold-pale) 35%, var(--lun-surface));
+}
+@media (min-width: 768px) {
+  .site-trust {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-inline: max(var(--space-6), calc((100% - 1320px) / 2));
+  }
+}
+.site-trust-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  color: var(--lun-plum-deep);
+  text-align: center;
+  text-decoration: none;
+}
+.site-trust-label {
+  font: var(--type-heading) var(--font-display);
+  letter-spacing: var(--type-display-m-tracking);
+}
+.site-trust-item:hover .site-trust-label {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
 .site-footer {
+  padding: var(--space-7) var(--space-4) var(--space-5);
+  background: var(--lun-gold-pale);
+  color: var(--lun-ink);
+}
+@media (min-width: 768px) {
+  .site-footer {
+    padding-inline: max(var(--space-6), calc((100% - 1320px) / 2));
+  }
+}
+.site-footer-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
+.site-footer-column {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-5);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
+  gap: var(--space-2);
 }
-.site-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
+.site-footer-heading {
+  margin: 0 0 var(--space-2);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
 }
 .site-footer-link {
   font: var(--type-body-s) var(--font-body);
-  color: color-mix(in srgb, var(--lun-surface) 85%, transparent);
+  color: var(--lun-ink);
   text-decoration: none;
 }
-.site-footer-link:hover {
-  color: var(--lun-surface);
+.site-footer-link:hover,
+.site-footer-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-footer-brand .wordmark-logo {
+  height: var(--space-7);
+  width: auto;
 }
 .site-footer-legal {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   font: var(--type-body-s) var(--font-body);
-  color: color-mix(in srgb, var(--lun-surface) 70%, transparent);
+}
+.site-footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--lun-gold-deep);
+  font: var(--type-label) var(--font-body);
 }
 
 /*
@@ -2514,39 +2589,6 @@ body {
   }
 }
 
-/* Osariya feature — one saree, two drapes, a culturally distinctive
-   panel no competitor shows online. */
-.home-osariya-panel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-.home-osariya-frame {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  background: var(--lun-surface);
-  border-radius: var(--radius-m);
-  overflow: hidden;
-}
-.home-osariya-frame img {
-  object-fit: cover;
-}
-.home-osariya-label {
-  display: block;
-  margin-top: var(--space-2);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  color: var(--lun-ink-muted);
-}
-.home-osariya-body {
-  margin-top: var(--space-5);
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink-muted);
-  max-width: 68ch;
-}
-
 /* Proof — customer photo reviews. No fabricated reviews are ever rendered
    here; until real, verified reviews exist (FR-46) this shows an honest
    placeholder note instead. */
@@ -2561,6 +2603,341 @@ body {
   color: var(--lun-ink-muted);
   font: var(--type-body) var(--font-body);
   max-width: 68ch;
+}
+
+/*
+ * Site-wide pieces of the reference look (docs/2-ui.md §7.4).
+ */
+.section-title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font: var(--type-display-l) var(--font-display);
+  font-weight: var(--type-display-l-weight);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum-deep);
+}
+.eyebrow {
+  margin: 0;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink);
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.text-link:hover {
+  color: var(--lun-plum);
+}
+/* A solid button: gold-pale with plum-deep words; plum-deep with white words. */
+.solid-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-5);
+  border-radius: var(--radius-s);
+  background: var(--lun-gold-pale);
+  color: var(--lun-plum-deep);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition:
+    background var(--motion-standard),
+    color var(--motion-standard);
+}
+.solid-pill:hover {
+  background: var(--lun-surface);
+}
+.solid-pill-plum {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.solid-pill-plum:hover {
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+}
+
+/* Scroll reveal: held back only once JS has found it below the fold. */
+.reveal[data-reveal] {
+  transition:
+    opacity var(--motion-section),
+    transform var(--motion-section);
+}
+.reveal[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(var(--space-5));
+}
+
+/* Home bands after the hero. */
+.home-band {
+  padding: var(--space-7) var(--space-4);
+}
+@media (min-width: 768px) {
+  .home-band {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+.home-band-tight {
+  padding-top: 0;
+}
+.home-band-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 1320px;
+  margin-inline: auto;
+}
+
+/* Product rail: cards in a row that scrolls sideways and snaps. */
+.product-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.product-rail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.product-rail-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.rail-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  color: var(--lun-ink);
+  transition: border-color var(--motion-standard);
+}
+.rail-arrow:hover {
+  border-color: var(--lun-plum);
+}
+.product-rail-track {
+  --rail-gap: var(--space-4);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  column-gap: var(--rail-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  /* Proximity, not mandatory: Chrome drops a smooth arrow scroll inside a mandatory snap row. */
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.product-rail-track::-webkit-scrollbar {
+  display: none;
+}
+.product-rail-item {
+  scroll-snap-align: start;
+}
+@media (min-width: 768px) {
+  .product-rail-track {
+    --rail-gap: var(--space-5);
+    grid-auto-columns: calc((100% - 2 * var(--rail-gap)) / 3);
+  }
+}
+@media (min-width: 1024px) {
+  .product-rail-track {
+    grid-auto-columns: calc((100% - 3 * var(--rail-gap)) / 4);
+  }
+}
+
+/* Ways in: a photograph over a solid label bar with an arrow. */
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 1024px) {
+  .home-tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  color: var(--lun-plum-deep);
+  text-decoration: none;
+}
+.home-tile-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+.home-tile-image img {
+  object-fit: cover;
+}
+.home-tile-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--lun-gold-pale);
+  font: var(--type-body) var(--font-display);
+  font-weight: var(--weight-semibold);
+  transition:
+    background var(--motion-standard),
+    color var(--motion-standard);
+}
+.home-tile-label svg {
+  flex-shrink: 0;
+  transition: transform var(--motion-standard);
+}
+.home-tile:hover .home-tile-label {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.home-tile:hover .home-tile-label svg {
+  transform: translateX(var(--space-1));
+}
+
+/* Two photographs edge to edge, each with its name and a door; words
+   carry a soft halo on the letters only, never a tint on the photograph. */
+.home-split {
+  display: grid;
+  gap: var(--space-2);
+}
+@media (min-width: 768px) {
+  .home-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.home-split-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+@media (min-width: 768px) {
+  .home-split-panel {
+    aspect-ratio: 9 / 10;
+  }
+}
+.home-split-panel img {
+  object-fit: cover;
+}
+.home-split-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  text-align: center;
+}
+.home-split-title {
+  margin: 0;
+  font: var(--type-display-xl) var(--font-display);
+  font-weight: var(--type-display-xl-weight);
+  color: var(--lun-surface);
+  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
+}
+
+/* Statement: the promise, set large. */
+.home-statement {
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.home-statement-text {
+  margin: 0;
+  max-width: 40ch;
+  font: var(--type-display-l) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-ink);
+}
+
+.home-reviews {
+  max-width: 68ch;
+}
+
+/* A gold-pale panel beside a photograph. */
+.home-feature {
+  display: grid;
+  background: var(--lun-gold-pale);
+}
+@media (min-width: 768px) {
+  .home-feature {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.home-feature-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-5);
+}
+@media (min-width: 1024px) {
+  .home-feature-copy {
+    padding: var(--space-8) max(var(--space-8), calc((100vw - 1320px) / 2));
+    padding-inline-end: var(--space-8);
+  }
+}
+.home-feature-title {
+  margin: 0;
+  font: var(--type-display-l) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum-deep);
+}
+.home-feature-body {
+  margin: 0;
+  max-width: 52ch;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.home-feature-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+}
+.home-feature-image img {
+  object-fit: cover;
+}
+@media (min-width: 768px) {
+  .home-feature-image {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+/* A word from us, centred. */
+.home-community {
+  align-items: center;
+  max-width: 60ch;
+  text-align: center;
+}
+.home-community-body {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
 }
 
 /*

@@ -181,7 +181,8 @@
       "shipping": "නැව්ගත කිරීම",
       "privacy": "රහස්‍යතා ප්‍රතිපත්තිය",
       "terms": "සේවා නියම",
-      "myOrders": "මගේ ඇණවුම්"
+      "myOrders": "මගේ ඇණවුම්",
+      "policiesHeading": "ප්‍රතිපත්ති"
     },
     "slideover": {
       "addedTitle": "කරත්තයට එකතු කළා",
@@ -296,7 +297,10 @@
       "whatsapp": "WhatsApp හරහා අප අමතන්න"
     },
     "newArrivals": {
-      "heading": "අලුත් එකතුව"
+      "heading": "අලුත් එකතුව",
+      "viewAll": "සියල්ල බලන්න",
+      "previous": "පෙර සාරි",
+      "next": "තවත් සාරි"
     },
     "osariya": {
       "heading": "එක් සාරියක්, ඇඳුම් ආකාර දෙකක්",
@@ -308,7 +312,11 @@
       "sampleReviewerLabel": "සමාලෝචකයාගේ නම",
       "sampleDistrictLabel": "දිස්ත්‍රික්කය",
       "sampleQuote": "සමාලෝචන පෙළ මෙහි දිස්වනු ඇත."
-    }
+    },
+    "tiles": {
+      "heading": "ඔබේ සාරිය සොයන්න"
+    },
+    "shopNow": "දැන් මිලදී ගන්න"
   },
   "shop": {
     "title": "නිර්මාණය කළ යුගල සාප්පු කරන්න",

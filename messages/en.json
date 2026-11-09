@@ -181,7 +181,8 @@
       "shipping": "Shipping",
       "privacy": "Privacy policy",
       "terms": "Terms of service",
-      "myOrders": "My orders"
+      "myOrders": "My orders",
+      "policiesHeading": "Policies"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -296,7 +297,10 @@
       "whatsapp": "Reach us on WhatsApp"
     },
     "newArrivals": {
-      "heading": "New arrivals"
+      "heading": "New arrivals",
+      "viewAll": "View all",
+      "previous": "Previous sarees",
+      "next": "More sarees"
     },
     "osariya": {
       "heading": "One saree, two drapes",
@@ -308,7 +312,11 @@
       "sampleReviewerLabel": "Reviewer name",
       "sampleDistrictLabel": "District",
       "sampleQuote": "Review text will appear here."
-    }
+    },
+    "tiles": {
+      "heading": "Find your saree"
+    },
+    "shopNow": "Shop now"
   },
   "shop": {
     "title": "Shop curated pairings",

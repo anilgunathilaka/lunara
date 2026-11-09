@@ -3,8 +3,17 @@ import { SectionMarker } from '@/components/brand/SectionMarker';
 import { getCuratedListings } from '@/lib/catalogue/queries';
 import { ShopClient } from './ShopClient';
 
-export default async function ShopPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ShopPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>;
+  searchParams: Promise<{ material?: string }>;
+}) {
   const { locale } = await params;
+  // /shop?material=plain|super opens with that cotton chosen (the home page tiles link here).
+  const { material } = await searchParams;
+  const initialMaterial = material === 'plain' || material === 'super' ? material : 'all';
   setRequestLocale(locale);
   const t = await getTranslations('shop');
   const tFabric = await getTranslations('product.fabric');
@@ -23,6 +32,7 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
 
         <ShopClient
           products={products}
+          initialMaterial={initialMaterial}
           materialLabels={{ plain: tFabric('materialPlain'), super: tFabric('materialSuper') }}
           filterLabels={{
             material: t('filters.material'),
