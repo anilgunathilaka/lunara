@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Camera, MessageCircle, RotateCcw, Truck } from 'lucide-react';
+import { ArrowRight, Camera, MessageCircle, RotateCcw, Truck } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
@@ -28,9 +28,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const formatLeft = (count: number) => tStock('left', { count });
   const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
-  // The headline in two lines: the first half of its words, then the rest.
+  // The headline in two lines: a short first line (about a third of the
+  // words), centred over the longer second (docs/2-ui.md §7.2).
   const words = t('hero.headline').split(' ');
-  const split = Math.ceil(words.length / 2);
+  const split = Math.max(1, Math.floor(words.length / 3));
   const headlineLines = words.length > 1 ? [words.slice(0, split).join(' '), words.slice(split).join(' ')] : words;
 
   // Featured sarees for the showcase; until there are any, the hero photograph.
@@ -62,12 +63,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <div className="home-hero-aside">
               <p className="home-hero-subhead">{t('hero.subhead')}</p>
               <div className="home-hero-doors">
-                <Link href="/shop" className="btn focus-ring btn-primary btn-lg">
-                  {t('hero.shopCurated')}
+                <Link href="/shop" className="hero-slide-link focus-ring">
+                  <span>{t('hero.shopCurated')}</span>
+                  <span className="hero-circle-arrow" aria-hidden="true">
+                    <ArrowRight className="icon" />
+                  </span>
                 </Link>
                 {FEATURES.designYourOwn && (
-                  <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
-                    {t('hero.designYourOwn')}
+                  <Link href="/design-your-own" className="hero-slide-link focus-ring">
+                    <span>{t('hero.designYourOwn')}</span>
+                    <span className="hero-circle-arrow" aria-hidden="true">
+                      <ArrowRight className="icon" />
+                    </span>
                   </Link>
                 )}
               </div>
@@ -77,8 +84,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             slides={heroSlides}
             labels={{
               region: t('hero.slider.region'),
-              previous: t('hero.slider.previous'),
-              next: t('hero.slider.next'),
               pause: t('hero.slider.pause'),
               play: t('hero.slider.play'),
               slideOf: heroSlides.map((_, i) => t('hero.slider.slideOf', { n: i + 1, total: heroSlides.length })),

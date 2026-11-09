@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react';
+import { ArrowRight, Pause, Play } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,7 @@ export interface HeroSlide {
   href: string;
   image: { src: string; alt: string };
   title: string;
-  /** Short line under the title, e.g. the cotton. */
+  /** Short line beside the arrow, e.g. the cotton. */
   caption?: string;
 }
 
@@ -20,11 +20,9 @@ export interface HeroShowcaseProps {
   labels: {
     /** Accessible name of the whole showcase. */
     region: string;
-    previous: string;
-    next: string;
     pause: string;
     play: string;
-    /** "Slide {n} of {total}", already formatted per slide. */
+    /** "{n} of {total}", already formatted per slide. */
     slideOf: string[];
     view: string;
   };
@@ -36,10 +34,10 @@ const SWIPE_SHARE = 0.12;
 /**
  * Home hero showcase (docs/2-ui.md §7.2). Featured sarees in one wide
  * frame. A slide changes by a wipe of the frame: the photograph itself is
- * never moved or scaled (§7.1). Timing lives in CSS tokens — the gold
- * progress line's animation ending is what advances the slide — so pausing
- * (button, hover, focus) is just pausing that animation, and under
- * prefers-reduced-motion nothing advances on its own.
+ * never moved or scaled (§7.1). Timing lives in CSS tokens — the active
+ * dash filling is what advances the slide — so pausing (button, hover,
+ * focus) is just pausing that animation, and under prefers-reduced-motion
+ * nothing advances on its own.
  */
 export function HeroShowcase({ slides, labels }: HeroShowcaseProps) {
   const [active, setActive] = useState(0);
@@ -80,7 +78,12 @@ export function HeroShowcase({ slides, labels }: HeroShowcaseProps) {
 
   return (
     <section className="hero-showcase" aria-roledescription="carousel" aria-label={labels.region}>
-      <div className="hero-showcase-frame" onPointerDown={onPointerDown} onPointerUp={onPointerUp} onPointerCancel={() => (swipeFrom.current = null)}>
+      <div
+        className="hero-showcase-frame"
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => (swipeFrom.current = null)}
+      >
         {slides.map((slide, i) => {
           const isActive = i === active;
           return (
@@ -96,49 +99,64 @@ export function HeroShowcase({ slides, labels }: HeroShowcaseProps) {
                 if (isActive && e.target === e.currentTarget) setLeaving(null);
               }}
             >
-              <Image src={slide.image.src} alt={slide.image.alt} fill sizes="100vw" priority={i === 0} className="hero-slide-image" />
-              <div className="hero-slide-plate">
+              <Image
+                src={slide.image.src}
+                alt={slide.image.alt}
+                fill
+                sizes="100vw"
+                priority={i === 0}
+                className="hero-slide-image"
+              />
+              <div className="hero-slide-text">
                 <span className="hero-mask">
                   <span className="hero-slide-title">{slide.title}</span>
                 </span>
                 <Link href={slide.href} className="hero-slide-link focus-ring">
-                  <span>{slide.caption ? `${slide.caption} · ${labels.view}` : labels.view}</span>
-                  <span className="hero-slide-arrow" aria-hidden="true">
-                    <Icon icon={ArrowRight} size="inline" />
+                  <span>{slide.caption ?? labels.view}</span>
+                  <span className="hero-circle-arrow" aria-hidden="true">
+                    <Icon icon={ArrowRight} />
                   </span>
                 </Link>
               </div>
             </div>
           );
         })}
-      </div>
 
-      {count > 1 && (
-        <div className="hero-showcase-controls">
-          <span className="hero-showcase-count" aria-hidden="true">
-            {String(active + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
-          </span>
-          <span className="hero-showcase-progress" aria-hidden="true">
-            {autoplay && <span key={active} className="hero-showcase-progress-bar" onAnimationEnd={() => go(active + 1)} />}
-          </span>
-          <button type="button" className="hero-showcase-button focus-ring" onClick={() => go(active - 1)} aria-label={labels.previous}>
-            <Icon icon={ArrowLeft} />
+        {count > 1 && (
+          <div className="hero-showcase-dashes">
+            {slides.map((slide, i) => (
+              <button
+                key={slide.href + i}
+                type="button"
+                className={cn('hero-dash focus-ring', i === active && 'is-active')}
+                onClick={() => go(i)}
+                aria-label={labels.slideOf[i]}
+                aria-current={i === active ? 'true' : undefined}
+              >
+                <span className="hero-dash-track">
+                  {i === active &&
+                    (autoplay ? (
+                      <span key={active} className="hero-dash-fill" onAnimationEnd={() => go(active + 1)} />
+                    ) : (
+                      <span className="hero-dash-fill is-static" />
+                    ))}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {count > 1 && !reducedMotion && (
+          <button
+            type="button"
+            className="hero-showcase-pause focus-ring"
+            onClick={() => setUserPaused((p) => !p)}
+            aria-label={userPaused ? labels.play : labels.pause}
+          >
+            <Icon icon={userPaused ? Play : Pause} size="inline" />
           </button>
-          <button type="button" className="hero-showcase-button focus-ring" onClick={() => go(active + 1)} aria-label={labels.next}>
-            <Icon icon={ArrowRight} />
-          </button>
-          {!reducedMotion && (
-            <button
-              type="button"
-              className="hero-showcase-button focus-ring"
-              onClick={() => setUserPaused((p) => !p)}
-              aria-label={userPaused ? labels.play : labels.pause}
-            >
-              <Icon icon={userPaused ? Play : Pause} />
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }

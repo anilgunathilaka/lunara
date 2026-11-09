@@ -63,6 +63,7 @@ export default async function LocaleLayout({
               jacketMaterial: tNav('jacketMaterial'),
               support: tNav('support'),
               account: tNav('account'),
+              accountShort: tNav('accountShort'),
               cart: tNav('cart'),
               menu: tNav('menu'),
             }}

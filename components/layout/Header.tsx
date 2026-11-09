@@ -8,6 +8,8 @@ import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 export interface HeaderNavItem {
   href: string;
   label: string;
+  /** Short visible text beside an icon, on wide screens. */
+  text?: string;
 }
 
 export interface HeaderProps {
@@ -86,6 +88,7 @@ export function Header({
         {account && (
           <Link href={account.href} className="site-header-cart focus-ring" aria-label={account.label}>
             <Icon icon={UserRound} />
+            {account.text && <span className="site-header-account-text">{account.text}</span>}
           </Link>
         )}
         <Link href={cartHref} className="site-header-cart focus-ring" aria-label={cartLabel}>

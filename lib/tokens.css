@@ -160,6 +160,7 @@
      without switching to the all-caps --type-label treatment — a form
      field label, JacketBlock's "ships unstitched" notice (which must
      never render as fine print per docs/3-components.md §3.5). */
+  --weight-medium: 500;
   --weight-semibold: 600;
 
   /* SwatchChip visual sizes — docs/3-components.md §3.1 ('sm' 32px | 'md'

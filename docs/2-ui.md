@@ -380,7 +380,13 @@ The one decorative exception: the home hero and the header announce the brand on
 - Hero showcase: featured sarees in a wide frame, advancing every --motion-hero-interval. A slide changes by a wipe of the frame; the photograph itself never moves, scales or drifts (§7.1 still holds). Each slide's name rises out of a mask, --motion-reveal-delay after the wipe, on a solid --lun-surface plate — never an overlay or gradient on the photograph.
 - Controls: previous, next and pause are always visible (WCAG 2.2.2); the slides also follow swipe. Advancing pauses while the pointer is over the showcase or anything in it has focus.
 - prefers-reduced-motion: nothing animates and nothing advances on its own; slides change only when asked, instantly.
-- Aspect: 4:5 below 768px (portrait, so the saree reads on a phone), 16:9 above.
+- Aspect: 4:5 below 768px (portrait, so the saree reads on a phone), 16:9 from 768px, 12:5 from 1024px. Square corners.
+- Slide names sit directly on the photograph, middle left, with a circle-arrow link; a soft halo on the letters only (text-shadow), never an overlay, plate or gradient on the photograph. One dash per slide at the bottom left — the active one longer, filling over --motion-hero-interval; a small pause button at the bottom right.
+- Header: a --lun-plum-deep strip of short facts; generous height; navigation in regular uppercase (English), spaced wide, an underline drawn in on hover and focus; WhatsApp as an icon, language as quiet text, "Account" spelled out beside its icon on wide screens.
+
+7.3 Page Background (founder decision 2026-11-09)
+
+Every page background is --lun-surface (white). --lun-ground keeps its sampled value (brand colours are never adjusted) but is no longer used as a page or section background.
 
 8. Token Reference
 
