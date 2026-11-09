@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
-import { ArrowRight, ArrowUpRight, Camera, RotateCcw, Scissors, Truck } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -100,18 +100,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               scroll: t('hero.card.scroll'),
             }}
           />
-          {/* The facts in a row beneath the banner, each with its icon and a link to where it is explained. */}
+          {/* The four facts as coloured tiles, edge to edge beneath the banner
+              (docs/2-ui.md §7.2), each a link to where it is explained. */}
           <ul className="home-facts">
             {[
-              { icon: Scissors, label: tJacket('shipsUnstitched'), href: '/support/shipping' },
-              { icon: RotateCcw, label: t('trust.returns'), href: '/support/returns' },
-              { icon: Truck, label: t('trust.dispatch'), href: '/support/shipping' },
-              { icon: Camera, label: t('trust.colourPromise'), href: '/support/care-guide' },
+              { tone: 'plum', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { tone: 'pale', label: t('trust.returns'), href: '/support/returns' },
+              { tone: 'light', label: t('trust.dispatch'), href: '/support/shipping' },
+              { tone: 'deep', label: t('trust.colourPromise'), href: '/support/care-guide' },
             ].map((fact) => (
               <li key={fact.label}>
-                <Link href={fact.href} className="home-fact focus-ring">
-                  <fact.icon className="icon" aria-hidden="true" />
-                  <span>{fact.label}</span>
+                <Link href={fact.href} className={`home-fact home-fact-${fact.tone} focus-ring`}>
+                  {fact.label}
                 </Link>
               </li>
             ))}
