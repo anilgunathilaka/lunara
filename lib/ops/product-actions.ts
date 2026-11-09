@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 import { OpsError, back, checkbox, langOf, opsLocale, run, skuCode, slugify, uniqueValue } from './flow';
+import { recordCreated } from '@/lib/stock/movements';
 import { requireStaffAction } from './staff';
 
 /**
@@ -103,6 +104,7 @@ export async function createProductAction(form: FormData): Promise<void> {
         async (v) => !!(await tx.stockItem.findUnique({ where: { sku: v } })),
       );
       await tx.stockItem.create({ data: { sku, quantity: input.quantity, threshold: input.threshold } });
+      await recordCreated(tx, sku, input.quantity, staff.email);
       await tx.sareeColourway.create({
         data: { id: colourwayId, designId, materialId: input.materialId, colourName: input.colourName, colourHex: input.colourHex, lotId: lot(), sku },
       });
@@ -292,6 +294,7 @@ export async function createJacketAction(form: FormData): Promise<void> {
       const colourwayId = await uniqueValue(slugify(`${materialName}-${input.colourName}`, 80), async (v) => !!(await tx.jacketColourway.findUnique({ where: { id: v } })));
       const sku = await uniqueValue(`JKT-${skuCode(materialName)}-${skuCode(input.colourName)}`, async (v) => !!(await tx.stockItem.findUnique({ where: { sku: v } })));
       await tx.stockItem.create({ data: { sku, quantity: input.quantity, threshold: input.threshold } });
+      await recordCreated(tx, sku, input.quantity, staff.email);
       await tx.jacketColourway.create({
         data: { id: colourwayId, materialId, colourName: input.colourName, colourHex: input.colourHex, lotId: lot(), sku },
       });

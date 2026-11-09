@@ -98,7 +98,7 @@ export default async function OpsEditProductPage({
           <legend>{t('stockLegend')}</legend>
           <p className="field-message">
             {t('inStockNow', { count: saree.stock.quantity })}{' '}
-            <Link href="/ops/stock" className="focus-ring">
+            <Link href={`/ops/stock/${encodeURIComponent(saree.sku)}`} className="focus-ring">
               {t('adjustStock')}
             </Link>
           </p>

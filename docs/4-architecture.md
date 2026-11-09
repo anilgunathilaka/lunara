@@ -338,6 +338,16 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Margin | A shop product's cost is its saree cost plus its jacket cost, measured against the paired selling price; a jacket sold alone is measured against its standalone price. Profit = price − cost, margin = profit ÷ price. A SKU without a cost row is "not entered", never treated as free. |
 | History | Every save is audited (`cost.update`, before and after). The row holds the current cost only. Deleting a never-sold product deletes its cost row with its stock row. |
 
+3.12 Inventory and the stock ledger (`/[locale]/ops/stock`, `/[locale]/ops/stock/[sku]`)
+
+| Rule | Detail |
+| --- | --- |
+| One place | The Inventory page (formerly Stock) lists every SKU — saree colours and jacket colours, archived included — with quantity on hand, units sold online, value at cost (quantity × unit cost, §3.11) and value at selling price (a saree at its design × cotton price, a jacket at its price on its own). Adjust and low-stock forms stay on the same page. Units sold in the office join it with office sales. |
+| Still one source of truth | `stock_item.quantity` remains the only availability the shop, configurator and checkout read (§3.2). Nothing else holds a count to keep in sync. |
+| Ledger | `stock_movement` is append-only: SKU, kind (opening, created, adjustment, online_sale, online_cancel, office_sale, office_return), signed delta, balance after, reference (order or office sale number), note, actor, time. Every quantity change goes through `lib/stock/movements.ts` `moveStock` in the same transaction as the change, so a count and its explanation commit together or not at all. Movements are never edited or deleted, except with their SKU when a never-sold product is deleted. |
+| Opening balance | The ledger started on 2026-11-09 with one `opening` movement per SKU recording the quantity then held. Earlier changes remain in audit_log. The dev seed writes stock directly and is not a ledger source. |
+| Sold online | Counted from order lines of every order not cancelled — the orders are the record of a sale; the ledger explains stock, not revenue. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline

@@ -414,7 +414,7 @@
     "nav": {
       "orders": "Orders",
       "payments": "Bank transfers",
-      "stock": "Stock",
+      "stock": "Inventory",
       "prices": "Prices",
       "messages": "Messages",
       "photos": "Photos",
@@ -731,6 +731,40 @@
       "sareeCost": "Saree cost",
       "jacketCost": "Jacket cost",
       "priceAlone": "Price on its own"
+    },
+    "inventory": {
+      "intro": "Every saree and jacket colour in one place: what you hold, what has sold online, and what it is worth. The shop reads these same numbers. Click an item to see every change to its stock.",
+      "summary": "Inventory totals",
+      "unitsOnHand": "Pieces on hand",
+      "soldOnline": "Sold online",
+      "valueAtCost": "Value at cost",
+      "valueAtPrice": "Value at selling price",
+      "missingCost": "{count, plural, one {# item in stock has} other {# items in stock have}} no cost yet, so the value at cost is incomplete.",
+      "enterCosts": "Enter costs",
+      "noCost": "No cost",
+      "archived": "archived",
+      "back": "Back to inventory",
+      "editProduct": "Edit product",
+      "history": "Stock history",
+      "noHistory": "No changes recorded yet.",
+      "when": "When",
+      "what": "What happened",
+      "change": "Change",
+      "balance": "Balance after",
+      "reference": "Order / sale",
+      "by": "By",
+      "customer": "Customer (website)",
+      "system": "System",
+      "openingNote": "Stock held when the history started",
+      "kind": {
+        "opening": "Opening balance",
+        "created": "New product",
+        "adjustment": "Adjusted",
+        "online_sale": "Sold online",
+        "online_cancel": "Online order cancelled",
+        "office_sale": "Sold in office",
+        "office_return": "Office sale reversed"
+      }
     }
   },
   "notifications": {

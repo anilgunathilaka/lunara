@@ -78,7 +78,7 @@ export default async function OpsEditJacketPage({
           <legend>{t('stockLegend')}</legend>
           <p className="field-message">
             {t('inStockNow', { count: row.stock.quantity })}{' '}
-            <Link href="/ops/stock" className="focus-ring">
+            <Link href={`/ops/stock/${encodeURIComponent(row.sku)}`} className="focus-ring">
               {t('adjustStock')}
             </Link>
           </p>

@@ -731,6 +731,40 @@
       "sareeCost": "සාරි පිරිවැය",
       "jacketCost": "Jacket පිරිවැය",
       "priceAlone": "තනිව මිල"
+    },
+    "inventory": {
+      "intro": "සියලුම සාරි සහ jacket වර්ණ එක තැනක: ඔබ සතු ප්‍රමාණය, online විකිණුණු ප්‍රමාණය සහ එහි වටිනාකම. කඩයත් මෙම අංකම කියවයි. තොගයේ සෑම වෙනසක්ම බැලීමට අයිතමයක් මත click කරන්න.",
+      "summary": "තොග එකතුව",
+      "unitsOnHand": "අතේ ඇති කැබලි",
+      "soldOnline": "Online විකිණුණු",
+      "valueAtCost": "පිරිවැය අනුව වටිනාකම",
+      "valueAtPrice": "විකුණුම් මිල අනුව වටිනාකම",
+      "missingCost": "{count, plural, one {තොගයේ ඇති අයිතම # කට} other {තොගයේ ඇති අයිතම # කට}} තවම පිරිවැයක් නැත, එබැවින් පිරිවැය අනුව වටිනාකම අසම්පූර්ණයි.",
+      "enterCosts": "පිරිවැය ඇතුළත් කරන්න",
+      "noCost": "පිරිවැය නැත",
+      "archived": "archive කළ",
+      "back": "තොග වෙත ආපසු",
+      "editProduct": "නිෂ්පාදනය සංස්කරණය",
+      "history": "තොග ඉතිහාසය",
+      "noHistory": "තවම කිසිදු වෙනසක් සටහන් වී නැත.",
+      "when": "කවදා",
+      "what": "සිදු වූ දේ",
+      "change": "වෙනස",
+      "balance": "පසු ශේෂය",
+      "reference": "Order / විකුණුම",
+      "by": "කළේ",
+      "customer": "පාරිභෝගිකයා (website)",
+      "system": "පද්ධතිය",
+      "openingNote": "ඉතිහාසය ආරම්භ වූ විට තිබූ තොගය",
+      "kind": {
+        "opening": "ආරම්භක ශේෂය",
+        "created": "අලුත් නිෂ්පාදනය",
+        "adjustment": "වෙනස් කළා",
+        "online_sale": "Online විකිණුණා",
+        "online_cancel": "Online order එක cancel කළා",
+        "office_sale": "Office එකේ විකිණුණා",
+        "office_return": "Office විකුණුම ආපසු හැරවුණා"
+      }
     }
   },
   "notifications": {

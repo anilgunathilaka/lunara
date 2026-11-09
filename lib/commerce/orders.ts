@@ -2,6 +2,7 @@ import 'server-only';
 import { createHash, randomBytes, randomInt } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
+import { moveStock } from '@/lib/stock/movements';
 import { normaliseSriLankanMobile, type PlaceOrderInput } from './cart-ref';
 import { composeNotifications, siteUrl } from '@/lib/notifications/compose';
 import { deliverSoon } from '@/lib/notifications/deliver';
@@ -83,11 +84,8 @@ export async function placeOrder(input: PlaceOrderInput, userId: string | null =
         // shortfall rolls the whole order back. Sorted to keep lock order
         // stable across concurrent orders.
         for (const [sku, quantity] of [...demand].sort(([a], [b]) => a.localeCompare(b))) {
-          const { count } = await tx.stockItem.updateMany({
-            where: { sku, quantity: { gte: quantity } },
-            data: { quantity: { decrement: quantity } },
-          });
-          if (count !== 1) throw new StockShortError(sku);
+          const taken = await moveStock(tx, { sku, delta: -quantity, kind: 'online_sale', actor: 'customer', reference: number });
+          if (!taken) throw new StockShortError(sku);
         }
 
         const order = await tx.order.create({

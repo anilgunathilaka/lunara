@@ -8,6 +8,7 @@ import type { OrderStatus } from '@prisma/client';
 import { composeNotifications, isNotifiable } from '@/lib/notifications/compose';
 import { deliverSoon } from '@/lib/notifications/deliver';
 import { getPrisma } from '@/lib/prisma';
+import { moveStock } from '@/lib/stock/movements';
 import { getStorage } from '@/lib/storage';
 import { requireStaffAction } from './staff';
 import { ORDER_STATUSES, RESTOCK_ON_CANCEL_FROM, canTransition } from './transitions';
@@ -88,7 +89,7 @@ export async function transitionOrderAction(form: FormData): Promise<void> {
           }
         }
         for (const [sku, quantity] of [...units].sort(([a], [b]) => a.localeCompare(b))) {
-          await tx.stockItem.update({ where: { sku }, data: { quantity: { increment: quantity } } });
+          await moveStock(tx, { sku, delta: quantity, kind: 'online_cancel', actor: staff.email, reference: order.number });
         }
       }
 
@@ -145,7 +146,9 @@ export async function adjustStockAction(form: FormData): Promise<void> {
   const staff = await requireStaffAction();
   const parsed = adjustSchema.safeParse(Object.fromEntries(form));
   const lang = locale.safeParse(form.get('locale')).data ?? 'en';
-  const path = `/${lang}/ops/stock`;
+  // From an item's history page, return there; otherwise to the inventory list.
+  const fromHistory = form.get('from') === 'history';
+  const path = fromHistory ? `/${lang}/ops/stock/${encodeURIComponent(String(form.get('sku') ?? ''))}` : `/${lang}/ops/stock`;
   if (!parsed.success) back(path, { error: 'invalid' });
   const { sku, delta, reason } = parsed.data;
 
@@ -154,11 +157,7 @@ export async function adjustStockAction(form: FormData): Promise<void> {
       const before = await tx.stockItem.findUnique({ where: { sku } });
       if (!before) throw new OpsError('invalid');
       // Atomic and relative: never overwrites an order placed meanwhile, never below zero.
-      const { count } = await tx.stockItem.updateMany({
-        where: { sku, quantity: { gte: Math.max(0, -delta) } },
-        data: { quantity: { increment: delta } },
-      });
-      if (count !== 1) throw new OpsError('negative');
+      if (!(await moveStock(tx, { sku, delta, kind: 'adjustment', actor: staff.email, note: reason }))) throw new OpsError('negative');
       const after = await tx.stockItem.findUniqueOrThrow({ where: { sku } });
       await tx.auditLog.create({
         data: {
