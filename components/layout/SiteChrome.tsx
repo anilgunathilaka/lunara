@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { LayoutGrid, Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Footer, type FooterLink } from '@/components/layout/Footer';
@@ -12,6 +12,7 @@ import { LanguageSelector, type LanguageSelectorProps } from '@/components/layou
 import { Link, usePathname } from '@/i18n/navigation';
 import { CartProvider, useCart } from '@/lib/cart/CartContext';
 import { FEATURES } from '@/lib/features';
+import { cn } from '@/lib/utils';
 
 export interface SiteChromeProps {
   languageLabels: LanguageSelectorProps['labels'];
@@ -60,6 +61,17 @@ function SiteChromeInner({
   children,
 }: SiteChromeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  // The header scrolls away with the page; once it has, a floating "Menu"
+  // pill takes its place on wide screens (docs/2-ui.md §7.2).
+  const headerEnd = useRef<HTMLSpanElement>(null);
+  const [headerGone, setHeaderGone] = useState(false);
+  useEffect(() => {
+    const marker = headerEnd.current;
+    if (!marker) return;
+    const observer = new IntersectionObserver(([entry]) => setHeaderGone(!entry!.isIntersecting));
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, []);
   const pathname = usePathname();
   const { itemCount } = useCart();
 
@@ -83,6 +95,18 @@ function SiteChromeInner({
         languageLabels={languageLabels}
         announcement={announcement}
       />
+
+      <span ref={headerEnd} aria-hidden="true" />
+      <button
+        type="button"
+        className={cn('floating-menu focus-ring', headerGone && 'is-visible')}
+        onClick={() => setMenuOpen(true)}
+        tabIndex={headerGone ? 0 : -1}
+        aria-hidden={!headerGone}
+      >
+        {navLabels.menu}
+        <LayoutGrid className="icon icon-inline" aria-hidden="true" />
+      </button>
 
       {/* .site-content reserves space at the end of the scroll area for the
           fixed MobileNav bar, so Footer content isn't left hidden beneath
@@ -120,11 +144,17 @@ function SiteChromeInner({
         closeLabel={closeLabel}
       >
         <nav className="flex flex-col gap-4">
+          <Link href="/shop" className="site-header-link" onClick={() => setMenuOpen(false)}>
+            {navLabels.shop}
+          </Link>
           <Link href="/jacket-material" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.jacketMaterial}
           </Link>
           <Link href="/support" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.support}
+          </Link>
+          <Link href="/account/start" className="site-header-link" onClick={() => setMenuOpen(false)}>
+            {navLabels.accountShort}
           </Link>
           <LanguageSelector labels={languageLabels} />
         </nav>

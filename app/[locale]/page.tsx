@@ -1,13 +1,13 @@
 import Image from 'next/image';
-import { ArrowRight, Camera, MessageCircle, RotateCcw, Truck } from 'lucide-react';
+import type { CSSProperties } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { Icon } from '@/components/primitives/Icon';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { MotifDivider } from '@/components/brand/MotifDivider';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
-import { latestReviews } from '@/lib/reviews/reviews';
+import { latestReviews, siteReviewSummary } from '@/lib/reviews/reviews';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { FEATURES } from '@/lib/features';
@@ -19,22 +19,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   setRequestLocale(locale);
   // Parallel: each read is a round trip to the database.
-  const [arrivals, reviews] = await Promise.all([getCuratedListings({ featuredOnly: true, limit: 6 }), latestReviews(3)]);
+  const [arrivals, reviews, reviewSummary] = await Promise.all([
+    getCuratedListings({ featuredOnly: true, limit: 6 }),
+    latestReviews(3),
+    siteReviewSummary(),
+  ]);
   const t = await getTranslations('home');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');
+  const tJacket = await getTranslations('product.jacket');
 
   const formatLeft = (count: number) => tStock('left', { count });
   const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
-  // The headline in two lines: a short first line (about a third of the
-  // words), centred over the longer second (docs/2-ui.md §7.2).
-  const words = t('hero.headline').split(' ');
-  const split = Math.max(1, Math.floor(words.length / 3));
-  const headlineLines = words.length > 1 ? [words.slice(0, split).join(' '), words.slice(split).join(' ')] : words;
-
-  // Featured sarees for the showcase; until there are any, the hero photograph.
+  // Featured sarees for the hero card; until there are any, the hero photograph.
   const heroSlides: HeroSlide[] =
     arrivals.length > 0
       ? arrivals.slice(0, 5).map((item) => ({
@@ -45,74 +44,70 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         }))
       : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
 
+  // Real review proof only: initials of the latest reviewers and the true
+  // count and average. Nothing is shown until there are reviews.
+  const proof =
+    reviewSummary.count > 0 && reviewSummary.average !== null
+      ? {
+          initials: reviews.slice(0, 4).map((r) => r.displayName.trim().charAt(0).toUpperCase() || '·'),
+          text: t('hero.card.proof', { average: reviewSummary.average, count: reviewSummary.count }),
+        }
+      : null;
+
+  const headlineWords = t('hero.headline').split(' ');
+
   return (
     <>
-      {/* Hero (docs/1-ux.md §4.1; motion per docs/2-ui.md §7.2): the promise
-          set very large, then featured sarees in a wide showcase. The two
-          doors (curated shop / configurator) keep equal visual weight. */}
+      {/* Hero (docs/1-ux.md §4.1; layout and motion per docs/2-ui.md §7.2):
+          a rounded card of featured sarees carrying the trust facts as pills,
+          then the promise set very large beneath it. */}
       <section className="home-hero">
         <div className="home-hero-inner">
-          <div className="home-hero-top">
-            <h1 className="home-hero-headline">
-              {headlineLines.map((line, i) => (
-                <span key={i} className={`hero-mask home-hero-line home-hero-line-${i + 1}`}>
-                  <span className="hero-rise">{line}</span>
-                </span>
-              ))}
-            </h1>
-            <div className="home-hero-aside">
-              <p className="home-hero-subhead">{t('hero.subhead')}</p>
-              <div className="home-hero-doors">
-                <Link href="/shop" className="hero-slide-link focus-ring">
-                  <span>{t('hero.shopCurated')}</span>
-                  <span className="hero-circle-arrow" aria-hidden="true">
-                    <ArrowRight className="icon" />
-                  </span>
-                </Link>
-                {FEATURES.designYourOwn && (
-                  <Link href="/design-your-own" className="hero-slide-link focus-ring">
-                    <span>{t('hero.designYourOwn')}</span>
-                    <span className="hero-circle-arrow" aria-hidden="true">
-                      <ArrowRight className="icon" />
-                    </span>
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
           <HeroShowcase
             slides={heroSlides}
+            pills={[
+              { label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { label: t('trust.returns'), href: '/support/returns' },
+              { label: t('trust.dispatch'), href: '/support/shipping' },
+              { label: t('trust.colourPromise'), href: '/support/care-guide' },
+            ]}
+            contact={{ label: t('trust.whatsapp'), href: whatsappLink() }}
+            proof={proof}
+            scrollTarget="#home-after-hero"
             labels={{
               region: t('hero.slider.region'),
               pause: t('hero.slider.pause'),
               play: t('hero.slider.play'),
               slideOf: heroSlides.map((_, i) => t('hero.slider.slideOf', { n: i + 1, total: heroSlides.length })),
-              view: t('hero.slider.view'),
+              scroll: t('hero.card.scroll'),
             }}
           />
+          <h1 className="home-hero-headline">
+            {headlineWords.map((word, i) => (
+              <span key={i} className="home-hero-word" style={{ '--i': i } as CSSProperties}>
+                {word}
+              </span>
+            ))}
+          </h1>
+          <div className="home-hero-foot">
+            <p className="home-hero-subhead">{t('hero.subhead')}</p>
+            <div className="home-hero-doors">
+              <Link href="/shop" className="home-hero-door focus-ring">
+                {t('hero.shopCurated')}
+                <ArrowUpRight className="icon icon-inline" aria-hidden="true" />
+              </Link>
+              {FEATURES.designYourOwn && (
+                <Link href="/design-your-own" className="home-hero-door focus-ring">
+                  {t('hero.designYourOwn')}
+                  <ArrowUpRight className="icon icon-inline" aria-hidden="true" />
+                </Link>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Trust strip — four facts answering the category's biggest
-          doubts, above the fold on mobile. */}
-      <div className="home-trust-strip">
-        <div className="home-trust-item">
-          <Icon icon={Camera} />
-          <span className="home-trust-item-text">{t('trust.colourPromise')}</span>
-        </div>
-        <div className="home-trust-item">
-          <Icon icon={RotateCcw} />
-          <span className="home-trust-item-text">{t('trust.returns')}</span>
-        </div>
-        <div className="home-trust-item">
-          <Icon icon={Truck} />
-          <span className="home-trust-item-text">{t('trust.dispatch')}</span>
-        </div>
-        <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="home-trust-item">
-          <Icon icon={MessageCircle} />
-          <span className="home-trust-item-text">{t('trust.whatsapp')}</span>
-        </a>
-      </div>
+      <div id="home-after-hero" />
 
       {/* New arrivals */}
       <section className="home-section">

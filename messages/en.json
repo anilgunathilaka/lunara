@@ -270,8 +270,11 @@
         "next": "Next saree",
         "pause": "Pause the showcase",
         "play": "Play the showcase",
-        "slideOf": "{n} of {total}",
-        "view": "View"
+        "slideOf": "{n} of {total}"
+      },
+      "card": {
+        "scroll": "Scroll",
+        "proof": "Rated {average} out of 5 by {count, plural, one {# customer} other {# customers}}."
       }
     },
     "trust": {

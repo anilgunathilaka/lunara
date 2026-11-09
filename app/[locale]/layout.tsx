@@ -41,8 +41,6 @@ export default async function LocaleLayout({
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');
   const tSlideover = await getTranslations('layout.slideover');
-  const tJacket = await getTranslations('product.jacket');
-  const tTrust = await getTranslations('home.trust');
 
   const languageLabels = {
     en: tCommon('languageEnglish'),
@@ -56,7 +54,6 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <SiteChrome
             languageLabels={languageLabels}
-            announcement={[tJacket('shipsUnstitched'), tTrust('dispatch'), tTrust('returns')]}
             navLabels={{
               shop: tNav('shop'),
               designYourOwn: tNav('designYourOwn'),
