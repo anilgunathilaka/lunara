@@ -12,6 +12,7 @@ const SECTIONS = [
   { href: '/ops/products', key: 'products' },
   { href: '/ops/stock', key: 'stock' },
   { href: '/ops/prices', key: 'prices' },
+  { href: '/ops/costs', key: 'costs' },
   { href: '/ops/photos', key: 'photos' },
   { href: '/ops/reviews', key: 'reviews' },
   { href: '/ops/insights', key: 'insights' },

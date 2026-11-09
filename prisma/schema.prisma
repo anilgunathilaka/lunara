@@ -237,8 +237,28 @@ model StockItem {
 
   sareeColourway  SareeColourway?  @relation("SareeColourwayStock")
   jacketColourway JacketColourway? @relation("JacketColourwayStock")
+  cost            ProductCost?
 
   @@map("stock_item")
+}
+
+/// What one unit of a SKU costs Lunara to make and bring in, whole LKR
+/// (docs/4-architecture.md §3.11). Staff-only; never shown to customers and
+/// never part of a customer price. History lives in audit_log.
+model ProductCost {
+  sku            String   @id
+  fabric         Int      @default(0)
+  otherMaterials Int      @default(0)
+  sewing         Int      @default(0)
+  transport      Int      @default(0)
+  other          Int      @default(0)
+  note           String?
+  updatedBy      String
+  updatedAt      DateTime @updatedAt
+
+  stock StockItem @relation(fields: [sku], references: [sku], onDelete: Cascade)
+
+  @@map("product_cost")
 }
 
 /// A pairing chosen by Lunara. Holds no stock and no price of its own:

@@ -2264,6 +2264,19 @@ body {
 .ops-muted {
   color: var(--lun-ink-muted);
 }
+.ops-cost-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+}
+.ops-cost-summary dt {
+  color: var(--lun-ink-muted);
+}
+.ops-cost-summary dd {
+  margin: 0;
+  font-weight: 600;
+}
 .ops-danger-zone {
   border-color: var(--lun-danger);
 }

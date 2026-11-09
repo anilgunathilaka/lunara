@@ -98,7 +98,7 @@ export async function productForEdit(id: string) {
     relationLoadStrategy: 'join',
     where: { id },
     include: {
-      sareeColourway: { include: { design: true, material: true, price: true, stock: true } },
+      sareeColourway: { include: { design: true, material: true, price: true, stock: { include: { cost: true } } } },
     },
   });
   if (!row) return null;
@@ -113,7 +113,7 @@ export async function jacketForEdit(id: string) {
   const row = await prisma.jacketColourway.findUnique({
     relationLoadStrategy: 'join',
     where: { id },
-    include: { material: true, stock: true, _count: { select: { listings: true } } },
+    include: { material: true, stock: { include: { cost: true } }, _count: { select: { listings: true } } },
   });
   if (!row) return null;
   const sold = await prisma.orderLine.count({ where: { jacketColourwayId: row.id } });

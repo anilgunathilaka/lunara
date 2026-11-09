@@ -420,7 +420,8 @@
       "photos": "Photos",
       "reviews": "Reviews",
       "insights": "Insights",
-      "products": "Products"
+      "products": "Products",
+      "costs": "Costs"
     },
     "columns": {
       "number": "Order",
@@ -700,6 +701,36 @@
       "compositionHint": "e.g. 100% cotton",
       "pieceLength": "Piece length (metres)",
       "jacketPriceNote": "These prices belong to {material} and apply to every colour of it."
+    },
+    "costs": {
+      "legend": "Cost per piece (staff only)",
+      "sareeNote": "What one of this saree costs you to make and bring in. Customers never see this.",
+      "jacketNote": "What one piece of this jacket material costs you. Customers never see this.",
+      "part": {
+        "fabric": "Saree / jacket fabric",
+        "otherMaterials": "Other materials",
+        "sewing": "Sewing charges",
+        "transport": "Transport",
+        "other": "Other"
+      },
+      "note": "Note (supplier, invoice number…)",
+      "noteHint": "Optional",
+      "notEntered": "Cost not entered yet — profit can’t be worked out.",
+      "notEnteredShort": "Not entered",
+      "unitCost": "Total cost",
+      "profit": "Profit",
+      "percent": "{percent}%",
+      "lastUpdated": "Last updated by {who} on {when}",
+      "save": "Save cost",
+      "intro": "Cost and profit for everything on sale. A shop product is a saree and its jacket, so its cost is both added together. Click a name to enter or change its cost.",
+      "missing": "{count, plural, one {# item has} other {# items have}} no cost entered yet.",
+      "sareesHeading": "Shop products (saree + jacket)",
+      "jacketsHeading": "Jacket material sold on its own",
+      "product": "Product",
+      "setPrice": "Selling price",
+      "sareeCost": "Saree cost",
+      "jacketCost": "Jacket cost",
+      "priceAlone": "Price on its own"
     }
   },
   "notifications": {

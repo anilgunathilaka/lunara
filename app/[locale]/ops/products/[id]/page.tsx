@@ -6,6 +6,7 @@ import { productStatusAction, updateProductAction } from '@/lib/ops/product-acti
 import { productFormOptions, productForEdit } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
+import { CostForm } from '../CostForm';
 
 /** Edit, archive, restore or delete one saree product (docs/4-architecture.md §3.10). */
 export default async function OpsEditProductPage({
@@ -123,6 +124,15 @@ export default async function OpsEditProductPage({
           )}
         </div>
       </form>
+
+      <CostForm
+        locale={locale}
+        kind="saree"
+        id={row.id}
+        cost={saree.stock.cost}
+        price={saree.price.price}
+        priceLabel={t('sareePriceFor', { design: saree.design.name, cotton: saree.material.name })}
+      />
 
       <fieldset className="ops-form ops-danger-zone">
         <legend>{t('statusLegend')}</legend>

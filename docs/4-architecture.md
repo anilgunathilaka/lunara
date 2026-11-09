@@ -329,6 +329,15 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Identifiers | Ids and SKUs are generated from names (`SAR-DESIGN-PLN-COLOUR`, `JKT-MATERIAL-COLOUR`), made unique, and never change afterwards; renaming a colour keeps its SKU. |
 | Stock | Created with a starting quantity; changed afterwards only through the Stock page's audited, reasoned adjustments (§3.5). |
 
+3.11 Costing (`/[locale]/ops/costs`)
+
+| Rule | Detail |
+| --- | --- |
+| What is recorded | `product_cost`, one row per SKU (saree colour or jacket colour): fabric, other materials, sewing charges, transport, other — whole LKR per piece — plus a note. Entered on the product and jacket edit pages. |
+| Staff-only, never a price | Costs are never sent to customers and never feed a customer price; customer prices stay in lib/pricing (§3.3). RLS on, no policies. |
+| Margin | A shop product's cost is its saree cost plus its jacket cost, measured against the paired selling price; a jacket sold alone is measured against its standalone price. Profit = price − cost, margin = profit ÷ price. A SKU without a cost row is "not entered", never treated as free. |
+| History | Every save is audited (`cost.update`, before and after). The row holds the current cost only. Deleting a never-sold product deletes its cost row with its stock row. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline

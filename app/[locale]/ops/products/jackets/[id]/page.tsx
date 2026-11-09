@@ -6,6 +6,7 @@ import { jacketStatusAction, updateJacketAction } from '@/lib/ops/product-action
 import { jacketForEdit } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { OpsFlash, type OpsSearchParams } from '../../../shared';
+import { CostForm } from '../../CostForm';
 
 /** Edit, archive, restore or delete one jacket colour (docs/4-architecture.md §3.10). */
 export default async function OpsEditJacketPage({
@@ -93,6 +94,8 @@ export default async function OpsEditJacketPage({
           </Link>
         </div>
       </form>
+
+      <CostForm locale={locale} kind="jacket" id={row.id} cost={row.stock.cost} price={row.material.standalonePrice} priceLabel={t('priceAlone')} />
 
       <fieldset className="ops-form ops-danger-zone">
         <legend>{t('statusLegend')}</legend>
