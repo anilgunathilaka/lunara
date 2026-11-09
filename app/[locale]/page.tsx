@@ -1,30 +1,50 @@
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
+import { Suspense, type CSSProperties, type ReactNode } from 'react';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
-import { latestReviews, siteReviewSummary } from '@/lib/reviews/reviews';
+import { latestReviews, siteReviewSummary, type PublicReview } from '@/lib/reviews/reviews';
+import type { CatalogueProduct } from '@/lib/catalogue/types';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { FEATURES } from '@/lib/features';
-import { HeroShowcase, type HeroSlide } from '@/components/home/HeroShowcase';
+import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
 import { HERO_BANNERS } from '@/lib/home/hero';
 import { ProductRail } from '@/components/home/ProductRail';
 import { Reveal } from '@/components/motion/Reveal';
 
+/** Waits for a read inside its own Suspense boundary, then renders with it. */
+async function Await<T>({ promise, children }: { promise: Promise<T>; children: (value: T) => ReactNode }) {
+  return children(await promise);
+}
+
+/** Grey stand-ins the size of a product card, while the rail's data streams in. */
+function CardSkeleton() {
+  return (
+    <div className="product-card" aria-hidden="true">
+      <div className="product-card-image skeleton" />
+      <span className="skeleton skeleton-line" />
+      <span className="skeleton skeleton-line skeleton-line-short" />
+    </div>
+  );
+}
+
 // Rendered per request: "New arrivals" shows live price and stock
-// (docs/4-architecture.md §3.3).
+// (docs/4-architecture.md §3.3). Streamed (founder report 2026-11-10: a
+// refresh felt slow): nothing waits for the database before the first
+// paint. The header, the banner, the fact tiles, the headline and every
+// section of words go out at once; the featured sarees, the rail, the
+// tiles' photographs and the reviews follow as the reads answer, each in
+// a space the same size, so nothing shifts.
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  // Parallel: each read is a round trip to the database.
-  const [arrivals, reviews, reviewSummary] = await Promise.all([
-    getCuratedListings({ featuredOnly: true, limit: 6 }),
-    latestReviews(3),
-    siteReviewSummary(),
-  ]);
+  // Started together, awaited only where each is shown.
+  const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
+  const reviewsP = latestReviews(3);
+  const summaryP = siteReviewSummary();
   const t = await getTranslations('home');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
@@ -45,38 +65,100 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     image: { src: banner.src, alt: t(`hero.banners.${banner.altKey}`), focus: banner.focus, unoptimized: true },
     title: t('hero.shopCurated'),
   }));
-  const productSlides: HeroSlide[] =
-    arrivals.length > 0
-      ? arrivals.slice(0, Math.max(0, 5 - bannerSlides.length)).map((item) => ({
-          href: `/shop/${item.id}`,
-          image: { src: item.imageUrl, alt: item.name },
-          title: item.name,
-          caption: materialLabel[item.material],
-        }))
-      : bannerSlides.length > 0
-        ? []
-        : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
-  const heroSlides: HeroSlide[] = [...bannerSlides, ...productSlides];
+  // With no banner, the hero photograph stands in until the sarees arrive.
+  const firstSlides: HeroSlide[] =
+    bannerSlides.length > 0
+      ? bannerSlides
+      : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
+  const slideLabels = (total: number) =>
+    Array.from({ length: total }, (_, i) => t('hero.slider.slideOf', { n: i + 1, total }));
 
-  // Real review proof only: initials of the latest reviewers and the true
-  // count and average. Nothing is shown until there are reviews.
-  const proof =
-    reviewSummary.count > 0 && reviewSummary.average !== null
-      ? {
-          initials: reviews.slice(0, 4).map((r) => r.displayName.trim().charAt(0).toUpperCase() || '·'),
-          text: t('hero.card.proof', { average: reviewSummary.average, count: reviewSummary.count }),
-        }
-      : null;
+  // Featured sarees after the banners, five slides at most, and real review
+  // proof only (initials of the latest reviewers and the true count and
+  // average); nothing is shown until there are reviews.
+  const heroMore: Promise<HeroMore> = Promise.all([arrivalsP, reviewsP, summaryP]).then(([arrivals, reviews, summary]) => {
+    const slides: HeroSlide[] = arrivals.slice(0, Math.max(0, 5 - firstSlides.length)).map((item) => ({
+      href: `/shop/${item.id}`,
+      image: { src: item.imageUrl, alt: item.name },
+      title: item.name,
+      caption: materialLabel[item.material],
+    }));
+    const proof =
+      summary.count > 0 && summary.average !== null
+        ? {
+            initials: reviews.slice(0, 4).map((r) => r.displayName.trim().charAt(0).toUpperCase() || '·'),
+            text: t('hero.card.proof', { average: summary.average, count: summary.count }),
+          }
+        : null;
+    return { slides, slideOf: slideLabels(firstSlides.length + slides.length), proof };
+  });
 
   // Ways in: a real saree photograph of each cotton where one exists.
-  const photoOf = (material: 'plain' | 'super') =>
-    arrivals.find((item) => item.material === material)?.imageUrl ?? '/placeholder/product.jpg';
-  const tiles = [
-    { href: '/shop?material=plain', label: materialLabel.plain, image: photoOf('plain') },
-    { href: '/shop?material=super', label: materialLabel.super, image: photoOf('super') },
-    { href: '/jacket-material', label: tNav('jacketMaterial'), image: '/placeholder/product.jpg' },
-    { href: '/support/care-guide', label: tFooter('careGuide'), image: '/placeholder/product.jpg' },
-  ];
+  const tilesWith = (arrivals: CatalogueProduct[]) => {
+    const photoOf = (material: 'plain' | 'super') =>
+      arrivals.find((item) => item.material === material)?.imageUrl ?? '/placeholder/product.jpg';
+    return [
+      { href: '/shop?material=plain', label: materialLabel.plain, image: photoOf('plain') },
+      { href: '/shop?material=super', label: materialLabel.super, image: photoOf('super') },
+      { href: '/jacket-material', label: tNav('jacketMaterial'), image: '/placeholder/product.jpg' },
+      { href: '/support/care-guide', label: tFooter('careGuide'), image: '/placeholder/product.jpg' },
+    ];
+  };
+  const tileList = (tiles: ReturnType<typeof tilesWith>) => (
+    <ul className="home-tiles">
+      {tiles.map((tile) => (
+        <li key={tile.href}>
+          <Link href={tile.href} className="home-tile focus-ring">
+            <span className="home-tile-image">
+              <Image src={tile.image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" />
+            </span>
+            <span className="home-tile-label">
+              {tile.label}
+              <ArrowRight className="icon icon-inline" aria-hidden="true" />
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+
+  const railProps = {
+    heading: t('newArrivals.heading'),
+    viewAll: { href: '/shop', label: t('newArrivals.viewAll') },
+    labels: { previous: t('newArrivals.previous'), next: t('newArrivals.next') },
+  };
+  const renderRail = (arrivals: CatalogueProduct[]) => (
+      <ProductRail {...railProps}>
+        {arrivals.map((item) => (
+          <ProductCard
+            key={item.id}
+            href={`/shop/${item.id}`}
+            image={{ src: item.imageUrl, alt: item.name }}
+            name={item.name}
+            materialLabel={materialLabel[item.material]}
+            price={item.price}
+            jacketMaterialName={item.jacketMaterialName}
+            jacketSwatchHex={item.jacketSwatchHex}
+            stockState={item.stockState}
+            quantity={item.quantity}
+            outOfStockLabel={tStock('outOfStock')}
+            lowStockLabel={tStock('lowStock')}
+            formatLeft={formatLeft}
+          />
+        ))}
+      </ProductRail>
+  );
+
+  const renderReviews = (reviews: PublicReview[]) =>
+    reviews.length > 0 ? (
+      <div className="home-reviews">
+        <ReviewList reviews={reviews} showItem />
+      </div>
+    ) : (
+      <div className="home-proof-placeholder">
+        <p>{t('proof.placeholderNote')}</p>
+      </div>
+    );
   const drapeImage = '/placeholder/product.jpg';
 
   const headlineWords = t('hero.headline').split(' ');
@@ -89,24 +171,33 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       <section className="home-hero">
         <div className="home-hero-inner">
           <HeroShowcase
-            slides={heroSlides}
-            pills={[
-              { label: tJacket('shipsUnstitched'), href: '/support/shipping' },
-              { label: t('trust.returns'), href: '/support/returns' },
-              { label: t('trust.dispatch'), href: '/support/shipping' },
-              { label: t('trust.colourPromise'), href: '/support/care-guide' },
-            ]}
-            contact={{ label: t('trust.whatsapp'), href: whatsappLink() }}
-            proof={proof}
+            slides={firstSlides}
+            more={heroMore}
             scrollTarget="#home-after-hero"
             labels={{
               region: t('hero.slider.region'),
-              pause: t('hero.slider.pause'),
-              play: t('hero.slider.play'),
-              slideOf: heroSlides.map((_, i) => t('hero.slider.slideOf', { n: i + 1, total: heroSlides.length })),
+              previous: t('hero.slider.previous'),
+              next: t('hero.slider.next'),
+              slideOf: slideLabels(firstSlides.length),
               scroll: t('hero.card.scroll'),
             }}
           />
+          {/* The four facts as coloured tiles, edge to edge beneath the banner
+              (docs/2-ui.md §7.2), each a link to where it is explained. */}
+          <ul className="home-facts">
+            {[
+              { tone: 'plum', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { tone: 'pale', label: t('trust.returns'), href: '/support/returns' },
+              { tone: 'light', label: t('trust.dispatch'), href: '/support/shipping' },
+              { tone: 'deep', label: t('trust.colourPromise'), href: '/support/care-guide' },
+            ].map((fact) => (
+              <li key={fact.label}>
+                <Link href={fact.href} className={`home-fact home-fact-${fact.tone} focus-ring`}>
+                  {fact.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <h1 className="home-hero-headline">
             {headlineWords.map((word, i) => (
               <span key={i} className="home-hero-word" style={{ '--i': i } as CSSProperties}>
@@ -141,29 +232,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* New arrivals — a rail of cards that scrolls sideways. */}
       <section className="home-band">
         <div className="home-band-inner">
-          <ProductRail
-            heading={t('newArrivals.heading')}
-            viewAll={{ href: '/shop', label: t('newArrivals.viewAll') }}
-            labels={{ previous: t('newArrivals.previous'), next: t('newArrivals.next') }}
+          <Suspense
+            fallback={
+              <ProductRail {...railProps}>
+                {[0, 1, 2, 3].map((i) => (
+                  <CardSkeleton key={i} />
+                ))}
+              </ProductRail>
+            }
           >
-            {arrivals.map((item) => (
-              <ProductCard
-                key={item.id}
-                href={`/shop/${item.id}`}
-                image={{ src: item.imageUrl, alt: item.name }}
-                name={item.name}
-                materialLabel={materialLabel[item.material]}
-                price={item.price}
-                jacketMaterialName={item.jacketMaterialName}
-                jacketSwatchHex={item.jacketSwatchHex}
-                stockState={item.stockState}
-                quantity={item.quantity}
-                outOfStockLabel={tStock('outOfStock')}
-                lowStockLabel={tStock('lowStock')}
-                formatLeft={formatLeft}
-              />
-            ))}
-          </ProductRail>
+            <Await promise={arrivalsP}>{renderRail}</Await>
+          </Suspense>
         </div>
       </section>
 
@@ -173,21 +252,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Reveal>
             <h2 className="section-title">{t('tiles.heading')}</h2>
           </Reveal>
-          <ul className="home-tiles">
-            {tiles.map((tile) => (
-              <li key={tile.href}>
-                <Link href={tile.href} className="home-tile focus-ring">
-                  <span className="home-tile-image">
-                    <Image src={tile.image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" />
-                  </span>
-                  <span className="home-tile-label">
-                    {tile.label}
-                    <ArrowRight className="icon icon-inline" aria-hidden="true" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <Suspense fallback={tileList(tilesWith([]))}>
+            <Await promise={arrivalsP}>{(arrivals) => tileList(tilesWith(arrivals))}</Await>
+          </Suspense>
         </div>
       </section>
 
@@ -232,15 +299,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Reveal>
             <h2 className="section-title">{t('proof.heading')}</h2>
           </Reveal>
-          {reviews.length > 0 ? (
-            <div className="home-reviews">
-              <ReviewList reviews={reviews} showItem />
-            </div>
-          ) : (
-            <div className="home-proof-placeholder">
-              <p>{t('proof.placeholderNote')}</p>
-            </div>
-          )}
+          <Suspense fallback={<div className="home-reviews skeleton skeleton-block" aria-hidden="true" />}>
+            <Await promise={reviewsP}>{renderReviews}</Await>
+          </Suspense>
         </div>
       </section>
 

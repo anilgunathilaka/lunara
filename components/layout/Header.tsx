@@ -1,30 +1,16 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
-import type { CSSProperties, FocusEvent, KeyboardEvent } from 'react';
-import Image from 'next/image';
-import { ChevronDown, ShoppingBag, UserRound } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ShoppingBag, UserRound } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { Wordmark } from '@/components/brand/Wordmark';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { AnnouncementBar, type AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
+import { NavItem, type HeaderMegaMenu } from '@/components/layout/MegaMenu';
 import { cn } from '@/lib/utils';
 
-export interface HeaderMenuLink {
-  href: string;
-  label: string;
-  /** Opens outside the site (WhatsApp). */
-  external?: boolean;
-}
-
-/** The panel that opens under a header item (docs/2-ui.md §7.2). */
-export interface HeaderMegaMenu {
-  /** Names the panel and its toggle for screen readers: "Shop menu". */
-  label: string;
-  columns: { heading: string; links: HeaderMenuLink[] }[];
-  promo?: { title: string; cta: string; href: string };
-}
+export type { HeaderMegaMenu, HeaderMenuCategory, HeaderMenuImage, HeaderMenuLink } from '@/components/layout/MegaMenu';
 
 export interface HeaderNavItem {
   href: string;
@@ -82,14 +68,14 @@ export function Header({
         </Link>
 
         <nav className="site-header-nav hidden md:flex" aria-label="Primary">
-          <NavItem item={shop} />
+          <NavItem href={shop.href} label={shop.label} menu={shop.menu} />
           {designYourOwn && (
             <Link href={designYourOwn.href} className="site-header-link site-header-link-featured">
               {designYourOwn.label}
             </Link>
           )}
-          <NavItem item={jacketMaterial} />
-          <NavItem item={support} />
+          <NavItem href={jacketMaterial.href} label={jacketMaterial.label} menu={jacketMaterial.menu} />
+          <NavItem href={support.href} label={support.label} menu={support.menu} />
         </nav>
 
         <div className="site-header-actions">
@@ -108,99 +94,6 @@ export function Header({
           </Link>
         </div>
       </header>
-    </div>
-  );
-}
-
-/**
- * A header link, and — when it has a menu — the panel beneath the header.
- * The pointer opens it on hover; the keyboard opens it with the chevron
- * button beside the link (a disclosure, so the link itself still just
- * goes to its page). Escape closes it and returns focus to the chevron.
- */
-function NavItem({ item }: { item: HeaderNavItem }) {
-  const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const toggle = useRef<HTMLButtonElement>(null);
-  const menu = item.menu;
-
-  if (!menu) {
-    return (
-      <Link href={item.href} className="site-header-link">
-        {item.label}
-      </Link>
-    );
-  }
-
-  const onBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
-  };
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Escape' && open) {
-      setOpen(false);
-      toggle.current?.focus();
-    }
-  };
-  const close = () => setOpen(false);
-
-  return (
-    <div
-      className={cn('site-header-item', open && 'is-open')}
-      onPointerEnter={(event) => event.pointerType === 'mouse' && setOpen(true)}
-      onPointerLeave={(event) => event.pointerType === 'mouse' && setOpen(false)}
-      onBlur={onBlur}
-      onKeyDown={onKeyDown}
-    >
-      <Link href={item.href} className="site-header-link" onClick={close}>
-        {item.label}
-      </Link>
-      <button
-        ref={toggle}
-        type="button"
-        className="site-header-toggle focus-ring"
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-label={menu.label}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <Icon icon={ChevronDown} size="inline" />
-      </button>
-
-      <div id={panelId} className="site-mega" role="region" aria-label={menu.label}>
-        <div className="site-mega-columns">
-          {menu.columns.map((column, c) => (
-            <div key={column.heading} className="site-mega-column">
-              <p className="site-mega-heading" style={{ '--i': c } as CSSProperties}>
-                {column.heading}
-              </p>
-              <ul className="site-mega-list">
-                {column.links.map((link, l) =>
-                  link.external ? (
-                    <li key={link.label} style={{ '--i': c + l + 1 } as CSSProperties}>
-                      <a href={link.href} className="site-mega-link" target="_blank" rel="noopener noreferrer" onClick={close}>
-                        {link.label}
-                      </a>
-                    </li>
-                  ) : (
-                    <li key={link.label} style={{ '--i': c + l + 1 } as CSSProperties}>
-                      <Link href={link.href} className="site-mega-link" onClick={close}>
-                        {link.label}
-                      </Link>
-                    </li>
-                  ),
-                )}
-              </ul>
-            </div>
-          ))}
-        </div>
-        {menu.promo && (
-          <Link href={menu.promo.href} className="site-mega-promo" onClick={close}>
-            <Image src="/brand/lunara-emblem.webp" alt="" width={128} height={128} className="site-mega-promo-emblem" unoptimized />
-            <span className="site-mega-promo-title">{menu.promo.title}</span>
-            <span className="site-mega-promo-cta">{menu.promo.cta}</span>
-          </Link>
-        )}
-      </div>
     </div>
   );
 }
