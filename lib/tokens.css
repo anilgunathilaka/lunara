@@ -101,6 +101,10 @@
   --space-8: 64px;
   --space-9: 96px;
 
+  /* Widest the site content runs: header, sections, footer (founder decision 2026-11-09).
+     The home hero banner alone runs the full width of the page. */
+  --container-max: 1360px;
+
   /* ---------------------------------------------------------------- */
   /* Shape — radii stay small and disciplined                          */
   /* ---------------------------------------------------------------- */
@@ -138,7 +142,10 @@
   --motion-menu-duration: 300ms;
   --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
   --motion-header: 500ms var(--motion-menu-ease);
-  --motion-announcement-interval: 5000ms;
+  /* One full loop of the utility bar marquee (§7.2). */
+  --motion-marquee: 64s;
+  /* Words rising into place as a section scrolls into view (docs/2-ui.md §7.4). */
+  --motion-section: 800ms var(--motion-menu-ease);
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
@@ -212,5 +219,6 @@
     --motion-stagger: 0ms;
     --motion-menu-duration: 0ms;
     --motion-header: 0ms;
+    --motion-section: 0ms;
   }
 }

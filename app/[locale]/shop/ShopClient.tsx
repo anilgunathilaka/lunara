@@ -12,6 +12,8 @@ type OccasionFilter = 'all' | Occasion;
 
 export interface ShopClientProps {
   products: CatalogueProduct[];
+  /** From /shop?material=…; the customer can still change it. */
+  initialMaterial?: MaterialFilter;
   materialLabels: { plain: string; super: string };
   filterLabels: { material: string; occasion: string; priceBand: string; all: string; clear: string };
   occasionLabels: Record<Occasion, string>;
@@ -31,6 +33,7 @@ function matchesPriceBand(price: number, band: PriceBand): boolean {
 
 export function ShopClient({
   products,
+  initialMaterial = 'all',
   materialLabels,
   filterLabels,
   occasionLabels,
@@ -43,7 +46,7 @@ export function ShopClient({
   const t = useTranslations('shop');
   const tStock = useTranslations('product.stock');
   const formatLeft = (count: number) => tStock('left', { count });
-  const [material, setMaterial] = useState<MaterialFilter>('all');
+  const [material, setMaterial] = useState<MaterialFilter>(initialMaterial);
   const [occasion, setOccasion] = useState<OccasionFilter>('all');
   const [priceBand, setPriceBand] = useState<PriceBand>('all');
 

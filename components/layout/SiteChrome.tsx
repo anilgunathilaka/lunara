@@ -5,7 +5,7 @@ import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Header, type HeaderMegaMenu } from '@/components/layout/Header';
 import type { AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
-import { Footer, type FooterLink } from '@/components/layout/Footer';
+import { Footer, type FooterLink, type FooterProps } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 import { SlideOver } from '@/components/layout/SlideOver';
@@ -22,6 +22,8 @@ export interface SiteChromeProps {
   whatsappLabel: string;
   footerSupportLinks: FooterLink[];
   footerPolicyLinks: FooterLink[];
+  footerHeadings: FooterProps['headings'];
+  footerTrust: FooterProps['trust'];
   registrationNumber: string;
   address: string;
   phone: string;
@@ -56,6 +58,8 @@ function SiteChromeInner({
   whatsappLabel,
   footerSupportLinks,
   footerPolicyLinks,
+  footerHeadings,
+  footerTrust,
   registrationNumber,
   address,
   phone,
@@ -98,6 +102,9 @@ function SiteChromeInner({
         <Footer
           supportLinks={footerSupportLinks}
           policyLinks={footerPolicyLinks}
+          headings={footerHeadings}
+          trust={footerTrust}
+          whatsapp={{ href: whatsappHref, label: whatsappLabel }}
           registrationNumber={registrationNumber}
           address={address}
           phone={phone}

@@ -9,7 +9,14 @@ import { cn } from '@/lib/utils';
 
 export interface HeroSlide {
   href: string;
-  image: { src: string; alt: string };
+  image: {
+    src: string;
+    alt: string;
+    /** Where the subject sits, so a narrow crop keeps it in frame. */
+    focus?: 'center' | 'end';
+    /** Already sized and compressed (a founder banner on R2): skip the optimiser. */
+    unoptimized?: boolean;
+  };
   title: string;
   /** Short line after the title, e.g. the cotton. */
   caption?: string;
@@ -146,7 +153,8 @@ export function HeroShowcase({ slides, pills, contact, proof, scrollTarget, labe
                 fill
                 sizes="100vw"
                 priority={i === 0}
-                className="hero-slide-image"
+                unoptimized={slide.image.unoptimized}
+                className={cn('hero-slide-image', slide.image.focus === 'end' && 'hero-slide-image-end')}
               />
             </div>
           );

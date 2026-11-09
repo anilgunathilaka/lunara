@@ -181,7 +181,8 @@
       "shipping": "Shipping",
       "privacy": "Privacy policy",
       "terms": "Terms of service",
-      "myOrders": "My orders"
+      "myOrders": "My orders",
+      "policiesHeading": "Policies"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -204,8 +205,8 @@
     },
     "announcement": {
       "region": "Announcements",
-      "previous": "Previous announcement",
-      "next": "Next announcement"
+      "pause": "Pause the announcements",
+      "play": "Play the announcements"
     }
   },
   "feedback": {
@@ -287,6 +288,9 @@
       "card": {
         "scroll": "Scroll",
         "proof": "Rated {average} out of 5 by {count, plural, one {# customer} other {# customers}}."
+      },
+      "banners": {
+        "banner1Alt": "Two pink and white cotton sarees on wooden hangers against a sunlit cream wall"
       }
     },
     "trust": {
@@ -296,7 +300,10 @@
       "whatsapp": "Reach us on WhatsApp"
     },
     "newArrivals": {
-      "heading": "New arrivals"
+      "heading": "New arrivals",
+      "viewAll": "View all",
+      "previous": "Previous sarees",
+      "next": "More sarees"
     },
     "osariya": {
       "heading": "One saree, two drapes",
@@ -308,7 +315,11 @@
       "sampleReviewerLabel": "Reviewer name",
       "sampleDistrictLabel": "District",
       "sampleQuote": "Review text will appear here."
-    }
+    },
+    "tiles": {
+      "heading": "Find your saree"
+    },
+    "shopNow": "Shop now"
   },
   "shop": {
     "title": "Shop curated pairings",

@@ -182,6 +182,7 @@ A 4px base unit. Every margin, padding and gap resolves to one of these tokens �
 | --space-7 | 48px | Between page sections on mobile. |
 | --space-8 | 64px | Between page sections on desktop. |
 | --space-9 | 96px | Around the hero; major breathing room. |
+| --container-max | 1360px | Widest the site content runs; only the hero banner and utility bar go full width (§7.4). |
 
 4.2 Radius
 
@@ -360,8 +361,9 @@ Motion is used to make state changes legible, never to decorate. The configurato
 | --motion-stagger | 80ms | Between words of the hero headline (§7.2). |
 | --motion-hero-interval | 7000ms | Time each hero slide stays before advancing (§7.2). |
 | --motion-menu | 300ms cubic-bezier(0.33, 0, 0, 1) | Header menu panel fade (§7.2). |
-| --motion-header | 500ms cubic-bezier(0.33, 0, 0, 1) | Announcement slide; header hairline (§7.2). |
-| --motion-announcement-interval | 5000ms | Time each announcement stays (§7.2). |
+| --motion-header | 500ms cubic-bezier(0.33, 0, 0, 1) | Header hairline (§7.2). |
+| --motion-marquee | 64s | One loop of the utility bar marquee (§7.2). |
+| --motion-section | 800ms cubic-bezier(0.33, 0, 0, 1) | Words rising into place on scroll (§7.4). |
 
 7.1 Motion Rules
 
@@ -379,9 +381,9 @@ No scroll-triggered reveal animations. On mobile data they read as broken loadin
 
 The one decorative exception: the home hero and the header announce the brand on arrival. It runs once, on page load, never on scroll.
 
-- Announcement strip (founder decision 2026-11-09, after theirnibs.com): a --lun-gold-pale strip above the header shows one fact at a time (ships unstitched, dispatch, returns, colour promise), sliding sideways (--motion-header) every --motion-announcement-interval, with arrows either side. It waits while hovered or focused, stops for good once an arrow is used, and never moves on its own under reduced motion.
-- Header: compact — wordmark with the navigation beside it, account and cart icons at the far end — with the same side edges as the hero card. The strip and header are sticky together: they stay at the top while the page scrolls, and a hairline settles under the header once the page has moved. Shop and Support carry a chevron that opens a menu panel under the full width of the header: link columns divided by hairlines and a --lun-plum-deep promise card with the emblem and a shop door. Hover opens it; the chevron button opens it from the keyboard; Escape closes it. It fades in (--motion-menu) and its words rise one after another (--motion-stagger). Unlike the reference, the page behind is not dimmed (no overlay on product photography). WhatsApp is a fixed round button at the bottom right of every page, on every screen. The language choice is hidden for now and the site opens in English (founder decision 2026-11-09; lib/features.ts languageSelector, i18n/routing.ts localeDetection) — the Sinhala and Tamil pages and messages stay complete, so switching it back on restores all three. Phones also keep the bottom bar. The header fades down into place on load (--motion-page).
-- Hero card: featured sarees in one card with --radius-l corners (4:5 on phones, 16:9 from 768px, 5:2 from 1280px). Advancing every --motion-hero-interval, a slide changes by a wipe of the frame; the photograph itself never moves, scales, drifts or takes a tint (§7.1 still holds).
+- Utility bar (founder decision 2026-11-09, after tillysveaas.co.uk): above the header on white, the four facts (ships unstitched, dispatch, returns, colour promise) run without end from right to left in small capitals, --lun-plum-deep, with the Lunara emblem between them; one loop takes --motion-marquee. The whole 44px bar is a pause/play button (WCAG 2.2.2) with a quiet icon at its right edge, and it waits while hovered; screen readers get the facts once as a list. It scrolls away with the page while the header stays (the group sticks at minus the bar height). Under reduced motion it stands still.
+- Header: compact — the logo in the centre of the page, 20% larger than the base wordmark size (founder decision 2026-11-09), the navigation on the left, account and cart icons on the right — with the same side edges as the hero card. The strip and header are sticky together: they stay at the top while the page scrolls, and a hairline settles under the header once the page has moved. Shop and Support carry a chevron that opens a menu panel under the full width of the header: link columns divided by hairlines and a --lun-plum-deep promise card with the emblem and a shop door. Hover opens it; the chevron button opens it from the keyboard; Escape closes it. It fades in (--motion-menu) and its words rise one after another (--motion-stagger). Unlike the reference, the page behind is not dimmed (no overlay on product photography). WhatsApp is a fixed round button at the bottom right of every page, on every screen. The language choice is hidden for now and the site opens in English (founder decision 2026-11-09; lib/features.ts languageSelector, i18n/routing.ts localeDetection) — the Sinhala and Tamil pages and messages stay complete, so switching it back on restores all three. Phones also keep the bottom bar. The header fades down into place on load (--motion-page).
+- Hero card: featured sarees in one card running the full width of the page, edge to edge with square corners (founder decision 2026-11-09) (4:5 on phones, 16:9 from 768px, 5:2 from 1280px). Advancing every --motion-hero-interval, a slide changes by a wipe of the frame; the photograph itself never moves, scales, drifts or takes a tint (§7.1 still holds).
 - On the card: top left, the current saree's name and cotton, which decode into place character by character, with the pause control and a counter; top right, WhatsApp; a vertical "scroll" cue on the right whose line carries a moving light; bottom left, the trust facts as solid --lun-plum-deep pills, each linking to its support page; bottom right, real review proof (initials of recent reviewers, the true count and average) — hidden while there are no reviews, never invented. Words on the photograph are white with a soft plum halo on the letters only.
 - Headline: beneath the card, the promise set very large in one line where it fits; each word arrives out of a blur, --motion-stagger apart. Below it, the subhead on the left and the shop door as an underlined link on the right, closed by a hairline.
 - Controls: pause is always visible (WCAG 2.2.2); slides follow swipe; advancing pauses while the pointer is over the card or anything in it has focus.
@@ -390,6 +392,17 @@ The one decorative exception: the home hero and the header announce the brand on
 7.3 Page Background (founder decision 2026-11-09)
 
 Every page background is --lun-surface (white). --lun-ground keeps its sampled value (brand colours are never adjusted) but is no longer used as a page or section background.
+
+7.4 Site Sections and Footer (founder decision 2026-11-09, after theirnibs.com)
+
+The founder asked for the whole site to follow theirnibs.com in layout and motion, with Lunara's own content and colours. Pages are rebuilt in waves; the home page and footer come first.
+
+- Home after the hero, in order: New arrivals as a rail of cards that scrolls sideways and snaps (four across from 1024px, three from 768px, one and a bit on phones), with View all and round arrow buttons; ways in as four photograph tiles over solid --lun-gold-pale label bars with an arrow (Plain Cotton, Super Cotton — opening /shop?material=… — Jacket Material, the care guide); the two drapes as two photographs edge to edge, each with its name in white with the plum halo and a gold-pale button; the drape promise set large; reviews; a --lun-gold-pale panel beside a photograph (getting the jacket stitched); and a centred word from us (WhatsApp).
+- Footer: a band of the four facts with icons on gold-pale at 35% over white, then Support and Policies columns and the business details on --lun-gold-pale, closed by a --lun-gold-deep hairline and the copyright line. Text on gold-pale is --lun-ink, never --lun-ink-muted (contrast).
+- Container: site content runs at most --container-max (1360px) wide, centred, on every page: header, menu panels, home sections, shop, product, cart, footer (founder decision 2026-11-09). Only the home hero banner and the utility bar run the full width of the page.
+- Section titles: --type-display-l in the display face, --lun-plum-deep. Product names on cards (English) in the display face.
+- Motion: headings and words rise softly into place as they scroll into view (--motion-section). Text only: photographs never fade, slide or scale on their own (§7.1). Content is never hidden without JavaScript, and nothing moves under prefers-reduced-motion. The product rail moves only when the customer moves it.
+- Not taken from the reference: dimming the page behind menus, and fading photographs in as they load (§7.1).
 
 8. Token Reference
 

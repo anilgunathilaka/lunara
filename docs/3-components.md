@@ -458,7 +458,7 @@ Three placements are required by Document 1: the listing, checkout, and the prin
 | WhatsAppAction | Floating on mobile, header and footer on desktop. Reachable from every page without scrolling. |
 | SlideOver | Used for add-to-cart confirmation. Confirms without navigating away from the product, per Flow A step 3. |
 | Accordion | Product detail secondary blocks on mobile. First panel open by default. |
-| Footer | --lun-plum-deep ground. Support links, policies, registration number, address, contact number, language selector. |
+| Footer | Facts band with icons, then --lun-gold-pale ground (docs/2-ui.md §7.4). Support links, policies, registration number, address, contact number, language selector. |
 
 7. Quality Standards
 

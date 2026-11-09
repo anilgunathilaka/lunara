@@ -71,6 +71,9 @@ export function LayoutQaClient({
             { href: '/', label: footerLabels.privacy },
             { href: '/', label: footerLabels.terms },
           ]}
+          headings={{ support: footerLabels.support, policies: footerLabels.privacy }}
+          trust={[{ key: 'returns', label: footerLabels.returns, href: '/' }]}
+          whatsapp={{ href: '/', label: 'WhatsApp' }}
           registrationNumber={registrationNumber}
           address={address}
           phone={phone}

@@ -95,7 +95,7 @@ export default async function LocaleLayout({
   };
   const announcement = {
     items: [tJacket('shipsUnstitched'), tTrust('dispatch'), tTrust('returns'), tTrust('colourPromise')],
-    labels: { region: tAnnouncement('region'), previous: tAnnouncement('previous'), next: tAnnouncement('next') },
+    labels: { region: tAnnouncement('region'), pause: tAnnouncement('pause'), play: tAnnouncement('play') },
   };
 
   const languageLabels = {
@@ -132,6 +132,13 @@ export default async function LocaleLayout({
               { href: '/support/shipping', label: tFooter('shipping') },
               // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
               { href: '/account/start', label: tFooter('myOrders') },
+            ]}
+            footerHeadings={{ support: tFooter('support'), policies: tFooter('policiesHeading') }}
+            footerTrust={[
+              { key: 'unstitched', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { key: 'dispatch', label: tTrust('dispatch'), href: '/support/shipping' },
+              { key: 'returns', label: tTrust('returns'), href: '/support/returns' },
+              { key: 'colour', label: tTrust('colourPromise'), href: '/support/care-guide' },
             ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },

@@ -723,6 +723,11 @@ body {
   text-transform: uppercase;
   color: var(--lun-ink-muted);
 }
+.product-card-name:lang(en) {
+  font: var(--type-heading) var(--font-display);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum-deep);
+}
 .product-card-jacket-row {
   display: flex;
   align-items: center;
@@ -1084,9 +1089,11 @@ body {
  * pill so it never reads as one plain link among five.
  */
 .site-header {
-  display: flex;
+  /* Logo in the centre of the page (founder decision 2026-11-09): menu on
+     the left, account and cart on the right, each side taking equal room. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
@@ -1104,88 +1111,101 @@ body {
  */
 .site-header-group {
   position: sticky;
-  top: 0;
+  /* Sticks with the utility bar's height above the top edge: the bar
+     scrolls away with the page and the header below it stays. */
+  top: -44px;
   z-index: 30;
   background: var(--lun-surface);
   animation: header-in var(--motion-page) both;
 }
 
-/* Announcement strip: one fact at a time, sliding sideways, arrows either side. */
+/*
+ * Utility bar (founder decision 2026-11-09, after tillysveaas.co.uk): the
+ * facts run without end from right to left in small capitals, the emblem
+ * between them. It scrolls away with the page; the header below it stays.
+ */
 .site-announcement {
+  overflow: hidden;
+  background: var(--lun-surface);
+  color: var(--lun-plum-deep);
+}
+.site-announcement-toggle {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding-inline: var(--space-2);
-  background: var(--lun-gold-pale);
-  color: var(--lun-ink);
-}
-.site-announcement-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* 44×44 touch target (docs/3-components.md §7.1). */
-  min-width: 44px;
+  width: 100%;
+  /* The whole bar is the pause button: a 44px-tall target (docs/3-components.md §7.1). */
   min-height: 44px;
-  color: var(--lun-ink);
-  opacity: 0.6;
-  transition: opacity var(--motion-standard);
-}
-.site-announcement-arrow:hover,
-.site-announcement-arrow:focus-visible {
-  opacity: 1;
-}
-.site-announcement-window {
   overflow: hidden;
-  width: min(100%, 36rem);
+  color: inherit;
+  cursor: pointer;
 }
 .site-announcement-track {
   display: flex;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  transition: transform var(--motion-header);
+  width: max-content;
+  animation: marquee var(--motion-marquee) linear infinite;
 }
-.site-announcement-item {
-  flex: 0 0 100%;
-  overflow: hidden;
-  font: var(--type-body-s) var(--font-body);
-  text-align: center;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.site-announcement-item:lang(en) {
-  font-weight: var(--weight-medium);
-}
-/* The timer: an invisible element whose animation ending moves the strip on. */
-.site-announcement-timer {
-  position: absolute;
-  width: 0;
-  height: 0;
-  animation: announcement-timer var(--motion-announcement-interval) linear;
-}
-.site-announcement:hover .site-announcement-timer,
-.site-announcement:focus-within .site-announcement-timer {
+.site-announcement-toggle:hover .site-announcement-track,
+.site-announcement-track.is-paused {
   animation-play-state: paused;
 }
-@keyframes announcement-timer {
+.site-announcement-copy {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.site-announcement-text {
+  padding-inline: var(--space-3);
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.site-announcement-text:lang(si),
+.site-announcement-text:lang(ta) {
+  letter-spacing: normal;
+  text-transform: none;
+}
+/* The emblem between facts: gold as an accent, never as text. */
+.site-announcement-mark {
+  flex-shrink: 0;
+  width: var(--space-4);
+  height: var(--space-4);
+  margin-inline: var(--space-3);
+}
+/* Pause / play, quiet at the right edge, on a white ground so the words pass beneath it. */
+.site-announcement-state {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: var(--space-3);
+  background: var(--lun-surface);
+  opacity: 0.6;
+  transition: opacity var(--motion-standard);
+}
+.site-announcement-toggle:hover .site-announcement-state,
+.site-announcement-toggle:focus-visible .site-announcement-state {
+  opacity: 1;
+}
+@keyframes marquee {
   from {
-    opacity: 0;
+    transform: translateX(0);
   }
   to {
-    opacity: 1;
+    transform: translateX(-50%);
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-announcement-timer {
+  .site-announcement-track {
     animation: none;
   }
 }
-/* Same side edges as the hero card: its padding, and its 1760px limit on very wide screens. */
+/* Same side edges as the page content: its padding, and the --container-max limit on wide screens. */
 @media (min-width: 768px) {
   .site-header {
-    padding-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   }
 }
 @media (min-width: 1024px) {
@@ -1199,12 +1219,37 @@ body {
   }
   .site-header-nav {
     gap: var(--space-6);
-    /* Beside the logo, as in the reference: the actions keep the far end. */
-    margin-inline-start: var(--space-5);
-    margin-inline-end: auto;
   }
   .site-header .wordmark-logo {
-    height: calc(var(--space-6) + var(--space-2));
+    height: calc((var(--space-6) + var(--space-2)) * 1.2);
+  }
+}
+.site-header-logo {
+  grid-column: 2;
+  grid-row: 1;
+}
+.site-header-nav {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+.site-header-actions {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+/* The logo 20% larger than before (founder decision 2026-11-09). */
+.site-header .wordmark-logo {
+  height: calc(var(--space-7) * 1.2);
+}
+@media (max-width: 767px) {
+  .site-header .wordmark-logo {
+    height: calc(var(--space-6) * 1.2);
+  }
+}
+@media (min-width: 1024px) {
+  .site-header .wordmark-logo {
+    height: calc((var(--space-6) + var(--space-2)) * 1.2);
   }
 }
 /* Header actions: WhatsApp as an icon (named for screen readers), the
@@ -1316,7 +1361,7 @@ body {
 .site-mega {
   position: absolute;
   top: 100%;
-  inset-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  inset-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
   border: 1px solid var(--lun-line);
@@ -1463,36 +1508,106 @@ body {
 }
 
 /*
- * Footer — docs/3-components.md §6.2. --lun-plum-deep ground.
+ * Footer — docs/3-components.md §6.2; layout per docs/2-ui.md §7.4 (founder
+ * decision 2026-11-09, after theirnibs.com): a band of the four facts with
+ * their icons, then link columns and the business details on a
+ * --lun-gold-pale ground. Text on gold-pale is --lun-ink, never muted grey.
  */
+.site-trust {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-4);
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  list-style: none;
+  background: color-mix(in srgb, var(--lun-gold-pale) 35%, var(--lun-surface));
+}
+@media (min-width: 768px) {
+  .site-trust {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
+  }
+}
+.site-trust-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  color: var(--lun-plum-deep);
+  text-align: center;
+  text-decoration: none;
+}
+.site-trust-label {
+  font: var(--type-heading) var(--font-display);
+  letter-spacing: var(--type-display-m-tracking);
+}
+.site-trust-item:hover .site-trust-label {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
 .site-footer {
+  padding: var(--space-7) var(--space-4) var(--space-5);
+  background: var(--lun-gold-pale);
+  color: var(--lun-ink);
+}
+@media (min-width: 768px) {
+  .site-footer {
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
+  }
+}
+.site-footer-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+  }
+}
+.site-footer-column {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-5);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
+  gap: var(--space-2);
 }
-.site-footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4);
+.site-footer-heading {
+  margin: 0 0 var(--space-2);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
 }
 .site-footer-link {
   font: var(--type-body-s) var(--font-body);
-  color: color-mix(in srgb, var(--lun-surface) 85%, transparent);
+  color: var(--lun-ink);
   text-decoration: none;
 }
-.site-footer-link:hover {
-  color: var(--lun-surface);
+.site-footer-link:hover,
+.site-footer-link:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-footer-brand .wordmark-logo {
+  height: var(--space-7);
+  width: auto;
 }
 .site-footer-legal {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
   font: var(--type-body-s) var(--font-body);
-  color: color-mix(in srgb, var(--lun-surface) 70%, transparent);
+}
+.site-footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-7);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--lun-gold-deep);
+  font: var(--type-label) var(--font-body);
 }
 
 /*
@@ -2062,7 +2177,7 @@ body {
   }
 }
 .home-section-inner {
-  max-width: 1320px;
+  max-width: var(--container-max);
   margin-inline: auto;
 }
 .home-section-header {
@@ -2088,20 +2203,26 @@ body {
    rounded card of featured sarees carrying small facts in its corners and
    the trust facts as pills, then the promise set very large beneath it.
    The photograph itself never moves, scales or takes a tint. */
+/* The card runs the full width of the page, edge to edge (founder decision
+   2026-11-09); the headline and the line beneath keep the page edges. */
 .home-hero {
-  padding: var(--space-3) var(--space-3) var(--space-7);
+  --hero-edge: var(--space-3);
+  padding-bottom: var(--space-7);
   background: var(--lun-surface);
 }
 @media (min-width: 768px) {
   .home-hero {
-    padding: var(--space-4) var(--space-6) var(--space-8);
+    --hero-edge: var(--space-6);
+    padding-bottom: var(--space-8);
   }
 }
 .home-hero-inner {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 1760px;
+}
+.home-hero-inner > :not(.hero-card) {
+  width: min(100% - 2 * var(--hero-edge), var(--container-max));
   margin-inline: auto;
 }
 
@@ -2110,7 +2231,6 @@ body {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--radius-l);
   background: var(--lun-plum-deep);
   touch-action: pan-y;
 }
@@ -2144,6 +2264,10 @@ body {
 }
 .hero-slide-image {
   object-fit: cover;
+}
+/* Subject on the right of a wide banner: a narrow crop keeps it in frame. */
+.hero-slide-image-end {
+  object-position: 85% 50%;
 }
 /* Invisible timer: its animation ending advances the slide. */
 .hero-card-timer {
@@ -2514,39 +2638,6 @@ body {
   }
 }
 
-/* Osariya feature — one saree, two drapes, a culturally distinctive
-   panel no competitor shows online. */
-.home-osariya-panel {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
-}
-.home-osariya-frame {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  background: var(--lun-surface);
-  border-radius: var(--radius-m);
-  overflow: hidden;
-}
-.home-osariya-frame img {
-  object-fit: cover;
-}
-.home-osariya-label {
-  display: block;
-  margin-top: var(--space-2);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  color: var(--lun-ink-muted);
-}
-.home-osariya-body {
-  margin-top: var(--space-5);
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink-muted);
-  max-width: 68ch;
-}
-
 /* Proof — customer photo reviews. No fabricated reviews are ever rendered
    here; until real, verified reviews exist (FR-46) this shows an honest
    placeholder note instead. */
@@ -2561,6 +2652,341 @@ body {
   color: var(--lun-ink-muted);
   font: var(--type-body) var(--font-body);
   max-width: 68ch;
+}
+
+/*
+ * Site-wide pieces of the reference look (docs/2-ui.md §7.4).
+ */
+.section-title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font: var(--type-display-l) var(--font-display);
+  font-weight: var(--type-display-l-weight);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum-deep);
+}
+.eyebrow {
+  margin: 0;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink);
+}
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.text-link:hover {
+  color: var(--lun-plum);
+}
+/* A solid button: gold-pale with plum-deep words; plum-deep with white words. */
+.solid-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: var(--space-5);
+  border-radius: var(--radius-s);
+  background: var(--lun-gold-pale);
+  color: var(--lun-plum-deep);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition:
+    background var(--motion-standard),
+    color var(--motion-standard);
+}
+.solid-pill:hover {
+  background: var(--lun-surface);
+}
+.solid-pill-plum {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.solid-pill-plum:hover {
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+}
+
+/* Scroll reveal: held back only once JS has found it below the fold. */
+.reveal[data-reveal] {
+  transition:
+    opacity var(--motion-section),
+    transform var(--motion-section);
+}
+.reveal[data-reveal='pending'] {
+  opacity: 0;
+  transform: translateY(var(--space-5));
+}
+
+/* Home bands after the hero. */
+.home-band {
+  padding: var(--space-7) var(--space-4);
+}
+@media (min-width: 768px) {
+  .home-band {
+    padding: var(--space-8) var(--space-6);
+  }
+}
+.home-band-tight {
+  padding-top: 0;
+}
+.home-band-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--container-max);
+  margin-inline: auto;
+}
+
+/* Product rail: cards in a row that scrolls sideways and snaps. */
+.product-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.product-rail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.product-rail-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.rail-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  color: var(--lun-ink);
+  transition: border-color var(--motion-standard);
+}
+.rail-arrow:hover {
+  border-color: var(--lun-plum);
+}
+.product-rail-track {
+  --rail-gap: var(--space-4);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 78%;
+  column-gap: var(--rail-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  /* Proximity, not mandatory: Chrome drops a smooth arrow scroll inside a mandatory snap row. */
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.product-rail-track::-webkit-scrollbar {
+  display: none;
+}
+.product-rail-item {
+  scroll-snap-align: start;
+}
+@media (min-width: 768px) {
+  .product-rail-track {
+    --rail-gap: var(--space-5);
+    grid-auto-columns: calc((100% - 2 * var(--rail-gap)) / 3);
+  }
+}
+@media (min-width: 1024px) {
+  .product-rail-track {
+    grid-auto-columns: calc((100% - 3 * var(--rail-gap)) / 4);
+  }
+}
+
+/* Ways in: a photograph over a solid label bar with an arrow. */
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 1024px) {
+  .home-tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+.home-tile {
+  display: flex;
+  flex-direction: column;
+  color: var(--lun-plum-deep);
+  text-decoration: none;
+}
+.home-tile-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+.home-tile-image img {
+  object-fit: cover;
+}
+.home-tile-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-3) var(--space-4);
+  background: var(--lun-gold-pale);
+  font: var(--type-body) var(--font-display);
+  font-weight: var(--weight-semibold);
+  transition:
+    background var(--motion-standard),
+    color var(--motion-standard);
+}
+.home-tile-label svg {
+  flex-shrink: 0;
+  transition: transform var(--motion-standard);
+}
+.home-tile:hover .home-tile-label {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.home-tile:hover .home-tile-label svg {
+  transform: translateX(var(--space-1));
+}
+
+/* Two photographs edge to edge, each with its name and a door; words
+   carry a soft halo on the letters only, never a tint on the photograph. */
+.home-split {
+  display: grid;
+  gap: var(--space-2);
+}
+@media (min-width: 768px) {
+  .home-split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.home-split-panel {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+@media (min-width: 768px) {
+  .home-split-panel {
+    aspect-ratio: 9 / 10;
+  }
+}
+.home-split-panel img {
+  object-fit: cover;
+}
+.home-split-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  text-align: center;
+}
+.home-split-title {
+  margin: 0;
+  font: var(--type-display-xl) var(--font-display);
+  font-weight: var(--type-display-xl-weight);
+  color: var(--lun-surface);
+  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
+}
+
+/* Statement: the promise, set large. */
+.home-statement {
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.home-statement-text {
+  margin: 0;
+  max-width: 40ch;
+  font: var(--type-display-l) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-ink);
+}
+
+.home-reviews {
+  max-width: 68ch;
+}
+
+/* A gold-pale panel beside a photograph. */
+.home-feature {
+  display: grid;
+  background: var(--lun-gold-pale);
+}
+@media (min-width: 768px) {
+  .home-feature {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.home-feature-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-5);
+}
+@media (min-width: 1024px) {
+  .home-feature-copy {
+    padding: var(--space-8) max(var(--space-8), calc((100vw - var(--container-max)) / 2));
+    padding-inline-end: var(--space-8);
+  }
+}
+.home-feature-title {
+  margin: 0;
+  font: var(--type-display-l) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum-deep);
+}
+.home-feature-body {
+  margin: 0;
+  max-width: 52ch;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.home-feature-image {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: var(--lun-surface);
+}
+.home-feature-image img {
+  object-fit: cover;
+}
+@media (min-width: 768px) {
+  .home-feature-image {
+    aspect-ratio: 1 / 1;
+  }
+}
+
+/* A word from us, centred. */
+.home-community {
+  align-items: center;
+  max-width: 60ch;
+  text-align: center;
+}
+.home-community-body {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
 }
 
 /*
@@ -2952,4 +3378,21 @@ body {
 }
 .ops-danger-zone {
   border-color: var(--lun-danger);
+}
+
+/* The hero banner runs full width, but its words, pills and controls keep
+   the page edges: the --container-max column, centred (docs/2-ui.md §7.4). */
+@media (min-width: 768px) {
+  .hero-card {
+    --hero-inset: max(var(--space-5), calc((100% - var(--container-max)) / 2));
+  }
+  .hero-card-top-start,
+  .hero-card-pills {
+    inset-inline-start: var(--hero-inset);
+  }
+  .hero-card-top-end,
+  .hero-card-scroll,
+  .hero-card-proof {
+    inset-inline-end: var(--hero-inset);
+  }
 }
