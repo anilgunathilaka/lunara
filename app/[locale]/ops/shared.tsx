@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server';
 
 export type OpsSearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-const ERROR_CODES = ['invalid', 'conflict', 'negative', 'tracking'] as const;
+const ERROR_CODES = ['invalid', 'conflict', 'negative', 'tracking', 'exists', 'inUse', 'sold', 'notFound'] as const;
 
 /** Outcome of the last action, from ?saved=1 / ?error=<code> (lib/ops/actions.ts). */
 export async function OpsFlash({ searchParams }: { searchParams: Awaited<OpsSearchParams> }) {

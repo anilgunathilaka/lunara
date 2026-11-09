@@ -318,6 +318,36 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Definitions | Delivered revenue: totals of orders that reached the customer and were not refunded. Super Cotton upgrade: Super share of saree units. On-time dispatch: dispatched on the day of confirmation or the next, Colombo time (target above 98%). Photo reviews per 100 delivered orders. Returns by saree colour. COD by district. |
 | Honest gaps | Shown as "not measured yet", with what is missing: configurator funnel and toggle use (needs the live configurator), colour complaints and return reasons (no reason captured), COD refusals (no "refused" outcome after dispatch), WhatsApp response time (outside the system), cost per order (costs not recorded). |
 
+3.10 Product Management (`/[locale]/ops/products`)
+
+| Rule | Detail |
+| --- | --- |
+| What staff manage | Saree products (a curated listing: design, cotton, colour, paired jacket, stock, price) and jacket colours (with a new or existing jacket material). New designs and jacket materials can be created from the same forms. |
+| Price stays single-sourced | The saree price is the PRICE_MATRIX cell for its design × cotton, shared by every colour of that design in that cotton; the form says so. Jacket prices belong to the jacket material. Every price change is audited. |
+| Archive, never lose history | Removing a product archives it (founder decision 2026-11-09): `active = false` on the listing and its saree colourway, which hides it from the shop, Design Your Own and checkout (the quote refuses archived colourways). It can be restored. A jacket colour paired in a live product cannot be archived. |
+| Delete only the never-sold | Permanent delete is offered only when no order line refers to the item, and needs an explicit "can't be undone" confirmation, checked on the server. |
+| Identifiers | Ids and SKUs are generated from names (`SAR-DESIGN-PLN-COLOUR`, `JKT-MATERIAL-COLOUR`), made unique, and never change afterwards; renaming a colour keeps its SKU. |
+| Stock | Created with a starting quantity; changed afterwards only through the Stock page's audited, reasoned adjustments (§3.5). |
+
+3.11 Costing (`/[locale]/ops/costs`)
+
+| Rule | Detail |
+| --- | --- |
+| What is recorded | `product_cost`, one row per SKU (saree colour or jacket colour): fabric, other materials, sewing charges, transport, other — whole LKR per piece — plus a note. Entered on the product and jacket edit pages. |
+| Staff-only, never a price | Costs are never sent to customers and never feed a customer price; customer prices stay in lib/pricing (§3.3). RLS on, no policies. |
+| Margin | A shop product's cost is its saree cost plus its jacket cost, measured against the paired selling price; a jacket sold alone is measured against its standalone price. Profit = price − cost, margin = profit ÷ price. A SKU without a cost row is "not entered", never treated as free. |
+| History | Every save is audited (`cost.update`, before and after). The row holds the current cost only. Deleting a never-sold product deletes its cost row with its stock row. |
+
+3.12 Inventory and the stock ledger (`/[locale]/ops/stock`, `/[locale]/ops/stock/[sku]`)
+
+| Rule | Detail |
+| --- | --- |
+| One place | The Inventory page (formerly Stock) lists every SKU — saree colours and jacket colours, archived included — with quantity on hand, units sold online, value at cost (quantity × unit cost, §3.11) and value at selling price (a saree at its design × cotton price, a jacket at its price on its own). Adjust and low-stock forms stay on the same page. Units sold in the office join it with office sales. |
+| Still one source of truth | `stock_item.quantity` remains the only availability the shop, configurator and checkout read (§3.2). Nothing else holds a count to keep in sync. |
+| Ledger | `stock_movement` is append-only: SKU, kind (opening, created, adjustment, online_sale, online_cancel, office_sale, office_return), signed delta, balance after, reference (order or office sale number), note, actor, time. Every quantity change goes through `lib/stock/movements.ts` `moveStock` in the same transaction as the change, so a count and its explanation commit together or not at all. Movements are never edited or deleted, except with their SKU when a never-sold product is deleted. |
+| Opening balance | The ledger started on 2026-11-09 with one `opening` movement per SKU recording the quantity then held. Earlier changes remain in audit_log. The dev seed writes stock directly and is not a ledger source. |
+| Sold online | Counted from order lines of every order not cancelled — the orders are the record of a sale; the ledger explains stock, not revenue. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
@@ -359,6 +389,21 @@ Preview: composited approximation, labelled as such
 | Lot change | A new fabric lot triggers re-photography and a texture update before continued sale. Enforced by lot_id on the colourway record. |
 
 5. The 360° Preview Pipeline
+
+5.0 Decision (2026-11-09): 3D model in the browser
+
+PRD §4.4 now records the founder's decision: the preview is a 3D model rendered on the customer's device with WebGL (three.js), replacing server-side compositing of photographed frames. Sections 5.1 to 5.3 below describe the earlier frame-compositing design and are kept for the record; where they conflict, this section wins.
+
+| Rule | Detail |
+| --- | --- |
+| Model | One 3D model (glTF binary, `.glb`) whose garment parts are separate, named meshes: `Saree` (body and pleats), `Pallu`, `Jacket`, and for Kandyan Osariya `Skirt` (the straight skirt, border down the front) and `Frill` (waist and hip frill, bordered). Parts used by only one drape carry the suffix `_saree` or `_osariya` and are shown only for that drape. Until a model exists, a built-in placeholder figure with the same parts is used, so nothing else changes when the model arrives. |
+| Painting | Saree and pallu: the design's pattern (its tintable asset, or a built-in pattern until one is uploaded), multiplied by the saree colour, with the material's weave and sheen (Plain: matte, open weave; Super: finer weave, soft sheen). Jacket: the jacket colour, with its swatch photograph as a tiled texture when one exists. Colour is a tint, so any design renders in any colour. |
+| Rotation | By hand only (drag, swipe, arrow keys, the rotate buttons), one-to-one with input; never auto-played (UX-C8). Vertical tilt is limited so the model is always upright. |
+| Cost | No server work: the page ships plain data and the model file. The 3D library loads only on this page. The renderer draws only when something changes. |
+| Honesty | The HonestyNote stays beside the preview (FR-22); alt text names the selection and says it is a rendered approximation. |
+| Degrades, never blocks | No WebGL, a failed load or a renderer error swaps to the static fallback with FallbackNotice (§5.4). Choosing and buying never depend on the preview. |
+| Buyable vs viewable | Any combination can be previewed. Only a combination that exists as a stocked saree colourway can be added to the cart; the colour picker shows the others disabled, never hidden (UX-C5). |
+
 
 The most demanding component in the system. The approach follows the layered-compositing decision recorded in PRD Section 4.4.
 
@@ -419,7 +464,8 @@ Because designs are recolourable, colour costs nothing in capture: it is a tint 
 | Option | Assessment | Verdict |
 | --- | --- | --- |
 | Client-side canvas compositing | Zero server cost and instant response after load, but requires shipping base frames, masks and shading maps to the device. At N frames × multiple layers this is far beyond the mobile payload budget. | Rejected on payload |
-| Server-side compositing with CDN cache | Server composites on demand and caches the result at the edge. First request for a combination is slower; every subsequent one is a static fetch. Payload to device is a plain image sequence. | SELECTED |
+| Client-side 3D model (WebGL) | One model file plus small textures; every combination and every angle rendered on the device. | SELECTED 2026-11-09 (§5.0) |
+| Server-side compositing with CDN cache | Server composites on demand and caches the result at the edge. First request for a combination is slower; every subsequent one is a static fetch. Payload to device is a plain image sequence. | Superseded by §5.0: not possible within the Workers Free CPU budget |
 | Full pre-render of all combinations | Every combination rendered ahead of time. Storage becomes very large and every new material triggers a full re-render. | Rejected on storage and agility |
 | Hybrid: pre-render popular, composite the rest | Pre-render curated and historically popular pairings; composite the long tail on demand. | Recommended optimisation once usage data exists |
 

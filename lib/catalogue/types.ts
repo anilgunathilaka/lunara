@@ -57,7 +57,13 @@ export interface JacketProductDetail extends JacketProduct {
 
 /** Everything the configurator (purchase path B) needs, prices pre-resolved. */
 export interface ConfiguratorCatalogue {
-  designs: { id: string; name: string; thumbnailUrl: string }[];
+  designs: {
+    id: string;
+    name: string;
+    thumbnailUrl: string;
+    /** Tintable pattern asset, once uploaded; the 3D preview draws a built-in pattern until then. */
+    patternUrl: string | null;
+  }[];
   jackets: {
     id: string;
     name: string;
@@ -65,8 +71,16 @@ export interface ConfiguratorCatalogue {
     colourName: string;
     swatchHex: string;
     thumbnailUrl: string;
+    /** Swatch photograph, tiled onto the 3D jacket when present. */
+    textureUrl: string | null;
     stockState: StockStateValue;
   }[];
+  /** Every saree colour in the range: any design previews in any of them (recolourable). */
+  colours: { name: string; hex: string }[];
+  /** What can actually be bought: stocked colourways keyed by colourwayKey(design, material). */
+  colourways: Record<string, { colourName: string; stockState: StockStateValue; quantity?: number }[]>;
+  /** Weave texture per cotton material, once uploaded. */
+  materialTextures: Record<MaterialId, string | null>;
   /** Customer price keyed by quoteKey(design, material, jacket). */
   quotes: Record<string, number>;
   /** Super minus Plain for a design + jacket, keyed by deltaKey (UX-C10b). */
@@ -79,6 +93,10 @@ export function quoteKey(designId: string, materialId: MaterialId, jacketId: str
 
 export function deltaKey(designId: string, jacketId: string): string {
   return `${designId}|${jacketId}`;
+}
+
+export function colourwayKey(designId: string, materialId: MaterialId): string {
+  return `${designId}|${materialId}`;
 }
 
 /** Shown wherever a product has no photograph yet (OPS-02). */

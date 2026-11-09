@@ -9,6 +9,7 @@ import { StockState } from '@/components/product/StockState';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
 import { getStandaloneJacket } from '@/lib/catalogue/queries';
 import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
+import { FEATURES } from '@/lib/features';
 
 // Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
 export default async function JacketDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -115,16 +116,18 @@ export default async function JacketDetailPage({ params }: { params: Promise<{ l
                 {pairsWith.map((saree) => (
                   <Link
                     key={saree.id}
-                    href={`/design-your-own?jacket=${jacket.id}`}
+                    href={FEATURES.designYourOwn ? `/design-your-own?jacket=${jacket.id}` : `/shop/${saree.id}`}
                     className="btn focus-ring btn-secondary btn-md"
                   >
                     {saree.name}
                   </Link>
                 ))}
               </div>
-              <Link href={`/design-your-own?jacket=${jacket.id}`} className="btn focus-ring btn-tertiary btn-sm">
-                {t('seeAgainstSaree')}
-              </Link>
+              {FEATURES.designYourOwn && (
+                <Link href={`/design-your-own?jacket=${jacket.id}`} className="btn focus-ring btn-tertiary btn-sm">
+                  {t('seeAgainstSaree')}
+                </Link>
+              )}
             </div>
           </>
         )}

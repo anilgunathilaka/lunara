@@ -15,6 +15,7 @@ import { Accordion } from '@/components/layout/Accordion';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
 import { getCuratedListing, getCuratedListings } from '@/lib/catalogue/queries';
 import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
+import { FEATURES } from '@/lib/features';
 
 // Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
 export default async function ProductDetailPage({
@@ -121,9 +122,11 @@ export default async function ProductDetailPage({
               unstitchedLabel={tJacket('shipsUnstitched')}
             />
 
-            <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
-              {tPdp('customiseThis')}
-            </Link>
+            {FEATURES.designYourOwn && (
+              <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
+                {tPdp('customiseThis')}
+              </Link>
+            )}
             <button type="button" className="btn focus-ring btn-tertiary btn-md">
               {tPdp('sendSwatches')}
             </button>

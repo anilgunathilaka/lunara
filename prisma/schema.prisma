@@ -168,6 +168,9 @@ model SareeColourway {
   referenceFrameUrl String?
   galleryAssets     String[] @default([])
   sku               String   @unique
+  /// Archived colourways are hidden from the shop, configurator and checkout
+  /// but kept with their history (docs/4-architecture.md §3.10).
+  active            Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -211,6 +214,8 @@ model JacketColourway {
   swatchUrl      String?
   textureTileUrl String?
   sku            String   @unique
+  /// Archived jacket colours are hidden from sale but kept with their history.
+  active         Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -232,8 +237,64 @@ model StockItem {
 
   sareeColourway  SareeColourway?  @relation("SareeColourwayStock")
   jacketColourway JacketColourway? @relation("JacketColourwayStock")
+  cost            ProductCost?
+  movements       StockMovement[]
 
   @@map("stock_item")
+}
+
+/// What one unit of a SKU costs Lunara to make and bring in, whole LKR
+/// (docs/4-architecture.md §3.11). Staff-only; never shown to customers and
+/// never part of a customer price. History lives in audit_log.
+model ProductCost {
+  sku            String   @id
+  fabric         Int      @default(0)
+  otherMaterials Int      @default(0)
+  sewing         Int      @default(0)
+  transport      Int      @default(0)
+  other          Int      @default(0)
+  note           String?
+  updatedBy      String
+  updatedAt      DateTime @updatedAt
+
+  stock StockItem @relation(fields: [sku], references: [sku], onDelete: Cascade)
+
+  @@map("product_cost")
+}
+
+/// Why a stock quantity changed (docs/4-architecture.md §3.12).
+enum StockMovementKind {
+  opening        /// balance carried in when the ledger started
+  created        /// starting quantity of a new product
+  adjustment     /// staff adjustment on the Inventory page, with a reason
+  online_sale    /// a website order took it
+  online_cancel  /// a cancelled website order put it back
+  office_sale    /// sold in the office
+  office_return  /// an office sale reversed
+}
+
+/// Append-only ledger of every stock change, written in the same
+/// transaction as the change itself (docs/4-architecture.md §3.12).
+/// stock_item.quantity stays the single source of availability; this
+/// explains how it got there.
+model StockMovement {
+  id        String            @id @default(cuid())
+  sku       String
+  kind      StockMovementKind
+  delta     Int
+  /// stock_item.quantity right after this movement
+  balance   Int
+  /// order or office sale number, when there is one
+  reference String?
+  note      String?
+  actor     String
+  createdAt DateTime          @default(now())
+
+  stock StockItem @relation(fields: [sku], references: [sku], onDelete: Cascade)
+
+  @@index([sku, createdAt])
+  @@index([createdAt])
+  @@map("stock_movement")
 }
 
 /// A pairing chosen by Lunara. Holds no stock and no price of its own:

@@ -10,6 +10,7 @@ import { getCuratedListings } from '@/lib/catalogue/queries';
 import { latestReviews } from '@/lib/reviews/reviews';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
+import { FEATURES } from '@/lib/features';
 
 // Rendered per request: "New arrivals" shows live price and stock
 // (docs/4-architecture.md §3.3).
@@ -52,9 +53,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <Link href="/shop" className="btn focus-ring btn-primary btn-lg">
                 {t('hero.shopCurated')}
               </Link>
-              <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
-                {t('hero.designYourOwn')}
-              </Link>
+              {FEATURES.designYourOwn && (
+                <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
+                  {t('hero.designYourOwn')}
+                </Link>
+              )}
             </div>
           </div>
         </div>

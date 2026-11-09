@@ -14,7 +14,7 @@ export interface HeaderProps {
   /** docs/1-ux.md §1: "Five items maximum: Shop, Design Your Own, Jacket Material, Support, Cart." */
   shop: HeaderNavItem;
   /** Visually distinguished — the differentiator, must not read as one item among five. */
-  designYourOwn: HeaderNavItem;
+  designYourOwn?: HeaderNavItem;
   jacketMaterial: HeaderNavItem;
   support: HeaderNavItem;
   cartHref: string;
@@ -47,9 +47,11 @@ export function Header({
         <Link href={shop.href} className="site-header-link">
           {shop.label}
         </Link>
-        <Link href={designYourOwn.href} className="site-header-link site-header-link-featured">
-          {designYourOwn.label}
-        </Link>
+        {designYourOwn && (
+          <Link href={designYourOwn.href} className="site-header-link site-header-link-featured">
+            {designYourOwn.label}
+          </Link>
+        )}
         <Link href={jacketMaterial.href} className="site-header-link">
           {jacketMaterial.label}
         </Link>

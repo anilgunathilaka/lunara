@@ -13,7 +13,7 @@ export interface MobileNavItem {
 
 export interface MobileNavProps {
   shop: MobileNavItem;
-  design: MobileNavItem;
+  design?: MobileNavItem;
   cart: MobileNavItem;
   cartCount?: number;
   /** Opens the secondary menu (Jacket Material, Support, language) — a SlideOver, typically. */
@@ -36,7 +36,7 @@ export function MobileNav({
 }: MobileNavProps) {
   return (
     <nav className="mobile-nav md:hidden" aria-label="Primary">
-      {[shop, design, cart].map((item) => (
+      {[shop, design, cart].filter((item): item is MobileNavItem => !!item).map((item) => (
         <Link
           key={item.href}
           href={item.href}

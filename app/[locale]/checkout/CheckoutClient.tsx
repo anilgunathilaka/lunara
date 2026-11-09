@@ -21,6 +21,7 @@ import { DELIVERY_FEE_RANGE } from '@/lib/commerce/delivery';
 import { whatsappLink } from '@/lib/commerce/business';
 import { formatAmount, formatPriceLKR } from '@/lib/pricing/format';
 import type { QuotedLine } from '@/lib/commerce/quote';
+import { FEATURES } from '@/lib/features';
 
 const TOTAL_STEPS = 5;
 
@@ -116,10 +117,14 @@ export function CheckoutClient(props: CheckoutClientProps) {
     return (
       <EmptyState
         message={props.emptyMessage}
-        actions={[
-          { href: '/shop', label: props.shopCuratedLabel },
-          { href: '/design-your-own', label: props.designYourOwnLabel },
-        ]}
+        actions={
+          FEATURES.designYourOwn
+            ? [
+                { href: '/shop', label: props.shopCuratedLabel },
+                { href: '/design-your-own', label: props.designYourOwnLabel },
+              ]
+            : [{ href: '/shop', label: props.shopCuratedLabel }]
+        }
       />
     );
   }
