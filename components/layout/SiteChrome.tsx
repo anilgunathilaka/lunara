@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Header } from '@/components/layout/Header';
+import { Header, type HeaderMegaMenu } from '@/components/layout/Header';
+import type { AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
 import { Footer, type FooterLink } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
@@ -25,7 +26,9 @@ export interface SiteChromeProps {
   address: string;
   phone: string;
   /** Facts for the strip above the header. */
-  announcement?: string[];
+  announcement?: AnnouncementBarProps;
+  /** Panels under Shop and Support (docs/2-ui.md §7.2). */
+  menus?: { shop?: HeaderMegaMenu; support?: HeaderMegaMenu };
   children: ReactNode;
 }
 
@@ -57,6 +60,7 @@ function SiteChromeInner({
   address,
   phone,
   announcement,
+  menus,
   children,
 }: SiteChromeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,10 +74,10 @@ function SiteChromeInner({
       </a>
 
       <Header
-        shop={{ href: '/shop', label: navLabels.shop }}
+        shop={{ href: '/shop', label: navLabels.shop, menu: menus?.shop }}
         designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
         jacketMaterial={{ href: '/jacket-material', label: navLabels.jacketMaterial }}
-        support={{ href: '/support', label: navLabels.support }}
+        support={{ href: '/support', label: navLabels.support, menu: menus?.support }}
         account={{ href: '/account/start', label: navLabels.account, text: navLabels.accountShort }}
         cartHref="/cart"
         cartLabel={navLabels.cart}

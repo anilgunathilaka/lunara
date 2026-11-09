@@ -133,6 +133,12 @@
   --motion-reveal-delay: 400ms;
   --motion-stagger: 80ms;
   --motion-hero-interval: 7000ms;
+  /* Header (docs/2-ui.md §7.2): menu panels fade, the strip slides. */
+  --motion-menu-ease: cubic-bezier(0.33, 0, 0, 1);
+  --motion-menu-duration: 300ms;
+  --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
+  --motion-header: 500ms var(--motion-menu-ease);
+  --motion-announcement-interval: 5000ms;
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
@@ -204,5 +210,7 @@
     --motion-reveal: 0ms;
     --motion-reveal-delay: 0ms;
     --motion-stagger: 0ms;
+    --motion-menu-duration: 0ms;
+    --motion-header: 0ms;
   }
 }

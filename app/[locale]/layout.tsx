@@ -41,6 +41,62 @@ export default async function LocaleLayout({
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');
   const tSlideover = await getTranslations('layout.slideover');
+  const tMenu = await getTranslations('layout.menu');
+  const tAnnouncement = await getTranslations('layout.announcement');
+  const tJacket = await getTranslations('product.jacket');
+  const tTrust = await getTranslations('home.trust');
+  const tOsariya = await getTranslations('home.osariya');
+
+  const promo = { title: tOsariya('heading'), cta: tMenu('promoCta'), href: '/shop' };
+  const menus = {
+    shop: {
+      label: tMenu('open', { label: tNav('shop') }),
+      columns: [
+        {
+          heading: tNav('shop'),
+          links: [
+            { href: '/shop', label: tMenu('shopAll') },
+            { href: '/jacket-material', label: tNav('jacketMaterial') },
+          ],
+        },
+        {
+          heading: tMenu('goodToKnow'),
+          links: [
+            { href: '/support/shipping', label: tJacket('shipsUnstitched') },
+            { href: '/support/shipping', label: tTrust('dispatch') },
+            { href: '/support/returns', label: tTrust('returns') },
+            { href: '/support/care-guide', label: tTrust('colourPromise') },
+          ],
+        },
+      ],
+      promo,
+    },
+    support: {
+      label: tMenu('open', { label: tNav('support') }),
+      columns: [
+        {
+          heading: tNav('support'),
+          links: [
+            { href: '/support/shipping', label: tFooter('shipping') },
+            { href: '/support/returns', label: tFooter('returns') },
+            { href: '/support/care-guide', label: tFooter('careGuide') },
+          ],
+        },
+        {
+          heading: tMenu('contact'),
+          links: [
+            { href: whatsappLink(), label: tLayout('whatsapp'), external: true },
+            { href: '/support', label: tFooter('support') },
+          ],
+        },
+      ],
+      promo,
+    },
+  };
+  const announcement = {
+    items: [tJacket('shipsUnstitched'), tTrust('dispatch'), tTrust('returns'), tTrust('colourPromise')],
+    labels: { region: tAnnouncement('region'), previous: tAnnouncement('previous'), next: tAnnouncement('next') },
+  };
 
   const languageLabels = {
     en: tCommon('languageEnglish'),
@@ -65,6 +121,8 @@ export default async function LocaleLayout({
               menu: tNav('menu'),
             }}
             closeLabel={tSlideover('close')}
+            announcement={announcement}
+            menus={menus}
             whatsappHref={whatsappLink()}
             whatsappLabel={tLayout('whatsapp')}
             footerSupportLinks={[

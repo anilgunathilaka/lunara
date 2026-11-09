@@ -1091,58 +1091,96 @@ body {
   padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
   background: var(--lun-surface);
-  /* Sticky: the menu stays at the top while the page scrolls (founder decision 2026-11-09). */
-  position: sticky;
-  top: 0;
-  z-index: 30;
+  transition: border-color var(--motion-header);
 }
 .site-header-nav {
   align-items: center;
   gap: var(--space-5);
 }
-/* Announcement strip and header entrance (docs/2-ui.md §7.2). */
-.site-announcement {
-  padding: var(--space-2) var(--space-4);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
+/*
+ * Header group (docs/2-ui.md §7.2): the announcement strip and the header
+ * stay at the top together while the page scrolls (founder decision
+ * 2026-11-09). It is also the frame the menu panels hang from.
+ */
+.site-header-group {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--lun-surface);
   animation: header-in var(--motion-page) both;
 }
-.site-announcement-list {
+
+/* Announcement strip: one fact at a time, sliding sideways, arrows either side. */
+.site-announcement {
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: var(--space-5);
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-2);
+  background: var(--lun-gold-pale);
+  color: var(--lun-ink);
+}
+.site-announcement-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 touch target (docs/3-components.md §7.1). */
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--lun-ink);
+  opacity: 0.6;
+  transition: opacity var(--motion-standard);
+}
+.site-announcement-arrow:hover,
+.site-announcement-arrow:focus-visible {
+  opacity: 1;
+}
+.site-announcement-window {
+  overflow: hidden;
+  width: min(100%, 36rem);
+}
+.site-announcement-track {
+  display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  text-align: center;
-}
-.site-announcement-list:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
+  transition: transform var(--motion-header);
 }
 .site-announcement-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-5);
+  flex: 0 0 100%;
+  overflow: hidden;
+  font: var(--type-body-s) var(--font-body);
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-/* A small gold diamond between facts: an accent on the dark strip, never text. */
-.site-announcement-item + .site-announcement-item::before {
-  content: '';
-  width: var(--space-1);
-  height: var(--space-1);
-  background: var(--lun-gold);
-  transform: rotate(45deg);
+.site-announcement-item:lang(en) {
+  font-weight: var(--weight-medium);
 }
-@media (max-width: 767px) {
-  .site-announcement-item:not(:first-child) {
-    display: none;
+/* The timer: an invisible element whose animation ending moves the strip on. */
+.site-announcement-timer {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation: announcement-timer var(--motion-announcement-interval) linear;
+}
+.site-announcement:hover .site-announcement-timer,
+.site-announcement:focus-within .site-announcement-timer {
+  animation-play-state: paused;
+}
+@keyframes announcement-timer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
-.site-header {
-  animation: header-in var(--motion-page) both;
+@media (prefers-reduced-motion: reduce) {
+  .site-announcement-timer {
+    animation: none;
+  }
 }
 /* Same side edges as the hero card: its padding, and its 1760px limit on very wide screens. */
 @media (min-width: 768px) {
@@ -1155,8 +1193,15 @@ body {
     padding-block: var(--space-3);
     border-bottom-color: transparent;
   }
+  .site-header-group.is-scrolled .site-header,
+  .site-header-group:has(.site-header-item.is-open) .site-header {
+    border-bottom-color: var(--lun-line);
+  }
   .site-header-nav {
     gap: var(--space-6);
+    /* Beside the logo, as in the reference: the actions keep the far end. */
+    margin-inline-start: var(--space-5);
+    margin-inline-end: auto;
   }
   .site-header .wordmark-logo {
     height: calc(var(--space-6) + var(--space-2));
@@ -1237,6 +1282,153 @@ body {
   border-radius: var(--radius-full);
   color: var(--lun-plum);
   font-weight: var(--weight-semibold);
+}
+/* A header item with a menu: the link, then a chevron that opens the panel. */
+.site-header-item {
+  display: flex;
+  align-items: center;
+}
+.site-header-item.is-open .site-header-link::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.site-header-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 touch target, drawn in close to the word it belongs to. */
+  min-width: 44px;
+  min-height: 44px;
+  margin-inline: calc(var(--space-3) * -1);
+  color: var(--lun-ink);
+}
+.site-header-toggle svg {
+  transition: transform var(--motion-menu);
+}
+.site-header-item.is-open .site-header-toggle svg {
+  transform: rotate(180deg);
+}
+
+/*
+ * Menu panel: hangs under the header across its full width, the same edges
+ * as the hero card. Fades in; its words rise into place one after another.
+ */
+.site-mega {
+  position: absolute;
+  top: 100%;
+  inset-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  border: 1px solid var(--lun-line);
+  border-top: 0;
+  background: var(--lun-surface);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-menu),
+    visibility 0s linear var(--motion-menu-duration);
+}
+/* An invisible bridge over the header's lower padding, so the pointer can travel down into the panel. */
+.site-mega::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  height: var(--space-3);
+}
+.site-header-item.is-open .site-mega {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--motion-menu),
+    visibility 0s;
+}
+.site-mega-columns {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 17rem);
+  padding-block: var(--space-6);
+}
+.site-mega-column {
+  padding-inline: var(--space-6);
+}
+.site-mega-column + .site-mega-column {
+  border-inline-start: 1px solid var(--lun-line);
+}
+.site-mega-heading {
+  margin: 0 0 var(--space-3);
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.site-mega-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-mega-link {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink-muted);
+  text-decoration: none;
+  transition: color var(--motion-standard);
+}
+.site-mega-link:hover,
+.site-mega-link:focus-visible {
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-mega-heading,
+.site-mega-list > li {
+  opacity: 0;
+  transform: translateY(var(--space-2));
+  transition:
+    opacity var(--motion-menu),
+    transform var(--motion-menu);
+}
+.site-header-item.is-open .site-mega-heading,
+.site-header-item.is-open .site-mega-list > li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+/* The promise card on the right: plum ground, the emblem, a door to the shop. */
+.site-mega-promo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  min-height: 16rem;
+  padding: var(--space-6);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  text-decoration: none;
+}
+.site-mega-promo-emblem {
+  width: var(--space-7);
+  height: auto;
+  margin-bottom: auto;
+}
+.site-mega-promo-title {
+  font: var(--type-display-m) var(--font-display);
+  letter-spacing: var(--type-display-m-tracking);
+}
+.site-mega-promo-cta {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--lun-gold-pale);
+  color: var(--lun-plum-deep);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  transition: background var(--motion-standard);
+}
+.site-mega-promo:hover .site-mega-promo-cta {
+  background: var(--lun-surface);
 }
 .site-header-actions {
   display: flex;

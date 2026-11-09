@@ -194,6 +194,18 @@
       "careContent": "Machine wash cold, inside out. Line dry in shade. Warm iron on the reverse.",
       "returns": "Returns & exchanges",
       "returnsContent": "7-day returns on unworn items with tags attached. Because nothing is personalised, all returned stock is resellable."
+    },
+    "menu": {
+      "shopAll": "All sarees",
+      "goodToKnow": "Good to know",
+      "contact": "Talk to us",
+      "open": "{label} menu",
+      "promoCta": "Shop now"
+    },
+    "announcement": {
+      "region": "Announcements",
+      "previous": "Previous announcement",
+      "next": "Next announcement"
     }
   },
   "feedback": {
