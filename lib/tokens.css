@@ -101,6 +101,10 @@
   --space-8: 64px;
   --space-9: 96px;
 
+  /* Widest the site content runs: header, sections, footer (founder decision 2026-11-09).
+     The home hero banner alone runs the full width of the page. */
+  --container-max: 1360px;
+
   /* ---------------------------------------------------------------- */
   /* Shape — radii stay small and disciplined                          */
   /* ---------------------------------------------------------------- */

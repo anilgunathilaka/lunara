@@ -182,6 +182,7 @@ A 4px base unit. Every margin, padding and gap resolves to one of these tokens �
 | --space-7 | 48px | Between page sections on mobile. |
 | --space-8 | 64px | Between page sections on desktop. |
 | --space-9 | 96px | Around the hero; major breathing room. |
+| --container-max | 1360px | Widest the site content runs; only the hero banner and utility bar go full width (§7.4). |
 
 4.2 Radius
 
@@ -398,6 +399,7 @@ The founder asked for the whole site to follow theirnibs.com in layout and motio
 
 - Home after the hero, in order: New arrivals as a rail of cards that scrolls sideways and snaps (four across from 1024px, three from 768px, one and a bit on phones), with View all and round arrow buttons; ways in as four photograph tiles over solid --lun-gold-pale label bars with an arrow (Plain Cotton, Super Cotton — opening /shop?material=… — Jacket Material, the care guide); the two drapes as two photographs edge to edge, each with its name in white with the plum halo and a gold-pale button; the drape promise set large; reviews; a --lun-gold-pale panel beside a photograph (getting the jacket stitched); and a centred word from us (WhatsApp).
 - Footer: a band of the four facts with icons on gold-pale at 35% over white, then Support and Policies columns and the business details on --lun-gold-pale, closed by a --lun-gold-deep hairline and the copyright line. Text on gold-pale is --lun-ink, never --lun-ink-muted (contrast).
+- Container: site content runs at most --container-max (1360px) wide, centred, on every page: header, menu panels, home sections, shop, product, cart, footer (founder decision 2026-11-09). Only the home hero banner and the utility bar run the full width of the page.
 - Section titles: --type-display-l in the display face, --lun-plum-deep. Product names on cards (English) in the display face.
 - Motion: headings and words rise softly into place as they scroll into view (--motion-section). Text only: photographs never fade, slide or scale on their own (§7.1). Content is never hidden without JavaScript, and nothing moves under prefers-reduced-motion. The product rail moves only when the customer moves it.
 - Not taken from the reference: dimming the page behind menus, and fading photographs in as they load (§7.1).

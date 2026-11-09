@@ -1200,10 +1200,10 @@ body {
     animation: none;
   }
 }
-/* Same side edges as the hero card: its padding, and its 1760px limit on very wide screens. */
+/* Same side edges as the page content: its padding, and the --container-max limit on wide screens. */
 @media (min-width: 768px) {
   .site-header {
-    padding-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   }
 }
 @media (min-width: 1024px) {
@@ -1334,7 +1334,7 @@ body {
 .site-mega {
   position: absolute;
   top: 100%;
-  inset-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  inset-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
   border: 1px solid var(--lun-line);
@@ -1498,7 +1498,7 @@ body {
 @media (min-width: 768px) {
   .site-trust {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    padding-inline: max(var(--space-6), calc((100% - 1320px) / 2));
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   }
 }
 .site-trust-item {
@@ -1526,7 +1526,7 @@ body {
 }
 @media (min-width: 768px) {
   .site-footer {
-    padding-inline: max(var(--space-6), calc((100% - 1320px) / 2));
+    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
   }
 }
 .site-footer-grid {
@@ -2150,7 +2150,7 @@ body {
   }
 }
 .home-section-inner {
-  max-width: 1320px;
+  max-width: var(--container-max);
   margin-inline: auto;
 }
 .home-section-header {
@@ -2195,7 +2195,7 @@ body {
   gap: var(--space-5);
 }
 .home-hero-inner > :not(.hero-card) {
-  width: min(100% - 2 * var(--hero-edge), 1760px);
+  width: min(100% - 2 * var(--hero-edge), var(--container-max));
   margin-inline: auto;
 }
 
@@ -2715,7 +2715,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 1320px;
+  max-width: var(--container-max);
   margin-inline: auto;
 }
 
@@ -2920,7 +2920,7 @@ body {
 }
 @media (min-width: 1024px) {
   .home-feature-copy {
-    padding: var(--space-8) max(var(--space-8), calc((100vw - 1320px) / 2));
+    padding: var(--space-8) max(var(--space-8), calc((100vw - var(--container-max)) / 2));
     padding-inline-end: var(--space-8);
   }
 }
@@ -3351,4 +3351,21 @@ body {
 }
 .ops-danger-zone {
   border-color: var(--lun-danger);
+}
+
+/* The hero banner runs full width, but its words, pills and controls keep
+   the page edges: the --container-max column, centred (docs/2-ui.md §7.4). */
+@media (min-width: 768px) {
+  .hero-card {
+    --hero-inset: max(var(--space-5), calc((100% - var(--container-max)) / 2));
+  }
+  .hero-card-top-start,
+  .hero-card-pills {
+    inset-inline-start: var(--hero-inset);
+  }
+  .hero-card-top-end,
+  .hero-card-scroll,
+  .hero-card-proof {
+    inset-inline-end: var(--hero-inset);
+  }
 }
