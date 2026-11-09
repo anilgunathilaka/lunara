@@ -3682,3 +3682,16 @@ body {
     padding-bottom: var(--bottom-bar-h);
   }
 }
+
+/* Stand-ins while the home page's data streams in (same size as what follows). */
+.skeleton-line {
+  display: block;
+  width: 80%;
+  height: var(--space-4);
+}
+.skeleton-line-short {
+  width: 45%;
+}
+.skeleton-block {
+  min-height: calc(var(--space-9) + var(--space-5));
+}

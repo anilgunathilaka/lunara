@@ -21,10 +21,19 @@ export interface HeroSlide {
   caption?: string;
 }
 
-export interface HeroShowcaseProps {
+/** Slides that need the database, streamed in after the page has painted. */
+export interface HeroMore {
   slides: HeroSlide[];
-  /** Bottom right: real review proof, or nothing. */
+  /** "{n} of {total}" for every slide, the first ones included. */
+  slideOf: string[];
   proof: { initials: string[]; text: string } | null;
+}
+
+export interface HeroShowcaseProps {
+  /** Shown at once: the founder's banners (no database needed). */
+  slides: HeroSlide[];
+  /** Featured sarees and review proof, joined on when the database answers. */
+  more?: Promise<HeroMore>;
   /** Where the vertical "scroll" cue points. */
   scrollTarget: string;
   labels: {
@@ -51,13 +60,32 @@ const SWIPE_SHARE = 0.12;
  * it stops advancing on its own (WCAG 2.2.2). Under prefers-reduced-motion
  * nothing advances on its own.
  */
-export function HeroShowcase({ slides, proof, scrollTarget, labels }: HeroShowcaseProps) {
+export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }: HeroShowcaseProps) {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
   // Once the customer uses an arrow, the slides stop moving on their own.
   const [userStopped, setUserStopped] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const swipeFrom = useRef<number | null>(null);
+  // The banners paint at once; featured sarees and review proof join the
+  // end of the row when the database answers, without restarting it.
+  const [extra, setExtra] = useState<HeroMore | null>(null);
+  useEffect(() => {
+    let live = true;
+    if (!more) return;
+    // The server streams a React thenable, whose then() returns nothing: wrap it in a real promise.
+    Promise.resolve(more)
+      .then((value) => {
+        if (live) setExtra(value);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [more]);
+  const slides = extra ? [...firstSlides, ...extra.slides] : firstSlides;
+  const slideOf = extra ? extra.slideOf : labels.slideOf;
+  const proof = extra?.proof ?? null;
   const count = slides.length;
 
   useEffect(() => {
@@ -109,7 +137,7 @@ export function HeroShowcase({ slides, proof, scrollTarget, labels }: HeroShowca
               className={cn('hero-slide', isActive && 'is-active', i === leaving && 'is-leaving')}
               role="group"
               aria-roledescription="slide"
-              aria-label={labels.slideOf[i]}
+              aria-label={slideOf[i]}
               aria-hidden={!isActive}
               inert={!isActive}
               onTransitionEnd={(e) => {
