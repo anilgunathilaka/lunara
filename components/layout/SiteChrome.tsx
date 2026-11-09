@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { Menu, Package, ShoppingBag, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Header } from '@/components/layout/Header';
+import { Header, type HeaderMegaMenu } from '@/components/layout/Header';
+import type { AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
 import { Footer, type FooterLink } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
@@ -15,7 +16,7 @@ import { FEATURES } from '@/lib/features';
 
 export interface SiteChromeProps {
   languageLabels: LanguageSelectorProps['labels'];
-  navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'account' | 'cart' | 'menu', string>;
+  navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'account' | 'accountShort' | 'cart' | 'menu', string>;
   closeLabel: string;
   whatsappHref: string;
   whatsappLabel: string;
@@ -25,7 +26,9 @@ export interface SiteChromeProps {
   address: string;
   phone: string;
   /** Facts for the strip above the header. */
-  announcement?: string[];
+  announcement?: AnnouncementBarProps;
+  /** Panels under Shop and Support (docs/2-ui.md §7.2). */
+  menus?: { shop?: HeaderMegaMenu; support?: HeaderMegaMenu };
   children: ReactNode;
 }
 
@@ -57,6 +60,7 @@ function SiteChromeInner({
   address,
   phone,
   announcement,
+  menus,
   children,
 }: SiteChromeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,16 +74,14 @@ function SiteChromeInner({
       </a>
 
       <Header
-        shop={{ href: '/shop', label: navLabels.shop }}
+        shop={{ href: '/shop', label: navLabels.shop, menu: menus?.shop }}
         designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
         jacketMaterial={{ href: '/jacket-material', label: navLabels.jacketMaterial }}
-        support={{ href: '/support', label: navLabels.support }}
-        account={{ href: '/account/start', label: navLabels.account }}
+        support={{ href: '/support', label: navLabels.support, menu: menus?.support }}
+        account={{ href: '/account/start', label: navLabels.account, text: navLabels.accountShort }}
         cartHref="/cart"
         cartLabel={navLabels.cart}
         cartCount={itemCount}
-        whatsappHref={whatsappHref}
-        whatsappLabel={whatsappLabel}
         languageLabels={languageLabels}
         announcement={announcement}
       />
@@ -120,11 +122,17 @@ function SiteChromeInner({
         closeLabel={closeLabel}
       >
         <nav className="flex flex-col gap-4">
+          <Link href="/shop" className="site-header-link" onClick={() => setMenuOpen(false)}>
+            {navLabels.shop}
+          </Link>
           <Link href="/jacket-material" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.jacketMaterial}
           </Link>
           <Link href="/support" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.support}
+          </Link>
+          <Link href="/account/start" className="site-header-link" onClick={() => setMenuOpen(false)}>
+            {navLabels.accountShort}
           </Link>
           <LanguageSelector labels={languageLabels} />
         </nav>

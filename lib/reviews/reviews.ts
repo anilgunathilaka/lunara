@@ -126,6 +126,14 @@ export async function listingReviews(listingId: string, take = 20): Promise<{ re
   };
 }
 
+/** Count and average over every published review, for the home hero. */
+export async function siteReviewSummary(): Promise<ReviewSummary> {
+  await connection();
+  const agg = await getPrisma().review.aggregate({ where: { status: 'published' }, _count: { _all: true }, _avg: { rating: true } });
+  const average = agg._avg.rating;
+  return { count: agg._count._all, average: average === null ? null : Math.round(average * 10) / 10 };
+}
+
 /** Latest published reviews for the home page, photo reviews first. Never filtered by rating. */
 export async function latestReviews(take = 3): Promise<PublicReview[]> {
   await connection();

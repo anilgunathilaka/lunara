@@ -357,7 +357,11 @@ Motion is used to make state changes legible, never to decorate. The configurato
 | --motion-page | 320ms ease-out | Page and route transitions. |
 | --motion-reveal | 1150ms cubic-bezier(0.58, 0, 0.28, 0.99) | Home hero and header entrance only (§7.2). |
 | --motion-reveal-delay | 400ms | Stagger between hero reveal steps (§7.2). |
+| --motion-stagger | 80ms | Between words of the hero headline (§7.2). |
 | --motion-hero-interval | 7000ms | Time each hero slide stays before advancing (§7.2). |
+| --motion-menu | 300ms cubic-bezier(0.33, 0, 0, 1) | Header menu panel fade (§7.2). |
+| --motion-header | 500ms cubic-bezier(0.33, 0, 0, 1) | Announcement slide; header hairline (§7.2). |
+| --motion-announcement-interval | 5000ms | Time each announcement stays (§7.2). |
 
 7.1 Motion Rules
 
@@ -371,16 +375,21 @@ prefers-reduced-motion is honoured absolutely: cross-fades become instant swaps 
 
 No scroll-triggered reveal animations. On mobile data they read as broken loading rather than as polish.
 
-7.2 Home Hero and Header Entrance (founder decision 2026-11-09)
+7.2 Home Hero and Header (founder decision 2026-11-09)
 
 The one decorative exception: the home hero and the header announce the brand on arrival. It runs once, on page load, never on scroll.
 
-- Header: the announcement strip and header fade down into place (--motion-page).
-- Hero headline: set very large (--type-display-hero), in two lines; each line rises out of its own mask (--motion-reveal), the second --motion-reveal-delay after the first. The subhead and doors fade in after.
-- Hero showcase: featured sarees in a wide frame, advancing every --motion-hero-interval. A slide changes by a wipe of the frame; the photograph itself never moves, scales or drifts (§7.1 still holds). Each slide's name rises out of a mask, --motion-reveal-delay after the wipe, on a solid --lun-surface plate — never an overlay or gradient on the photograph.
-- Controls: previous, next and pause are always visible (WCAG 2.2.2); the slides also follow swipe. Advancing pauses while the pointer is over the showcase or anything in it has focus.
-- prefers-reduced-motion: nothing animates and nothing advances on its own; slides change only when asked, instantly.
-- Aspect: 4:5 below 768px (portrait, so the saree reads on a phone), 16:9 above.
+- Announcement strip (founder decision 2026-11-09, after theirnibs.com): a --lun-gold-pale strip above the header shows one fact at a time (ships unstitched, dispatch, returns, colour promise), sliding sideways (--motion-header) every --motion-announcement-interval, with arrows either side. It waits while hovered or focused, stops for good once an arrow is used, and never moves on its own under reduced motion.
+- Header: compact — wordmark with the navigation beside it, account and cart icons at the far end — with the same side edges as the hero card. The strip and header are sticky together: they stay at the top while the page scrolls, and a hairline settles under the header once the page has moved. Shop and Support carry a chevron that opens a menu panel under the full width of the header: link columns divided by hairlines and a --lun-plum-deep promise card with the emblem and a shop door. Hover opens it; the chevron button opens it from the keyboard; Escape closes it. It fades in (--motion-menu) and its words rise one after another (--motion-stagger). Unlike the reference, the page behind is not dimmed (no overlay on product photography). WhatsApp is a fixed round button at the bottom right of every page, on every screen. The language choice is hidden for now and the site opens in English (founder decision 2026-11-09; lib/features.ts languageSelector, i18n/routing.ts localeDetection) — the Sinhala and Tamil pages and messages stay complete, so switching it back on restores all three. Phones also keep the bottom bar. The header fades down into place on load (--motion-page).
+- Hero card: featured sarees in one card with --radius-l corners (4:5 on phones, 16:9 from 768px, 5:2 from 1280px). Advancing every --motion-hero-interval, a slide changes by a wipe of the frame; the photograph itself never moves, scales, drifts or takes a tint (§7.1 still holds).
+- On the card: top left, the current saree's name and cotton, which decode into place character by character, with the pause control and a counter; top right, WhatsApp; a vertical "scroll" cue on the right whose line carries a moving light; bottom left, the trust facts as solid --lun-plum-deep pills, each linking to its support page; bottom right, real review proof (initials of recent reviewers, the true count and average) — hidden while there are no reviews, never invented. Words on the photograph are white with a soft plum halo on the letters only.
+- Headline: beneath the card, the promise set very large in one line where it fits; each word arrives out of a blur, --motion-stagger apart. Below it, the subhead on the left and the shop door as an underlined link on the right, closed by a hairline.
+- Controls: pause is always visible (WCAG 2.2.2); slides follow swipe; advancing pauses while the pointer is over the card or anything in it has focus.
+- prefers-reduced-motion: nothing animates, decodes or advances on its own.
+
+7.3 Page Background (founder decision 2026-11-09)
+
+Every page background is --lun-surface (white). --lun-ground keeps its sampled value (brand colours are never adjusted) but is no longer used as a page or section background.
 
 8. Token Reference
 

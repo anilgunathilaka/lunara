@@ -92,7 +92,7 @@
  */
 @layer components {
 body {
-  background-color: var(--lun-ground);
+  background-color: var(--lun-surface);
   color: var(--lun-ink);
   font: var(--type-body) var(--font-body);
 }
@@ -1071,6 +1071,13 @@ body {
   color: var(--lun-surface);
   box-shadow: var(--elev-2);
 }
+/* Wide screens have no bottom bar to clear: the button sits in the corner. */
+@media (min-width: 768px) {
+  .whatsapp-action-floating {
+    right: var(--space-5);
+    bottom: var(--space-5);
+  }
+}
 
 /*
  * Header — docs/3-components.md §6.2. "Design Your Own" gets a bordered
@@ -1081,67 +1088,150 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
   background: var(--lun-surface);
+  transition: border-color var(--motion-header);
 }
 .site-header-nav {
   align-items: center;
   gap: var(--space-5);
 }
-/* Announcement strip and header entrance (docs/2-ui.md §7.2). */
-.site-announcement {
-  padding: var(--space-2) var(--space-4);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
+/*
+ * Header group (docs/2-ui.md §7.2): the announcement strip and the header
+ * stay at the top together while the page scrolls (founder decision
+ * 2026-11-09). It is also the frame the menu panels hang from.
+ */
+.site-header-group {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--lun-surface);
   animation: header-in var(--motion-page) both;
 }
-.site-announcement-list {
+
+/* Announcement strip: one fact at a time, sliding sideways, arrows either side. */
+.site-announcement {
+  position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
-  gap: var(--space-5);
+  justify-content: center;
+  gap: var(--space-2);
+  padding-inline: var(--space-2);
+  background: var(--lun-gold-pale);
+  color: var(--lun-ink);
+}
+.site-announcement-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 touch target (docs/3-components.md §7.1). */
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--lun-ink);
+  opacity: 0.6;
+  transition: opacity var(--motion-standard);
+}
+.site-announcement-arrow:hover,
+.site-announcement-arrow:focus-visible {
+  opacity: 1;
+}
+.site-announcement-window {
+  overflow: hidden;
+  width: min(100%, 36rem);
+}
+.site-announcement-track {
+  display: flex;
   margin: 0;
   padding: 0;
   list-style: none;
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  text-align: center;
-}
-.site-announcement-list:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
+  transition: transform var(--motion-header);
 }
 .site-announcement-item {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-5);
+  flex: 0 0 100%;
+  overflow: hidden;
+  font: var(--type-body-s) var(--font-body);
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
-/* A small gold diamond between facts: an accent on the dark strip, never text. */
-.site-announcement-item + .site-announcement-item::before {
-  content: '';
-  width: var(--space-1);
-  height: var(--space-1);
-  background: var(--lun-gold);
-  transform: rotate(45deg);
+.site-announcement-item:lang(en) {
+  font-weight: var(--weight-medium);
 }
-@media (max-width: 767px) {
-  .site-announcement-item:not(:first-child) {
-    display: none;
+/* The timer: an invisible element whose animation ending moves the strip on. */
+.site-announcement-timer {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation: announcement-timer var(--motion-announcement-interval) linear;
+}
+.site-announcement:hover .site-announcement-timer,
+.site-announcement:focus-within .site-announcement-timer {
+  animation-play-state: paused;
+}
+@keyframes announcement-timer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
-.site-header {
-  animation: header-in var(--motion-page) both;
+@media (prefers-reduced-motion: reduce) {
+  .site-announcement-timer {
+    animation: none;
+  }
+}
+/* Same side edges as the hero card: its padding, and its 1760px limit on very wide screens. */
+@media (min-width: 768px) {
+  .site-header {
+    padding-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  }
 }
 @media (min-width: 1024px) {
   .site-header {
-    padding-block: var(--space-5);
-    padding-inline: var(--space-7);
+    padding-block: var(--space-3);
+    border-bottom-color: transparent;
+  }
+  .site-header-group.is-scrolled .site-header,
+  .site-header-group:has(.site-header-item.is-open) .site-header {
+    border-bottom-color: var(--lun-line);
   }
   .site-header-nav {
     gap: var(--space-6);
+    /* Beside the logo, as in the reference: the actions keep the far end. */
+    margin-inline-start: var(--space-5);
+    margin-inline-end: auto;
+  }
+  .site-header .wordmark-logo {
+    height: calc(var(--space-6) + var(--space-2));
   }
 }
+/* Header actions: WhatsApp as an icon (named for screen readers), the
+   language choice as quiet text, and "Account" spelled out beside its icon. */
+.site-header .whatsapp-action > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.site-header .language-option {
+  border-color: transparent;
+  font: var(--type-body-s) var(--font-body);
+}
+.site-header .language-option-active {
+  border-color: transparent;
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-header-account-text {
+  display: none;
+  margin-inline-start: var(--space-2);
+  font: var(--type-body) var(--font-body);
+}
+
 @keyframes header-in {
   from {
     opacity: 0;
@@ -1160,10 +1250,8 @@ body {
   text-decoration: none;
 }
 .site-header-link:lang(en) {
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
 }
 /* Underline draws in from the left on hover and focus. */
 .site-header-link::after {
@@ -1194,6 +1282,153 @@ body {
   border-radius: var(--radius-full);
   color: var(--lun-plum);
   font-weight: var(--weight-semibold);
+}
+/* A header item with a menu: the link, then a chevron that opens the panel. */
+.site-header-item {
+  display: flex;
+  align-items: center;
+}
+.site-header-item.is-open .site-header-link::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.site-header-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 touch target, drawn in close to the word it belongs to. */
+  min-width: 44px;
+  min-height: 44px;
+  margin-inline: calc(var(--space-3) * -1);
+  color: var(--lun-ink);
+}
+.site-header-toggle svg {
+  transition: transform var(--motion-menu);
+}
+.site-header-item.is-open .site-header-toggle svg {
+  transform: rotate(180deg);
+}
+
+/*
+ * Menu panel: hangs under the header across its full width, the same edges
+ * as the hero card. Fades in; its words rise into place one after another.
+ */
+.site-mega {
+  position: absolute;
+  top: 100%;
+  inset-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  border: 1px solid var(--lun-line);
+  border-top: 0;
+  background: var(--lun-surface);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--motion-menu),
+    visibility 0s linear var(--motion-menu-duration);
+}
+/* An invisible bridge over the header's lower padding, so the pointer can travel down into the panel. */
+.site-mega::before {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  height: var(--space-3);
+}
+.site-header-item.is-open .site-mega {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--motion-menu),
+    visibility 0s;
+}
+.site-mega-columns {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 17rem);
+  padding-block: var(--space-6);
+}
+.site-mega-column {
+  padding-inline: var(--space-6);
+}
+.site-mega-column + .site-mega-column {
+  border-inline-start: 1px solid var(--lun-line);
+}
+.site-mega-heading {
+  margin: 0 0 var(--space-3);
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.site-mega-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-mega-link {
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink-muted);
+  text-decoration: none;
+  transition: color var(--motion-standard);
+}
+.site-mega-link:hover,
+.site-mega-link:focus-visible {
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-mega-heading,
+.site-mega-list > li {
+  opacity: 0;
+  transform: translateY(var(--space-2));
+  transition:
+    opacity var(--motion-menu),
+    transform var(--motion-menu);
+}
+.site-header-item.is-open .site-mega-heading,
+.site-header-item.is-open .site-mega-list > li {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * var(--motion-stagger));
+}
+/* The promise card on the right: plum ground, the emblem, a door to the shop. */
+.site-mega-promo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  min-height: 16rem;
+  padding: var(--space-6);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  text-decoration: none;
+}
+.site-mega-promo-emblem {
+  width: var(--space-7);
+  height: auto;
+  margin-bottom: auto;
+}
+.site-mega-promo-title {
+  font: var(--type-display-m) var(--font-display);
+  letter-spacing: var(--type-display-m-tracking);
+}
+.site-mega-promo-cta {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--lun-gold-pale);
+  color: var(--lun-plum-deep);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  transition: background var(--motion-standard);
+}
+.site-mega-promo:hover .site-mega-promo-cta {
+  background: var(--lun-surface);
 }
 .site-header-actions {
   display: flex;
@@ -1837,112 +2072,56 @@ body {
   gap: var(--space-4);
   margin-bottom: var(--space-5);
 }
+/* Long Sinhala and Tamil words must wrap rather than widen the page at 360px. */
+.home-section-header > div {
+  min-width: 0;
+}
 .home-section-title {
+  overflow-wrap: anywhere;
   font: var(--type-display-m) var(--font-display);
   font-weight: var(--type-display-m-weight);
   letter-spacing: var(--type-display-m-tracking);
   color: var(--lun-plum);
 }
 
-/* Hero (docs/1-ux.md §4.1; motion per docs/2-ui.md §7.2): the promise set
-   very large, its lines rising out of masks once on load, then featured
-   sarees in a wide showcase. The photograph itself never moves. */
+/* Hero (docs/1-ux.md §4.1; layout and motion per docs/2-ui.md §7.2): a
+   rounded card of featured sarees carrying small facts in its corners and
+   the trust facts as pills, then the promise set very large beneath it.
+   The photograph itself never moves, scales or takes a tint. */
 .home-hero {
-  padding-inline: var(--space-4);
-  padding-block: var(--space-6) var(--space-7);
-  background: var(--lun-ground);
+  padding: var(--space-3) var(--space-3) var(--space-7);
+  background: var(--lun-surface);
 }
 @media (min-width: 768px) {
   .home-hero {
-    padding-inline: var(--space-6);
-    padding-block: var(--space-7) var(--space-9);
+    padding: var(--space-4) var(--space-6) var(--space-8);
   }
 }
 .home-hero-inner {
-  max-width: 1320px;
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-}
-.home-hero-top {
-  display: grid;
   gap: var(--space-5);
-}
-@media (min-width: 1024px) {
-  .home-hero-top {
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    align-items: end;
-    gap: var(--space-8);
-  }
-}
-.home-hero-headline {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  font: var(--type-display-hero) var(--font-display);
-  font-weight: var(--type-display-xl-weight);
-  color: var(--lun-plum);
-}
-.home-hero-headline:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-display-hero-tracking);
-}
-/* Sinhala and Tamil words run longer and need room above and below the line. */
-.home-hero-headline:not(:lang(en)) {
-  font-size: clamp(2rem, 1rem + 4.5vw, 4.5rem);
-  line-height: 1.35;
-}
-@media (min-width: 768px) {
-  .home-hero-line-1 {
-    padding-inline-start: 0.9em;
-  }
-}
-/* A line rises out of its own mask. The small bottom padding keeps descenders. */
-.hero-mask {
-  display: block;
-  overflow: hidden;
-  padding-block-end: 0.08em;
-}
-.hero-rise {
-  display: block;
-  animation: hero-rise var(--motion-reveal) both;
-}
-.home-hero-line-2 .hero-rise {
-  animation-delay: var(--motion-reveal-delay);
-}
-.home-hero-aside {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-4);
-  animation: hero-fade var(--motion-reveal) both;
-  animation-delay: calc(var(--motion-reveal-delay) * 2);
-}
-.home-hero-subhead {
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink);
-  max-width: 40ch;
-}
-.home-hero-doors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  width: 100%;
+  max-width: 1760px;
+  margin-inline: auto;
 }
 
-/* Showcase. Stacked slides; the active one wipes in over the one leaving. */
-.hero-showcase-frame {
+/* The card. */
+.hero-card-frame {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--radius-m);
-  background: var(--lun-surface);
+  border-radius: var(--radius-l);
+  background: var(--lun-plum-deep);
   touch-action: pan-y;
 }
 @media (min-width: 768px) {
-  .hero-showcase-frame {
+  .hero-card-frame {
     aspect-ratio: 16 / 9;
+  }
+}
+@media (min-width: 1280px) {
+  .hero-card-frame {
+    aspect-ratio: 5 / 2;
   }
 }
 .hero-slide {
@@ -1966,116 +2145,293 @@ body {
 .hero-slide-image {
   object-fit: cover;
 }
-/* Name and link on a solid plate: never an overlay or gradient on the photograph. */
-.hero-slide-plate {
+/* Invisible timer: its animation ending advances the slide. */
+.hero-card-timer {
   position: absolute;
-  inset-inline-start: var(--space-4);
-  inset-block-end: var(--space-4);
-  max-width: calc(100% - var(--space-4) * 2);
+  width: 0;
+  height: 0;
+  animation: hero-timer var(--motion-hero-interval) linear both;
+}
+.hero-card:hover .hero-card-timer,
+.hero-card:focus-within .hero-card-timer {
+  animation-play-state: paused;
+}
+
+/* Words on the card are white with a soft plum halo on the letters only —
+   never an overlay, gradient or tint on the photograph. */
+.hero-card-corner {
+  position: absolute;
+  z-index: 3;
+  top: var(--space-3);
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding: var(--space-4) var(--space-5);
-  border-radius: var(--radius-m);
-  background: var(--lun-surface);
+  align-items: center;
+  gap: var(--space-2);
+}
+.hero-card-top-start {
+  inset-inline-start: var(--space-3);
+  max-width: calc(100% - var(--space-3) * 2);
+}
+.hero-card-top-end {
+  inset-inline-end: var(--space-5);
+  display: none;
 }
 @media (min-width: 768px) {
-  .hero-slide-plate {
-    inset-inline-start: var(--space-6);
-    inset-block-end: var(--space-6);
+  .hero-card-corner {
+    top: var(--space-4);
+  }
+  .hero-card-top-start {
+    inset-inline-start: var(--space-5);
+    max-width: 60%;
+  }
+  .hero-card-top-end {
+    display: flex;
   }
 }
-.hero-slide-title {
-  display: block;
-  font: var(--type-display-l) var(--font-display);
-  color: var(--lun-plum);
-}
-.hero-slide.is-active .hero-slide-title {
-  animation: hero-rise var(--motion-reveal) both;
-  animation-delay: var(--motion-reveal-delay);
-}
-.hero-slide-link {
+.hero-card-meta,
+.hero-card-count {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-3);
   min-height: 44px;
-  font: var(--type-body-s) var(--font-body);
-  color: var(--lun-ink);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  font-variant-numeric: tabular-nums;
+  color: var(--lun-surface);
   text-decoration: none;
+  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
 }
-.hero-slide-arrow {
+.hero-card-meta:lang(en),
+.hero-card-count:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: var(--type-label-tracking);
+}
+/* Phones: the top right stays clear (WhatsApp floats at the bottom instead). */
+@media (max-width: 767px) {
+  .hero-card-top-end.hero-card-meta {
+    display: none;
+  }
+}
+.hero-card-pause {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--lun-surface) 45%, transparent);
+  border-radius: var(--radius-full);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  cursor: pointer;
+}
+
+/* Vertical "scroll" cue on the right, its line carrying a moving light. */
+.hero-card-scroll {
+  position: absolute;
+  z-index: 3;
+  inset-inline-end: var(--space-5);
+  top: 50%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--lun-surface);
+  text-decoration: none;
+  transform: translateY(-50%);
+}
+@media (min-width: 768px) {
+  .hero-card-scroll {
+    display: flex;
+  }
+}
+.hero-card-scroll-line {
+  position: relative;
+  width: 1px;
+  height: var(--space-8);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--lun-surface) 45%, transparent);
+}
+.hero-card-scroll-line::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 40%;
+  background: var(--lun-surface);
+  animation: hero-scroll-cue var(--motion-pulse-duration) ease-in-out infinite;
+}
+.hero-card-scroll-text {
+  writing-mode: vertical-rl;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
+}
+.hero-card-scroll-text:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: var(--type-label-tracking);
+}
+
+/* Facts as pills, bottom left. Solid plum, so they read on any photograph. */
+.hero-card-pills {
+  position: absolute;
+  z-index: 3;
+  inset-inline-start: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-width: calc(100% - var(--space-3) * 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .hero-card-pills {
+    inset-inline-start: var(--space-5);
+    bottom: var(--space-5);
+    max-width: 55%;
+  }
+}
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  padding-inline: var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--lun-surface) 40%, transparent);
+  border-radius: var(--radius-full);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: background-color var(--motion-standard);
+}
+.hero-pill:hover {
+  background: var(--lun-plum);
+}
+
+/* Real review proof, bottom right. */
+.hero-card-proof {
+  position: absolute;
+  z-index: 3;
+  inset-inline-end: var(--space-5);
+  bottom: var(--space-5);
+  display: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+  max-width: 24ch;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-surface);
+  text-align: end;
+  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
+}
+@media (min-width: 1024px) {
+  .hero-card-proof {
+    display: flex;
+  }
+}
+.hero-card-avatars {
+  display: flex;
+  padding-inline-start: var(--space-2);
+}
+.hero-card-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: var(--space-6);
   height: var(--space-6);
-  border: 1px solid var(--lun-plum);
+  margin-inline-start: calc(var(--space-2) * -1);
+  border: 2px solid var(--lun-surface);
   border-radius: var(--radius-full);
-  color: var(--lun-plum);
-  transition:
-    transform var(--motion-standard),
-    background-color var(--motion-standard),
-    color var(--motion-standard);
-}
-.hero-slide-link:hover .hero-slide-arrow,
-.hero-slide-link:focus-visible .hero-slide-arrow {
-  background: var(--lun-plum);
-  color: var(--lun-surface);
-  transform: translateX(var(--space-1));
-}
-.hero-showcase-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-top: var(--space-3);
-}
-.hero-showcase-count {
+  background: var(--lun-plum-light);
   font: var(--type-label) var(--font-body);
   font-weight: var(--type-label-weight);
-  font-variant-numeric: tabular-nums;
-  color: var(--lun-ink);
+  text-shadow: none;
 }
-.hero-showcase-progress {
-  position: relative;
-  flex: 1;
-  height: 1px;
-  overflow: hidden;
-  background: var(--lun-line);
+.hero-card-avatar:nth-child(even) {
+  background: var(--lun-gold-deep);
 }
-/* Gold as a rule, never as text. Its animation ending advances the slide. */
-.hero-showcase-progress-bar {
-  position: absolute;
-  inset: 0;
-  background: var(--lun-gold);
-  transform-origin: left;
-  animation: hero-progress var(--motion-hero-interval) linear both;
+/* Card words arrive after the headline begins, one after another. */
+.hero-card-in {
+  animation: hero-fade var(--motion-reveal) both;
+  animation-delay: calc(var(--motion-reveal-delay) * (1.5 + var(--i, 0) * 0.25));
 }
-.hero-showcase:hover .hero-showcase-progress-bar,
-.hero-showcase:focus-within .hero-showcase-progress-bar {
-  animation-play-state: paused;
+
+/* The promise, very large, each word arriving out of a blur. */
+.home-hero-headline {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.25em;
+  margin: 0;
+  font: var(--type-display-hero) var(--font-display);
+  font-size: clamp(2.5rem, 9.4vw, 12rem);
+  line-height: 1.05;
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  color: var(--lun-plum);
+  text-align: center;
 }
-.hero-showcase-button {
+.home-hero-headline:not(:lang(en)) {
+  font-size: clamp(2rem, 5vw, 6rem);
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+.home-hero-word {
+  display: inline-block;
+  animation: hero-blur-up var(--motion-reveal) both;
+  animation-delay: calc(var(--motion-reveal-delay) * 0.5 + var(--i) * var(--motion-stagger));
+}
+.home-hero-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-block-end: var(--space-6);
+  border-bottom: 1px solid var(--lun-line);
+  animation: hero-fade var(--motion-reveal) both;
+  animation-delay: calc(var(--motion-reveal-delay) * 2);
+}
+@media (min-width: 768px) {
+  .home-hero-foot {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+}
+.home-hero-subhead {
+  margin: 0;
+  max-width: 60ch;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.home-hero-doors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+}
+.home-hero-door {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--lun-line);
-  border-radius: var(--radius-full);
-  background: var(--lun-surface);
+  gap: var(--space-1);
+  min-height: 44px;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.home-hero-door:hover {
   color: var(--lun-plum);
-  cursor: pointer;
-  transition: border-color var(--motion-quick);
 }
-.hero-showcase-button:hover {
-  border-color: var(--lun-plum);
-}
-@keyframes hero-rise {
+@keyframes hero-timer {
   from {
-    transform: translateY(105%);
+    opacity: 0;
   }
   to {
-    transform: none;
+    opacity: 1;
   }
 }
 @keyframes hero-fade {
@@ -2088,12 +2444,29 @@ body {
     transform: none;
   }
 }
-@keyframes hero-progress {
+@keyframes hero-blur-up {
   from {
-    transform: scaleX(0);
+    opacity: 0;
+    transform: translateY(0.3em);
+    filter: blur(var(--space-2));
   }
   to {
-    transform: scaleX(1);
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes hero-scroll-cue {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(250%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-card-scroll-line::after {
+    animation: none;
   }
 }
 
@@ -2392,7 +2765,7 @@ body {
   overflow: hidden;
   border: 1px solid var(--lun-line);
   border-radius: var(--radius-s);
-  background: var(--lun-ground);
+  background: var(--lun-surface);
 }
 .ops-photo img {
   object-fit: cover;
@@ -2446,7 +2819,7 @@ body {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: var(--radius-s);
-  background: var(--lun-ground);
+  background: var(--lun-surface);
 }
 .review-photo img {
   object-fit: cover;
@@ -2556,7 +2929,7 @@ body {
   aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: var(--radius-s);
-  background: var(--lun-ground);
+  background: var(--lun-surface);
 }
 .ops-thumb img {
   object-fit: cover;

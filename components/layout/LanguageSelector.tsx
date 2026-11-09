@@ -4,6 +4,7 @@ import { useLocale } from 'next-intl';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { routing } from '@/i18n/routing';
 import { cn } from '@/lib/utils';
+import { FEATURES } from '@/lib/features';
 
 export interface LanguageSelectorProps {
   /** Each locale's OWN name, e.g. { en: 'English', si: 'සිංහල', ta: 'தமிழ்' }. */
@@ -22,6 +23,9 @@ export function LanguageSelector({ labels, className }: LanguageSelectorProps) {
   const pathname = usePathname();
   const router = useRouter();
   const activeLocale = useLocale();
+
+  // Hidden while the site is English-only for now (lib/features.ts).
+  if (!FEATURES.languageSelector) return null;
 
   return (
     <div className={cn('language-selector', className)} role="group" aria-label="Language">

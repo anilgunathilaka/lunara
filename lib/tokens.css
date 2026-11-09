@@ -107,6 +107,8 @@
   --radius-none: 0;
   --radius-s: 2px;
   --radius-m: 4px;
+  /* Home hero card only (docs/2-ui.md §7.2). */
+  --radius-l: 16px;
   --radius-full: 999px;
 
   /* ---------------------------------------------------------------- */
@@ -129,7 +131,14 @@
   /* Home hero and header entrance only (docs/2-ui.md §7.2). */
   --motion-reveal: 1150ms cubic-bezier(0.58, 0, 0.28, 0.99);
   --motion-reveal-delay: 400ms;
+  --motion-stagger: 80ms;
   --motion-hero-interval: 7000ms;
+  /* Header (docs/2-ui.md §7.2): menu panels fade, the strip slides. */
+  --motion-menu-ease: cubic-bezier(0.33, 0, 0, 1);
+  --motion-menu-duration: 300ms;
+  --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
+  --motion-header: 500ms var(--motion-menu-ease);
+  --motion-announcement-interval: 5000ms;
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
@@ -160,6 +169,7 @@
      without switching to the all-caps --type-label treatment — a form
      field label, JacketBlock's "ships unstitched" notice (which must
      never render as fine print per docs/3-components.md §3.5). */
+  --weight-medium: 500;
   --weight-semibold: 600;
 
   /* SwatchChip visual sizes — docs/3-components.md §3.1 ('sm' 32px | 'md'
@@ -199,5 +209,8 @@
     --motion-page: 0ms;
     --motion-reveal: 0ms;
     --motion-reveal-delay: 0ms;
+    --motion-stagger: 0ms;
+    --motion-menu-duration: 0ms;
+    --motion-header: 0ms;
   }
 }
