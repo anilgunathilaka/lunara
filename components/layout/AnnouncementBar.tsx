@@ -1,69 +1,78 @@
 'use client';
 
-import { Fragment, useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { Icon } from '@/components/primitives/Icon';
+import { Link } from '@/i18n/navigation';
+import { cn } from '@/lib/utils';
+
+export interface AnnouncementItem {
+  label: string;
+  /** Where the fact is explained. */
+  href: string;
+}
 
 export interface AnnouncementBarProps {
-  /** Short facts, run end to end. */
-  items: string[];
+  items: AnnouncementItem[];
   labels: { region: string; pause: string; play: string };
 }
 
-/** Each copy repeats the facts so one copy is wider than the widest screen. */
-const REPEATS = 3;
-
 /**
- * The utility bar above the header (docs/2-ui.md §7.2): the facts run
- * continuously from right to left, separated by the Lunara emblem. Two
- * identical copies sit side by side and the pair slides by exactly one copy
- * per --motion-marquee, so the loop never shows a seam.
+ * The utility bar above the header (docs/2-ui.md §7.2; founder decision
+ * 2026-11-09, after killstar.com): one fact at a time, centred in light
+ * white type on --lun-plum-deep, each a link to where it is explained. The
+ * facts cross-fade (--motion-announcement-fade) every
+ * --motion-announcement-interval and loop. The timer is a CSS animation on
+ * an invisible element, so both durations live in tokens, not in code.
  *
- * The whole bar is one button that pauses and resumes it (WCAG 2.2.2); it
- * also waits while the pointer is over it. Screen readers get the facts
- * once, as a plain list, not the moving copies. Under
- * prefers-reduced-motion it stands still.
+ * It waits while the pointer is over it or anything in it has focus; a
+ * quiet pause button at the right edge stops it for good (WCAG 2.2.2).
+ * Under prefers-reduced-motion it never moves on its own.
  */
 export function AnnouncementBar({ items, labels }: AnnouncementBarProps) {
+  const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  if (items.length === 0) return null;
-
-  const copy = (key: number) => (
-    <span key={key} className="site-announcement-copy">
-      {Array.from({ length: REPEATS }, (_, r) =>
-        items.map((item, i) => (
-          <Fragment key={`${r}-${i}`}>
-            <span className="site-announcement-text">{item}</span>
-            <Image src="/brand/lunara-emblem.webp" alt="" width={128} height={128} className="site-announcement-mark" unoptimized />
-          </Fragment>
-        )),
-      )}
-    </span>
-  );
+  const count = items.length;
+  if (count === 0) return null;
 
   return (
-    <div className="site-announcement" role="region" aria-label={labels.region}>
-      <ul className="sr-only">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
+    <div className="site-announcement" role="region" aria-roledescription="carousel" aria-label={labels.region}>
+      <div className="site-announcement-slides">
+        {items.map((item, i) => (
+          <div
+            key={item.label}
+            className={cn('site-announcement-slide', i === index && 'is-active')}
+            aria-hidden={i !== index}
+            inert={i !== index}
+          >
+            <Link href={item.href} className="site-announcement-link focus-ring">
+              {item.label}
+            </Link>
+          </div>
         ))}
-      </ul>
-      <button
-        type="button"
-        className="site-announcement-toggle focus-ring"
-        aria-pressed={paused}
-        aria-label={paused ? labels.play : labels.pause}
-        onClick={() => setPaused((p) => !p)}
-      >
-        <span className={paused ? 'site-announcement-track is-paused' : 'site-announcement-track'} aria-hidden="true">
-          {copy(0)}
-          {copy(1)}
-        </span>
-        <span className="site-announcement-state" aria-hidden="true">
-          <Icon icon={paused ? Play : Pause} size="inline" />
-        </span>
-      </button>
+      </div>
+
+      {count > 1 && (
+        <>
+          <button
+            type="button"
+            className="site-announcement-state focus-ring"
+            aria-pressed={paused}
+            aria-label={paused ? labels.play : labels.pause}
+            onClick={() => setPaused((p) => !p)}
+          >
+            <Icon icon={paused ? Play : Pause} size="inline" />
+          </button>
+          {!paused && (
+            <span
+              key={index}
+              className="site-announcement-timer"
+              aria-hidden="true"
+              onAnimationEnd={() => setIndex((i) => (i + 1) % count)}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

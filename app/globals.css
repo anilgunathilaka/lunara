@@ -1120,85 +1120,95 @@ body {
 }
 
 /*
- * Utility bar (founder decision 2026-11-09, after tillysveaas.co.uk): the
- * facts run without end from right to left in small capitals, the emblem
- * between them. It scrolls away with the page; the header below it stays.
+ * Utility bar (founder decision 2026-11-09, after killstar.com): one fact at
+ * a time, centred, light white type on --lun-plum-deep; the facts
+ * cross-fade in turn. It scrolls away with the page; the header stays.
  */
 .site-announcement {
-  overflow: hidden;
-  background: var(--lun-surface);
-  color: var(--lun-plum-deep);
-}
-.site-announcement-toggle {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
+  /* 44px: the height the header group sticks above the top edge, and a full touch target. */
+  min-height: 44px;
+  padding-inline: calc(44px + var(--space-2));
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+/* Every fact sits in the same place; only the active one is seen. */
+.site-announcement-slides {
+  display: grid;
   width: 100%;
-  /* The whole bar is the pause button: a 44px-tall target (docs/3-components.md §7.1). */
+}
+.site-announcement-slide {
+  grid-area: 1 / 1;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--motion-announcement-fade);
+}
+.site-announcement-slide.is-active {
+  opacity: 1;
+}
+.site-announcement-link {
+  display: inline-flex;
+  align-items: center;
   min-height: 44px;
   overflow: hidden;
-  color: inherit;
-  cursor: pointer;
-}
-.site-announcement-track {
-  display: flex;
-  width: max-content;
-  animation: marquee var(--motion-marquee) linear infinite;
-}
-.site-announcement-toggle:hover .site-announcement-track,
-.site-announcement-track.is-paused {
-  animation-play-state: paused;
-}
-.site-announcement-copy {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-.site-announcement-text {
-  padding-inline: var(--space-3);
-  font: var(--type-body-s) var(--font-body);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
+  /* 15px, light, as in the reference. */
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-light);
+  color: var(--lun-surface);
+  text-align: center;
+  text-decoration: none;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
-.site-announcement-text:lang(si),
-.site-announcement-text:lang(ta) {
-  letter-spacing: normal;
-  text-transform: none;
+.site-announcement-link:hover {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
 }
-/* The emblem between facts: gold as an accent, never as text. */
-.site-announcement-mark {
-  flex-shrink: 0;
-  width: var(--space-4);
-  height: var(--space-4);
-  margin-inline: var(--space-3);
+.site-announcement-link:not(:lang(en)) {
+  font-weight: var(--type-body-s-weight);
 }
-/* Pause / play, quiet at the right edge, on a white ground so the words pass beneath it. */
+/* Pause / play: quiet, at the right edge. */
 .site-announcement-state {
   position: absolute;
   inset-block: 0;
-  inset-inline-end: 0;
-  display: flex;
+  inset-inline-end: var(--space-2);
+  display: inline-flex;
   align-items: center;
-  padding-inline: var(--space-3);
-  background: var(--lun-surface);
-  opacity: 0.6;
+  justify-content: center;
+  min-width: 44px;
+  color: var(--lun-surface);
+  opacity: 0.5;
   transition: opacity var(--motion-standard);
 }
-.site-announcement-toggle:hover .site-announcement-state,
-.site-announcement-toggle:focus-visible .site-announcement-state {
+.site-announcement-state:hover,
+.site-announcement-state:focus-visible {
   opacity: 1;
 }
-@keyframes marquee {
+/* The timer: an invisible element whose animation ending moves to the next fact. */
+.site-announcement-timer {
+  position: absolute;
+  width: 0;
+  height: 0;
+  animation: announcement-timer var(--motion-announcement-interval) linear;
+}
+.site-announcement:hover .site-announcement-timer,
+.site-announcement:focus-within .site-announcement-timer {
+  animation-play-state: paused;
+}
+@keyframes announcement-timer {
   from {
-    transform: translateX(0);
+    opacity: 0;
   }
   to {
-    transform: translateX(-50%);
+    opacity: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-announcement-track {
+  .site-announcement-timer {
     animation: none;
   }
 }

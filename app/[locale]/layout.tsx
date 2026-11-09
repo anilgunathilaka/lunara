@@ -126,7 +126,12 @@ export default async function LocaleLayout({
     },
   };
   const announcement = {
-    items: [tJacket('shipsUnstitched'), tTrust('dispatch'), tTrust('returns'), tTrust('colourPromise')],
+    items: [
+      { label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+      { label: tTrust('dispatch'), href: '/support/shipping' },
+      { label: tTrust('returns'), href: '/support/returns' },
+      { label: tTrust('colourPromise'), href: '/support/care-guide' },
+    ],
     labels: { region: tAnnouncement('region'), pause: tAnnouncement('pause'), play: tAnnouncement('play') },
   };
 

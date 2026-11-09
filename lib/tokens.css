@@ -144,8 +144,9 @@
   --motion-menu-duration: 300ms;
   --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
   --motion-header: 500ms var(--motion-menu-ease);
-  /* One full loop of the utility bar marquee (§7.2). */
-  --motion-marquee: 64s;
+  /* Utility bar (§7.2, after killstar.com): each fact stays, then cross-fades to the next. */
+  --motion-announcement-interval: 3000ms;
+  --motion-announcement-fade: 700ms ease;
   /* Header menu panel (§7.2, after bedrock-one-nu.vercel.app): it drops in;
      each entry's words rise in as it becomes active. */
   --motion-panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -229,6 +230,7 @@
     --motion-header: 0ms;
     --motion-section: 0ms;
     --motion-panel: 0ms;
+    --motion-announcement-fade: 0ms;
     --motion-pane: 0ms;
   }
 }
