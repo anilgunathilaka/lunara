@@ -2176,20 +2176,26 @@ body {
    rounded card of featured sarees carrying small facts in its corners and
    the trust facts as pills, then the promise set very large beneath it.
    The photograph itself never moves, scales or takes a tint. */
+/* The card runs the full width of the page, edge to edge (founder decision
+   2026-11-09); the headline and the line beneath keep the page edges. */
 .home-hero {
-  padding: var(--space-3) var(--space-3) var(--space-7);
+  --hero-edge: var(--space-3);
+  padding-bottom: var(--space-7);
   background: var(--lun-surface);
 }
 @media (min-width: 768px) {
   .home-hero {
-    padding: var(--space-4) var(--space-6) var(--space-8);
+    --hero-edge: var(--space-6);
+    padding-bottom: var(--space-8);
   }
 }
 .home-hero-inner {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  max-width: 1760px;
+}
+.home-hero-inner > :not(.hero-card) {
+  width: min(100% - 2 * var(--hero-edge), 1760px);
   margin-inline: auto;
 }
 
@@ -2198,7 +2204,6 @@ body {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--radius-l);
   background: var(--lun-plum-deep);
   touch-action: pan-y;
 }
