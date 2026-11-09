@@ -47,6 +47,10 @@ export default async function OpsStockPage({
           <dd>{totals.soldOnline}</dd>
         </div>
         <div>
+          <dt>{tInv('soldOffice')}</dt>
+          <dd>{totals.soldOffice}</dd>
+        </div>
+        <div>
           <dt>{tInv('valueAtCost')}</dt>
           <dd>{formatPriceLKR(totals.costValue)}</dd>
         </div>
@@ -71,6 +75,7 @@ export default async function OpsStockPage({
               <th scope="col">{tCol('item')}</th>
               <th scope="col">{tCol('inStock')}</th>
               <th scope="col">{tInv('soldOnline')}</th>
+              <th scope="col">{tInv('soldOffice')}</th>
               <th scope="col">{tInv('valueAtCost')}</th>
               <th scope="col">{tInv('valueAtPrice')}</th>
               <th scope="col">{tStock('adjust')}</th>
@@ -95,6 +100,7 @@ export default async function OpsStockPage({
                   {row.state === 'out' ? ` · ${tLevel('outOfStock')}` : row.state === 'low' ? ` · ${tLevel('lowStock')}` : ''}
                 </td>
                 <td>{row.soldOnline}</td>
+                <td>{row.soldOffice}</td>
                 <td>{row.costValue === null ? <span className="ops-status-low">{tInv('noCost')}</span> : formatPriceLKR(row.costValue)}</td>
                 <td>{formatPriceLKR(row.priceValue)}</td>
                 <td>

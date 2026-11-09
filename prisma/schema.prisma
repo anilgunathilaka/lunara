@@ -297,6 +297,124 @@ model StockMovement {
   @@map("stock_movement")
 }
 
+// ── Office sales (docs/4-architecture.md §3.13) ─────────────────────────────
+
+enum OfficeSaleStatus {
+  active
+  cancelled
+}
+
+enum OfficePaymentMethod {
+  cash
+  bank_transfer
+  card
+  other
+}
+
+/// A customer who buys in the office. Found again by phone.
+model OfficeCustomer {
+  id        String   @id @default(cuid())
+  name      String
+  /// Normalised Sri Lankan mobile, +947XXXXXXXX.
+  phone     String   @unique
+  address   String?
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sales OfficeSale[]
+
+  @@map("office_customer")
+}
+
+/// A sale made in the office, paid in one or more instalments. Prices come
+/// from the same resolver as the shop; any discount carries its reason.
+/// Paid and outstanding are always derived from payments, never stored.
+model OfficeSale {
+  id             String           @id @default(cuid())
+  number         String           @unique
+  customerId     String
+  status         OfficeSaleStatus @default(active)
+  soldOn         DateTime         @db.Date
+  subtotal       Int
+  discount       Int              @default(0)
+  discountReason String?
+  total          Int
+  note           String?
+  soldBy         String
+  cancelledAt    DateTime?
+  cancelledBy    String?
+  cancelReason   String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  customer    OfficeCustomer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  lines       OfficeSaleLine[]
+  instalments OfficeInstalment[]
+  payments    OfficePayment[]
+
+  @@index([status, soldOn])
+  @@index([customerId])
+  @@map("office_sale")
+}
+
+/// Snapshot of what was sold, kept even if the catalogue changes.
+model OfficeSaleLine {
+  id                String        @id @default(cuid())
+  saleId            String
+  kind              OrderLineKind
+  listingId         String?
+  jacketColourwayId String
+  sareeSku          String?
+  jacketSku         String
+  title             String
+  unitPrice         Int
+  quantity          Int
+
+  sale OfficeSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@map("office_sale_line")
+}
+
+/// One planned payment: how much, by when. Whether it is paid is derived by
+/// applying payments to instalments in order.
+model OfficeInstalment {
+  id      String   @id @default(cuid())
+  saleId  String
+  seq     Int
+  dueDate DateTime @db.Date
+  amount  Int
+
+  sale OfficeSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@unique([saleId, seq])
+  @@index([dueDate])
+  @@map("office_instalment")
+}
+
+/// Money received. Never deleted: a mistaken entry is voided with a reason.
+model OfficePayment {
+  id         String              @id @default(cuid())
+  saleId     String
+  amount     Int
+  method     OfficePaymentMethod
+  paidOn     DateTime            @db.Date
+  reference  String?
+  note       String?
+  receivedBy String
+  voidedAt   DateTime?
+  voidedBy   String?
+  voidReason String?
+  createdAt  DateTime            @default(now())
+
+  sale OfficeSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([saleId])
+  @@index([paidOn])
+  @@map("office_payment")
+}
+
 /// A pairing chosen by Lunara. Holds no stock and no price of its own:
 /// both resolve through its colourways (§3.1).
 model CuratedListing {

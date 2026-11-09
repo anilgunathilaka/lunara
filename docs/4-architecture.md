@@ -348,6 +348,17 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Opening balance | The ledger started on 2026-11-09 with one `opening` movement per SKU recording the quantity then held. Earlier changes remain in audit_log. The dev seed writes stock directly and is not a ledger source. |
 | Sold online | Counted from order lines of every order not cancelled — the orders are the record of a sale; the ledger explains stock, not revenue. |
 
+3.13 Office sales and instalments (`/[locale]/ops/office`)
+
+| Rule | Detail |
+| --- | --- |
+| What is recorded | `office_customer` (name, normalised mobile — unique, so a returning customer is found again — address, note); `office_sale` (number `OFF-XXXXXX`, date, subtotal, discount + reason, total, who sold it); `office_sale_line` (snapshot of each item at the price charged); `office_instalment` (1–3 planned payments: due date, amount); `office_payment` (amount, date, method, reference, who received it). RLS on all, no policies. |
+| Price: shop price + attributed discount | Items are chosen from live shop products and jackets sold alone; the server prices them with the shop's own `buildQuote`, so the office can never quote a different price for the same item (CLAUDE.md). A discount (founder decision 2026-11-09) needs a reason, can't exceed the shop price, and is shown beside the price on the sale. Database CHECKs enforce `total = subtotal − discount` and the reason. |
+| Plan with due dates | 1–3 instalments. Due dates start on or after the sale date and run in order. Amounts are either all given and sum exactly to the total, or all blank and split evenly (remainder on the first). The plan can be changed later under the same rules; audited with before and after. |
+| Paid and outstanding are derived | Never stored. Paid = sum of payments not voided; outstanding = total − paid. Payments are applied to instalments in order (`lib/office/plan.ts`), giving each one paid / part paid / due / overdue against today's date in Sri Lanka. A payment above what is owed is refused (the sale row is locked while checking). A mistaken payment is voided with a reason, never deleted. |
+| Stock | Selling takes stock from the same `stock_item` the shop reads, through the ledger (`office_sale`, reference = sale number); a shortfall rolls the whole sale back. Cancelling (reason + explicit confirmation) returns it (`office_return`) and keeps payments on record so the refund owed is visible. The Inventory page shows units sold in the office beside units sold online. |
+| Lists | Office sales filter by still owed / overdue / fully paid / cancelled / all, with totals still owed, overdue and due in the next 7 days. Each customer page shows their sales, paid and outstanding. |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline
