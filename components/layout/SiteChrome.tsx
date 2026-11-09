@@ -15,7 +15,7 @@ import { FEATURES } from '@/lib/features';
 
 export interface SiteChromeProps {
   languageLabels: LanguageSelectorProps['labels'];
-  navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'cart' | 'menu', string>;
+  navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'account' | 'cart' | 'menu', string>;
   closeLabel: string;
   whatsappHref: string;
   whatsappLabel: string;
@@ -71,6 +71,7 @@ function SiteChromeInner({
         designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
         jacketMaterial={{ href: '/jacket-material', label: navLabels.jacketMaterial }}
         support={{ href: '/support', label: navLabels.support }}
+        account={{ href: '/account/start', label: navLabels.account }}
         cartHref="/cart"
         cartLabel={navLabels.cart}
         cartCount={itemCount}

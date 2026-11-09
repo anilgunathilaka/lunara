@@ -59,6 +59,7 @@ export default async function LocaleLayout({
               designYourOwn: tNav('designYourOwn'),
               jacketMaterial: tNav('jacketMaterial'),
               support: tNav('support'),
+              account: tNav('account'),
               cart: tNav('cart'),
               menu: tNav('menu'),
             }}
@@ -71,7 +72,7 @@ export default async function LocaleLayout({
               { href: '/support/care-guide', label: tFooter('careGuide') },
               { href: '/support/shipping', label: tFooter('shipping') },
               // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
-              { href: '/account', label: tFooter('myOrders') },
+              { href: '/account/start', label: tFooter('myOrders') },
             ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },

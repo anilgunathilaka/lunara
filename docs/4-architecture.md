@@ -275,7 +275,7 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 
 | Rule | Detail |
 | --- | --- |
-| Optional, after purchase | Guest checkout stays the only required path (PRD FR-33). The account is offered on the order page once the order exists, with the order's email pre-filled; sign-in is the same passwordless 6-digit code. A "My orders" link sits in the footer, not the five-item header. |
+| Optional, after purchase | Guest checkout stays the only required path (PRD FR-33). The account is offered on the order page once the order exists, with the order's email pre-filled; sign-in is the same passwordless 6-digit code. A "My orders" link sits in the footer, and a person icon sits beside the cart in the header (docs/1-ux.md, founder decision 2026-11-09). Both go to `/[locale]/account/start`, which sends staff to `/ops`, customers to `/account`, and anyone signed out to sign-in and back; a plain sign-in with no return path lands there too. |
 | Which orders an account sees | Orders linked to it (`order.userId`), plus orders nobody has linked that carry the account's verified email. Once an order is linked to one account it never appears in another. |
 | Linking | Orders placed while signed in are linked at placement. A guest order is linked by "claiming" it: the claim must present the order's access token, the same proof that opens the guest order page, and only an unlinked order can be claimed. |
 | Tracking | Progress (placed → confirmed → packed → with the courier → delivered) is derived from ORDER_EVENT, never stored twice. Courier and tracking number show once dispatched. The guest order page and the account show the same record from one component, so they cannot disagree. |

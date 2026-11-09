@@ -120,6 +120,7 @@ HOME
 | Rule | Specification |
 | --- | --- |
 | Primary navigation | Five items maximum: Shop, Design Your Own, Jacket Material, Support, Cart. On mobile these collapse to a bottom bar of four (Shop, Design, Cart, Menu) plus a persistent WhatsApp affordance. |
+| Account icon | A person icon beside the cart (founder decision 2026-11-09) — an action, not a sixth navigation item. It opens sign-in; once signed in, staff land in the operations panel and customers in Orders & tracking. It never asks anyone to create an account before buying: guest checkout stays the only required path. |
 | Design Your Own placement | MUST sit in primary navigation, visually distinguished from the other items. It is the differentiator; burying it in a submenu wastes the entire Phase 2 investment. |
 | Cart persistence | Cart contents survive across sessions on the same device for at least 30 days. A configured design in the cart retains its full selection state. |
 | Language selector | Present in the header on every page. Selection persists across sessions. Never resets on navigation. |

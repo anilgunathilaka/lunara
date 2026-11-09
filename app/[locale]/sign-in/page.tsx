@@ -7,7 +7,8 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 
 /** Only same-site paths: never redirect off-site after sign-in (open-redirect guard). */
 function safeNext(value: string | string[] | undefined, locale: string): string {
-  const fallback = `/${locale}`;
+  // Plain sign-in: staff → operations, customers → their orders (account/start).
+  const fallback = `/${locale}/account/start`;
   if (typeof value !== 'string') return fallback;
   if (!value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
   return value;
