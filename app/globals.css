@@ -1091,6 +1091,10 @@ body {
   padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
   background: var(--lun-surface);
+  /* Sticky: the menu stays at the top while the page scrolls (founder decision 2026-11-09). */
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
 .site-header-nav {
   align-items: center;
@@ -1157,46 +1161,6 @@ body {
   .site-header .wordmark-logo {
     height: calc(var(--space-6) + var(--space-2));
   }
-}
-/* Once the header has scrolled away, a floating "Menu" pill opens the menu (wide screens). */
-.floating-menu {
-  position: fixed;
-  z-index: 40;
-  top: var(--space-4);
-  inset-inline-end: var(--space-5);
-  display: none;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 44px;
-  padding-inline: var(--space-4);
-  border: 1px solid var(--lun-line);
-  border-radius: var(--radius-full);
-  background: var(--lun-surface);
-  color: var(--lun-ink);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  box-shadow: var(--elev-1);
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(calc(var(--space-2) * -1));
-  transition:
-    opacity var(--motion-standard),
-    transform var(--motion-standard);
-}
-.floating-menu:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
-}
-@media (min-width: 768px) {
-  .floating-menu {
-    display: inline-flex;
-  }
-}
-.floating-menu.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: none;
 }
 /* Header actions: WhatsApp as an icon (named for screen readers), the
    language choice as quiet text, and "Account" spelled out beside its icon. */
