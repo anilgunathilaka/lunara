@@ -3612,3 +3612,73 @@ body {
     gap: 0;
   }
 }
+
+/*
+ * First view (founder decision 2026-11-10): the utility bar, the header, the
+ * hero banner and the fact tiles beneath it all fit on the first screen.
+ * The bar, the header and the tiles have fixed heights; the banner takes
+ * what is left of the screen (svh: the browser's toolbars already
+ * allowed for), never less than 18rem.
+ */
+:root {
+  --utility-h: 44px;
+  --logo-h: calc(var(--space-6) * 1.2);
+  /* The header is as tall as its tallest item: the logo, or the 44px icons. */
+  --header-h: calc(var(--space-3) * 2 + max(var(--logo-h), 44px) + 1px);
+  --facts-row: 104px;
+  --facts-rows: 2;
+  /* Phones: the fixed bottom bar covers the foot of the screen. */
+  --bottom-bar-h: calc(var(--control-height-lg) + var(--space-2) + env(safe-area-inset-bottom, 0px));
+}
+@media (min-width: 768px) {
+  :root {
+    /* Tablets take the desktop logo size, so the menu fits beside it. */
+    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.2);
+    --bottom-bar-h: 0px;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .site-header {
+    padding-inline: var(--space-4);
+  }
+  .site-header-nav {
+    gap: var(--space-4);
+  }
+}
+.site-header-link {
+  white-space: nowrap;
+}
+@media (min-width: 1024px) {
+  :root {
+    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.2);
+    --facts-rows: 1;
+  }
+}
+.site-header .wordmark-logo {
+  height: var(--logo-h);
+}
+.hero-card-frame {
+  aspect-ratio: auto;
+  height: max(
+    18rem,
+    calc(100svh - var(--utility-h) - var(--header-h) - var(--facts-row) * var(--facts-rows) - var(--bottom-bar-h))
+  );
+}
+.home-fact {
+  height: var(--facts-row);
+  min-height: 0;
+  padding-block: var(--space-3);
+  font-size: clamp(1.125rem, 0.7rem + 1.2vw, 2rem);
+}
+
+/* The phone bottom bar has one known height, used for the first view above
+   and for the space kept free at the end of every page. */
+@media (max-width: 767px) {
+  .mobile-nav {
+    box-sizing: border-box;
+    height: var(--bottom-bar-h);
+  }
+  .site-content {
+    padding-bottom: var(--bottom-bar-h);
+  }
+}
