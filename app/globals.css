@@ -991,6 +991,28 @@ body {
 .wordmark-inverted {
   color: var(--lun-surface);
 }
+/* The logo image (components/brand/Wordmark.tsx). Height sets the size;
+   width follows the artwork's proportions. */
+.wordmark-logo {
+  display: block;
+  height: var(--space-7);
+  width: auto;
+}
+.wordmark-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.wordmark-emblem {
+  display: block;
+  height: var(--space-6);
+  width: auto;
+}
+@media (max-width: 767px) {
+  .wordmark-logo {
+    height: var(--space-6);
+  }
+}
 
 /*
  * LanguageSelector — docs/1-ux.md §1 ("present in the header on every
