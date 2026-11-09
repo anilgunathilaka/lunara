@@ -1,4 +1,4 @@
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, UserRound } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { Wordmark } from '@/components/brand/Wordmark';
@@ -17,6 +17,8 @@ export interface HeaderProps {
   designYourOwn?: HeaderNavItem;
   jacketMaterial: HeaderNavItem;
   support: HeaderNavItem;
+  /** Sign in / My orders; staff land in the operations panel (app/[locale]/account/start). */
+  account?: HeaderNavItem;
   cartHref: string;
   cartLabel: string;
   cartCount: number;
@@ -30,6 +32,7 @@ export function Header({
   designYourOwn,
   jacketMaterial,
   support,
+  account,
   cartHref,
   cartLabel,
   cartCount,
@@ -65,7 +68,12 @@ export function Header({
         {/* On mobile the language selector lives in the MobileNav "Menu" panel
             instead, to keep the compact header down to wordmark + cart. */}
         <LanguageSelector labels={languageLabels} className="hidden md:flex" />
-        <Link href={cartHref} className="site-header-cart" aria-label={cartLabel}>
+        {account && (
+          <Link href={account.href} className="site-header-cart focus-ring" aria-label={account.label}>
+            <Icon icon={UserRound} />
+          </Link>
+        )}
+        <Link href={cartHref} className="site-header-cart focus-ring" aria-label={cartLabel}>
           <Icon icon={ShoppingBag} />
           {cartCount > 0 && <span className="site-header-cart-count">{cartCount}</span>}
         </Link>

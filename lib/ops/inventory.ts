@@ -1,6 +1,7 @@
 import 'server-only';
 import { totalCost } from '@/lib/costing/cost';
 import { getPrisma } from '@/lib/prisma';
+import { soldInOfficeBySku } from './office';
 import { resolveStandaloneJacketPrice } from '@/lib/pricing/resolve';
 import { availabilityOf } from '@/lib/stock/state';
 
@@ -22,6 +23,7 @@ export type InventoryRow = {
   threshold: number;
   state: 'in' | 'low' | 'out';
   soldOnline: number;
+  soldOffice: number;
   unitCost: number | null;
   unitPrice: number;
   costValue: number | null;
@@ -41,9 +43,9 @@ async function soldOnlineBySku(): Promise<Map<string, number>> {
   return new Map(rows.map((r) => [r.sku, Number(r.units)]));
 }
 
-export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: { units: number; soldOnline: number; costValue: number; priceValue: number; missingCost: number } }> {
+export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: { units: number; soldOnline: number; soldOffice: number; costValue: number; priceValue: number; missingCost: number } }> {
   const prisma = getPrisma();
-  const [items, sold] = await Promise.all([
+  const [items, sold, office] = await Promise.all([
     prisma.stockItem.findMany({
       relationLoadStrategy: 'join',
       orderBy: { sku: 'asc' },
@@ -54,6 +56,7 @@ export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: {
       },
     }),
     soldOnlineBySku(),
+    soldInOfficeBySku(),
   ]);
 
   const rows: InventoryRow[] = items.map((item) => {
@@ -73,6 +76,7 @@ export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: {
       threshold: item.threshold,
       state: availabilityOf(item).state,
       soldOnline: sold.get(item.sku) ?? 0,
+      soldOffice: office.get(item.sku) ?? 0,
       unitCost,
       unitPrice,
       costValue: unitCost === null ? null : unitCost * item.quantity,
@@ -86,6 +90,7 @@ export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: {
     totals: {
       units: rows.reduce((n, r) => n + r.quantity, 0),
       soldOnline: rows.reduce((n, r) => n + r.soldOnline, 0),
+      soldOffice: rows.reduce((n, r) => n + r.soldOffice, 0),
       costValue: rows.reduce((n, r) => n + (r.costValue ?? 0), 0),
       priceValue: rows.reduce((n, r) => n + r.priceValue, 0),
       missingCost: rows.filter((r) => r.unitCost === null && r.quantity > 0).length,

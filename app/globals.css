@@ -1090,6 +1090,11 @@ body {
 .site-header-cart {
   position: relative;
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 44×44 touch target (docs/3-components.md §7.1). */
+  min-width: 44px;
+  min-height: 44px;
   color: var(--lun-ink);
 }
 .site-header-cart-count {

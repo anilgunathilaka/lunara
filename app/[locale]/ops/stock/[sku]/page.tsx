@@ -61,6 +61,10 @@ export default async function OpsStockHistoryPage({
           <dd>{row.soldOnline}</dd>
         </div>
         <div>
+          <dt>{tInv('soldOffice')}</dt>
+          <dd>{row.soldOffice}</dd>
+        </div>
+        <div>
           <dt>{tInv('valueAtCost')}</dt>
           <dd>{row.costValue === null ? tInv('noCost') : formatPriceLKR(row.costValue)}</dd>
         </div>
@@ -133,6 +137,10 @@ export default async function OpsStockHistoryPage({
                     <td>
                       {m.reference && (m.kind === 'online_sale' || m.kind === 'online_cancel') ? (
                         <Link href={`/ops/orders/${m.reference}`} className="focus-ring">
+                          {m.reference}
+                        </Link>
+                      ) : m.reference && (m.kind === 'office_sale' || m.kind === 'office_return') ? (
+                        <Link href={`/ops/office/${m.reference}`} className="focus-ring">
                           {m.reference}
                         </Link>
                       ) : (

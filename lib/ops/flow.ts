@@ -10,7 +10,20 @@ import { z } from 'zod';
  * newer ops action files; lib/ops/actions.ts keeps its own copy.
  */
 
-export type OpsErrorCode = 'invalid' | 'conflict' | 'exists' | 'inUse' | 'sold' | 'notFound';
+export type OpsErrorCode =
+  | 'invalid'
+  | 'conflict'
+  | 'exists'
+  | 'inUse'
+  | 'sold'
+  | 'notFound'
+  | 'stock'
+  | 'discount'
+  | 'overpay'
+  | 'phone'
+  | 'phoneTaken'
+  | 'planDates'
+  | 'planMismatch';
 
 export class OpsError extends Error {
   constructor(readonly code: OpsErrorCode) {
