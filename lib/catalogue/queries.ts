@@ -34,10 +34,11 @@ export const listingInclude = {
 
 type ListingRow = Prisma.CuratedListingGetPayload<{ include: typeof listingInclude }>;
 
+/** On sale: the listing, its saree and jacket colourways, design and materials all active (§3.10). */
 export const activeListing = {
   active: true,
-  sareeColourway: { design: { active: true }, material: { active: true } },
-  jacketColourway: { material: { active: true } },
+  sareeColourway: { active: true, design: { active: true }, material: { active: true } },
+  jacketColourway: { active: true, material: { active: true } },
 } satisfies Prisma.CuratedListingWhereInput;
 
 const OPACITY: Record<string, Opacity> = { opaque: 'opaque', semi_sheer: 'semi-sheer', sheer: 'sheer' };
@@ -120,7 +121,7 @@ function toJacket(row: JacketRow): JacketProduct {
   };
 }
 
-export const activeJacket = { material: { active: true } } satisfies Prisma.JacketColourwayWhereInput;
+export const activeJacket = { active: true, material: { active: true } } satisfies Prisma.JacketColourwayWhereInput;
 const jacketOrder = [{ material: { sortOrder: 'asc' } }, { id: 'asc' }] satisfies Prisma.JacketColourwayOrderByWithRelationInput[];
 
 export async function getStandaloneJackets(): Promise<JacketProduct[]> {
@@ -175,7 +176,7 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
     }),
     prisma.sareeColourway.findMany({
       relationLoadStrategy: 'join',
-      where: { design: { active: true }, material: { active: true } },
+      where: { active: true, design: { active: true }, material: { active: true } },
       include: { stock: true },
       orderBy: [{ colourName: 'asc' }],
     }),

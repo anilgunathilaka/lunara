@@ -318,6 +318,17 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Definitions | Delivered revenue: totals of orders that reached the customer and were not refunded. Super Cotton upgrade: Super share of saree units. On-time dispatch: dispatched on the day of confirmation or the next, Colombo time (target above 98%). Photo reviews per 100 delivered orders. Returns by saree colour. COD by district. |
 | Honest gaps | Shown as "not measured yet", with what is missing: configurator funnel and toggle use (needs the live configurator), colour complaints and return reasons (no reason captured), COD refusals (no "refused" outcome after dispatch), WhatsApp response time (outside the system), cost per order (costs not recorded). |
 
+3.10 Product Management (`/[locale]/ops/products`)
+
+| Rule | Detail |
+| --- | --- |
+| What staff manage | Saree products (a curated listing: design, cotton, colour, paired jacket, stock, price) and jacket colours (with a new or existing jacket material). New designs and jacket materials can be created from the same forms. |
+| Price stays single-sourced | The saree price is the PRICE_MATRIX cell for its design × cotton, shared by every colour of that design in that cotton; the form says so. Jacket prices belong to the jacket material. Every price change is audited. |
+| Archive, never lose history | Removing a product archives it (founder decision 2026-11-09): `active = false` on the listing and its saree colourway, which hides it from the shop, Design Your Own and checkout (the quote refuses archived colourways). It can be restored. A jacket colour paired in a live product cannot be archived. |
+| Delete only the never-sold | Permanent delete is offered only when no order line refers to the item, and needs an explicit "can't be undone" confirmation, checked on the server. |
+| Identifiers | Ids and SKUs are generated from names (`SAR-DESIGN-PLN-COLOUR`, `JKT-MATERIAL-COLOUR`), made unique, and never change afterwards; renaming a colour keeps its SKU. |
+| Stock | Created with a starting quantity; changed afterwards only through the Stock page's audited, reasoned adjustments (§3.5). |
+
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
 4. Colour Management Pipeline

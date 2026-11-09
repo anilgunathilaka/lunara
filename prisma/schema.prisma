@@ -168,6 +168,9 @@ model SareeColourway {
   referenceFrameUrl String?
   galleryAssets     String[] @default([])
   sku               String   @unique
+  /// Archived colourways are hidden from the shop, configurator and checkout
+  /// but kept with their history (docs/4-architecture.md §3.10).
+  active            Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
@@ -211,6 +214,8 @@ model JacketColourway {
   swatchUrl      String?
   textureTileUrl String?
   sku            String   @unique
+  /// Archived jacket colours are hidden from sale but kept with their history.
+  active         Boolean  @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

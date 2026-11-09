@@ -98,6 +98,7 @@ async function resolveRefs(db: Db, inputs: QuoteLineInput[]): Promise<Map<string
           relationLoadStrategy: 'join',
           where: {
             OR: configured,
+            active: true,
             design: { active: true },
             material: { active: true },
           },
