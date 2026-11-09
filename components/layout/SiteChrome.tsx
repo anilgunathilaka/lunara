@@ -24,6 +24,8 @@ export interface SiteChromeProps {
   registrationNumber: string;
   address: string;
   phone: string;
+  /** Facts for the strip above the header. */
+  announcement?: string[];
   children: ReactNode;
 }
 
@@ -54,6 +56,7 @@ function SiteChromeInner({
   registrationNumber,
   address,
   phone,
+  announcement,
   children,
 }: SiteChromeProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -78,6 +81,7 @@ function SiteChromeInner({
         whatsappHref={whatsappHref}
         whatsappLabel={whatsappLabel}
         languageLabels={languageLabels}
+        announcement={announcement}
       />
 
       {/* .site-content reserves space at the end of the scroll area for the

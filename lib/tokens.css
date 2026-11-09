@@ -68,6 +68,9 @@
   /* Type detail — weight and tracking per docs/2-ui.md §3.2 */
   --type-display-xl-weight: 400;
   --type-display-xl-tracking: 0.06em;
+  /* Home hero headline only (docs/2-ui.md §7.2): fluid, 44px at 360px up to 104px. */
+  --type-display-hero: clamp(2.75rem, 1.2rem + 6.8vw, 6.5rem)/1;
+  --type-display-hero-tracking: 0.02em;
   --type-display-l-weight: 400;
   --type-display-l-tracking: 0.05em;
   --type-display-m-weight: 400;
@@ -123,6 +126,10 @@
   --motion-page: 320ms ease-out;
   --motion-spin-duration: 800ms;
   --motion-pulse-duration: 1500ms;
+  /* Home hero and header entrance only (docs/2-ui.md §7.2). */
+  --motion-reveal: 1150ms cubic-bezier(0.58, 0, 0.28, 0.99);
+  --motion-reveal-delay: 400ms;
+  --motion-hero-interval: 7000ms;
 
   /* ---------------------------------------------------------------- */
   /* Control metrics — sourced from docs/3-components.md §2.1/§2.2      */
@@ -190,5 +197,7 @@
     --motion-standard: 0ms;
     --motion-preview: 0ms;
     --motion-page: 0ms;
+    --motion-reveal: 0ms;
+    --motion-reveal-delay: 0ms;
   }
 }

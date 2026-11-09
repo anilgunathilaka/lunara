@@ -25,6 +25,8 @@ export interface HeaderProps {
   whatsappHref: string;
   whatsappLabel: string;
   languageLabels: LanguageSelectorProps['labels'];
+  /** Short facts in the strip above the header (docs/2-ui.md §7.2). Phones show the first only. */
+  announcement?: string[];
 }
 
 export function Header({
@@ -39,8 +41,21 @@ export function Header({
   whatsappHref,
   whatsappLabel,
   languageLabels,
+  announcement,
 }: HeaderProps) {
   return (
+    <>
+      {announcement && announcement.length > 0 && (
+        <div className="site-announcement">
+          <ul className="site-announcement-list">
+            {announcement.map((item) => (
+              <li key={item} className="site-announcement-item">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     <header className="site-header">
       <Link href="/" aria-label="Lunara Sarees">
         <Wordmark />
@@ -79,5 +94,6 @@ export function Header({
         </Link>
       </div>
     </header>
+    </>
   );
 }

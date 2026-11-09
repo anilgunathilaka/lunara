@@ -1089,10 +1089,101 @@ body {
   align-items: center;
   gap: var(--space-5);
 }
+/* Announcement strip and header entrance (docs/2-ui.md §7.2). */
+.site-announcement {
+  padding: var(--space-2) var(--space-4);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+  animation: header-in var(--motion-page) both;
+}
+.site-announcement-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  text-align: center;
+}
+.site-announcement-list:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: var(--type-label-tracking);
+}
+.site-announcement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+/* A small gold diamond between facts: an accent on the dark strip, never text. */
+.site-announcement-item + .site-announcement-item::before {
+  content: '';
+  width: var(--space-1);
+  height: var(--space-1);
+  background: var(--lun-gold);
+  transform: rotate(45deg);
+}
+@media (max-width: 767px) {
+  .site-announcement-item:not(:first-child) {
+    display: none;
+  }
+}
+.site-header {
+  animation: header-in var(--motion-page) both;
+}
+@media (min-width: 1024px) {
+  .site-header {
+    padding-block: var(--space-5);
+    padding-inline: var(--space-7);
+  }
+  .site-header-nav {
+    gap: var(--space-6);
+  }
+}
+@keyframes header-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 .site-header-link {
+  position: relative;
+  padding-block: var(--space-2);
   font: var(--type-body-s) var(--font-body);
   color: var(--lun-ink);
   text-decoration: none;
+}
+.site-header-link:lang(en) {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  text-transform: uppercase;
+  letter-spacing: var(--type-label-tracking);
+}
+/* Underline draws in from the left on hover and focus. */
+.site-header-link::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lun-plum);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--motion-standard);
+}
+.site-header-link:hover::after,
+.site-header-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.site-header-link-featured::after {
+  display: none;
 }
 .site-header-link:hover {
   color: var(--lun-plum);
@@ -1753,16 +1844,18 @@ body {
   color: var(--lun-plum);
 }
 
-/* Hero — the configurator's promise, shown rather than described. */
+/* Hero (docs/1-ux.md §4.1; motion per docs/2-ui.md §7.2): the promise set
+   very large, its lines rising out of masks once on load, then featured
+   sarees in a wide showcase. The photograph itself never moves. */
 .home-hero {
   padding-inline: var(--space-4);
-  padding-block: var(--space-7);
+  padding-block: var(--space-6) var(--space-7);
   background: var(--lun-ground);
 }
 @media (min-width: 768px) {
   .home-hero {
     padding-inline: var(--space-6);
-    padding-block: var(--space-9);
+    padding-block: var(--space-7) var(--space-9);
   }
 }
 .home-hero-inner {
@@ -1772,56 +1865,236 @@ body {
   flex-direction: column;
   gap: var(--space-6);
 }
+.home-hero-top {
+  display: grid;
+  gap: var(--space-5);
+}
 @media (min-width: 1024px) {
-  .home-hero-inner {
-    flex-direction: row;
-    align-items: center;
+  .home-hero-top {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    align-items: end;
     gap: var(--space-8);
   }
 }
-.home-hero-media {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: var(--lun-surface);
-  border-radius: var(--radius-m);
-  overflow: hidden;
+.home-hero-headline {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font: var(--type-display-hero) var(--font-display);
+  font-weight: var(--type-display-xl-weight);
+  color: var(--lun-plum);
 }
-@media (min-width: 1024px) {
-  .home-hero-media {
-    flex: 1 1 55%;
+.home-hero-headline:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: var(--type-display-hero-tracking);
+}
+/* Sinhala and Tamil words run longer and need room above and below the line. */
+.home-hero-headline:not(:lang(en)) {
+  font-size: clamp(2rem, 1rem + 4.5vw, 4.5rem);
+  line-height: 1.35;
+}
+@media (min-width: 768px) {
+  .home-hero-line-1 {
+    padding-inline-start: 0.9em;
   }
 }
-.home-hero-media img {
-  object-fit: cover;
+/* A line rises out of its own mask. The small bottom padding keeps descenders. */
+.hero-mask {
+  display: block;
+  overflow: hidden;
+  padding-block-end: 0.08em;
 }
-.home-hero-body {
+.hero-rise {
+  display: block;
+  animation: hero-rise var(--motion-reveal) both;
+}
+.home-hero-line-2 .hero-rise {
+  animation-delay: var(--motion-reveal-delay);
+}
+.home-hero-aside {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-4);
-}
-@media (min-width: 1024px) {
-  .home-hero-body {
-    flex: 1 1 45%;
-  }
-}
-.home-hero-headline {
-  font: var(--type-display-xl) var(--font-display);
-  font-weight: var(--type-display-xl-weight);
-  letter-spacing: var(--type-display-xl-tracking);
-  color: var(--lun-plum);
+  animation: hero-fade var(--motion-reveal) both;
+  animation-delay: calc(var(--motion-reveal-delay) * 2);
 }
 .home-hero-subhead {
-  font: var(--type-body-l) var(--font-body);
+  font: var(--type-body) var(--font-body);
   color: var(--lun-ink);
-  max-width: 68ch;
+  max-width: 40ch;
 }
 .home-hero-doors {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
   width: 100%;
+}
+
+/* Showcase. Stacked slides; the active one wipes in over the one leaving. */
+.hero-showcase-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+  touch-action: pan-y;
+}
+@media (min-width: 768px) {
+  .hero-showcase-frame {
+    aspect-ratio: 16 / 9;
+  }
+}
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  visibility: hidden;
+  clip-path: inset(0 0 0 100%);
+}
+.hero-slide.is-leaving {
+  z-index: 1;
+  visibility: visible;
+  clip-path: inset(0);
+}
+.hero-slide.is-active {
+  z-index: 2;
+  visibility: visible;
+  clip-path: inset(0);
+  transition: clip-path var(--motion-reveal);
+}
+.hero-slide-image {
+  object-fit: cover;
+}
+/* Name and link on a solid plate: never an overlay or gradient on the photograph. */
+.hero-slide-plate {
+  position: absolute;
+  inset-inline-start: var(--space-4);
+  inset-block-end: var(--space-4);
+  max-width: calc(100% - var(--space-4) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+}
+@media (min-width: 768px) {
+  .hero-slide-plate {
+    inset-inline-start: var(--space-6);
+    inset-block-end: var(--space-6);
+  }
+}
+.hero-slide-title {
+  display: block;
+  font: var(--type-display-l) var(--font-display);
+  color: var(--lun-plum);
+}
+.hero-slide.is-active .hero-slide-title {
+  animation: hero-rise var(--motion-reveal) both;
+  animation-delay: var(--motion-reveal-delay);
+}
+.hero-slide-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+  text-decoration: none;
+}
+.hero-slide-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border: 1px solid var(--lun-plum);
+  border-radius: var(--radius-full);
+  color: var(--lun-plum);
+  transition:
+    transform var(--motion-standard),
+    background-color var(--motion-standard),
+    color var(--motion-standard);
+}
+.hero-slide-link:hover .hero-slide-arrow,
+.hero-slide-link:focus-visible .hero-slide-arrow {
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+  transform: translateX(var(--space-1));
+}
+.hero-showcase-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+.hero-showcase-count {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  font-variant-numeric: tabular-nums;
+  color: var(--lun-ink);
+}
+.hero-showcase-progress {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  overflow: hidden;
+  background: var(--lun-line);
+}
+/* Gold as a rule, never as text. Its animation ending advances the slide. */
+.hero-showcase-progress-bar {
+  position: absolute;
+  inset: 0;
+  background: var(--lun-gold);
+  transform-origin: left;
+  animation: hero-progress var(--motion-hero-interval) linear both;
+}
+.hero-showcase:hover .hero-showcase-progress-bar,
+.hero-showcase:focus-within .hero-showcase-progress-bar {
+  animation-play-state: paused;
+}
+.hero-showcase-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  background: var(--lun-surface);
+  color: var(--lun-plum);
+  cursor: pointer;
+  transition: border-color var(--motion-quick);
+}
+.hero-showcase-button:hover {
+  border-color: var(--lun-plum);
+}
+@keyframes hero-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes hero-fade {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-3));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 
 /* Trust strip — four facts answering the category's biggest doubts,

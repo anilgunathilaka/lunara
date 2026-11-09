@@ -355,6 +355,9 @@ Motion is used to make state changes legible, never to decorate. The configurato
 | --motion-standard | 200ms ease-out | Slide-overs, accordions, tab changes. |
 | --motion-preview | 280ms ease-in-out | Configurator preview cross-fade on selection change. |
 | --motion-page | 320ms ease-out | Page and route transitions. |
+| --motion-reveal | 1150ms cubic-bezier(0.58, 0, 0.28, 0.99) | Home hero and header entrance only (§7.2). |
+| --motion-reveal-delay | 400ms | Stagger between hero reveal steps (§7.2). |
+| --motion-hero-interval | 7000ms | Time each hero slide stays before advancing (§7.2). |
 
 7.1 Motion Rules
 
@@ -367,6 +370,17 @@ Never animate a product photograph. No parallax, no scale-on-hover, no drift.
 prefers-reduced-motion is honoured absolutely: cross-fades become instant swaps and rotation becomes stepped.
 
 No scroll-triggered reveal animations. On mobile data they read as broken loading rather than as polish.
+
+7.2 Home Hero and Header Entrance (founder decision 2026-11-09)
+
+The one decorative exception: the home hero and the header announce the brand on arrival. It runs once, on page load, never on scroll.
+
+- Header: the announcement strip and header fade down into place (--motion-page).
+- Hero headline: set very large (--type-display-hero), in two lines; each line rises out of its own mask (--motion-reveal), the second --motion-reveal-delay after the first. The subhead and doors fade in after.
+- Hero showcase: featured sarees in a wide frame, advancing every --motion-hero-interval. A slide changes by a wipe of the frame; the photograph itself never moves, scales or drifts (§7.1 still holds). Each slide's name rises out of a mask, --motion-reveal-delay after the wipe, on a solid --lun-surface plate — never an overlay or gradient on the photograph.
+- Controls: previous, next and pause are always visible (WCAG 2.2.2); the slides also follow swipe. Advancing pauses while the pointer is over the showcase or anything in it has focus.
+- prefers-reduced-motion: nothing animates and nothing advances on its own; slides change only when asked, instantly.
+- Aspect: 4:5 below 768px (portrait, so the saree reads on a phone), 16:9 above.
 
 8. Token Reference
 
