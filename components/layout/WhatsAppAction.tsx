@@ -6,7 +6,7 @@ export interface WhatsAppActionProps {
   /** e.g. https://wa.me/94XXXXXXXXX */
   href: string;
   label: string;
-  /** 'floating': mobile-only fixed FAB. 'inline': desktop-only, for Header/Footer. */
+  /** 'floating': fixed button, bottom right, on every screen. 'inline': desktop-only, in a line of text. */
   variant: 'floating' | 'inline';
 }
 
@@ -19,7 +19,7 @@ export function WhatsAppAction({ href, label, variant }: WhatsAppActionProps) {
       rel="noopener noreferrer"
       className={cn(
         'whatsapp-action',
-        variant === 'floating' ? 'whatsapp-action-floating md:hidden' : 'hidden md:inline-flex',
+        variant === 'floating' ? 'whatsapp-action-floating' : 'hidden md:inline-flex',
       )}
     >
       <Icon icon={MessageCircle} size={variant === 'floating' ? 'touch' : 'default'} />

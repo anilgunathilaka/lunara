@@ -90,8 +90,6 @@ function SiteChromeInner({
         cartHref="/cart"
         cartLabel={navLabels.cart}
         cartCount={itemCount}
-        whatsappHref={whatsappHref}
-        whatsappLabel={whatsappLabel}
         languageLabels={languageLabels}
         announcement={announcement}
       />

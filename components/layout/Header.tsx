@@ -3,7 +3,6 @@ import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { Wordmark } from '@/components/brand/Wordmark';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
-import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 
 export interface HeaderNavItem {
   href: string;
@@ -24,8 +23,6 @@ export interface HeaderProps {
   cartHref: string;
   cartLabel: string;
   cartCount: number;
-  whatsappHref: string;
-  whatsappLabel: string;
   languageLabels: LanguageSelectorProps['labels'];
   /** Short facts in the strip above the header (docs/2-ui.md §7.2). Phones show the first only. */
   announcement?: string[];
@@ -40,8 +37,6 @@ export function Header({
   cartHref,
   cartLabel,
   cartCount,
-  whatsappHref,
-  whatsappLabel,
   languageLabels,
   announcement,
 }: HeaderProps) {
@@ -81,7 +76,6 @@ export function Header({
       </nav>
 
       <div className="site-header-actions">
-        <WhatsAppAction href={whatsappHref} label={whatsappLabel} variant="inline" />
         {/* On mobile the language selector lives in the MobileNav "Menu" panel
             instead, to keep the compact header down to wordmark + cart. */}
         <LanguageSelector labels={languageLabels} className="hidden md:flex" />

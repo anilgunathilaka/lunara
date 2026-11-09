@@ -53,8 +53,6 @@ export function LayoutQaClient({
             cartHref="/dev/cart"
             cartLabel={navLabels.cart}
             cartCount={2}
-            whatsappHref={whatsappLink()}
-            whatsappLabel={whatsappLabel}
             languageLabels={languageLabels}
           />
         </div>

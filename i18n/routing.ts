@@ -10,6 +10,9 @@ export const routing = defineRouting({
   locales: ['en', 'si', 'ta'],
   defaultLocale: 'en',
   localePrefix: 'always',
+  // English-only for now (lib/features.ts languageSelector): / always opens
+  // in English, whatever the browser's language or an earlier choice.
+  localeDetection: false,
 });
 
 export type AppLocale = (typeof routing.locales)[number];

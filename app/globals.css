@@ -1071,6 +1071,13 @@ body {
   color: var(--lun-surface);
   box-shadow: var(--elev-2);
 }
+/* Wide screens have no bottom bar to clear: the button sits in the corner. */
+@media (min-width: 768px) {
+  .whatsapp-action-floating {
+    right: var(--space-5);
+    bottom: var(--space-5);
+  }
+}
 
 /*
  * Header — docs/3-components.md §6.2. "Design Your Own" gets a bordered
@@ -1081,7 +1088,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
   background: var(--lun-surface);
 }
@@ -1133,10 +1140,15 @@ body {
 .site-header {
   animation: header-in var(--motion-page) both;
 }
+/* Same side edges as the hero card: its padding, and its 1760px limit on very wide screens. */
+@media (min-width: 768px) {
+  .site-header {
+    padding-inline: max(var(--space-6), calc((100% - 1760px) / 2));
+  }
+}
 @media (min-width: 1024px) {
   .site-header {
     padding-block: var(--space-3);
-    padding-inline: var(--space-6);
     border-bottom-color: transparent;
   }
   .site-header-nav {
