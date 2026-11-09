@@ -11,6 +11,7 @@ import { latestReviews } from '@/lib/reviews/reviews';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { FEATURES } from '@/lib/features';
+import { HeroShowcase, type HeroSlide } from '@/components/home/HeroShowcase';
 
 // Rendered per request: "New arrivals" shows live price and stock
 // (docs/4-architecture.md §3.3).
@@ -27,39 +28,63 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const formatLeft = (count: number) => tStock('left', { count });
   const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
+  // The headline in two lines: the first half of its words, then the rest.
+  const words = t('hero.headline').split(' ');
+  const split = Math.ceil(words.length / 2);
+  const headlineLines = words.length > 1 ? [words.slice(0, split).join(' '), words.slice(split).join(' ')] : words;
+
+  // Featured sarees for the showcase; until there are any, the hero photograph.
+  const heroSlides: HeroSlide[] =
+    arrivals.length > 0
+      ? arrivals.slice(0, 5).map((item) => ({
+          href: `/shop/${item.id}`,
+          image: { src: item.imageUrl, alt: item.name },
+          title: item.name,
+          caption: materialLabel[item.material],
+        }))
+      : [{ href: '/shop', image: { src: '/placeholder/hero.jpg', alt: t('hero.headline') }, title: t('hero.shopCurated') }];
+
   return (
     <>
-      {/* Hero — the configurator's promise, shown rather than described
-          (docs/1-ux.md §4.1). The two doors (curated shop / configurator)
-          carry equal visual weight, neither is the "advanced" option. */}
+      {/* Hero (docs/1-ux.md §4.1; motion per docs/2-ui.md §7.2): the promise
+          set very large, then featured sarees in a wide showcase. The two
+          doors (curated shop / configurator) keep equal visual weight. */}
       <section className="home-hero">
         <div className="home-hero-inner">
-          <div className="home-hero-media">
-            {/* Real capture footage (OPS-09) doesn't exist yet — this is
-                the same placeholder asset used elsewhere pending
-                photography, not a claim about the finished product. */}
-            <Image
-              src="/placeholder/hero.jpg"
-              alt="A Lunara cotton saree and jacket pairing"
-              fill
-              sizes="(min-width: 1024px) 55vw, 100vw"
-              priority
-            />
-          </div>
-          <div className="home-hero-body">
-            <h1 className="home-hero-headline">{t('hero.headline')}</h1>
-            <p className="home-hero-subhead">{t('hero.subhead')}</p>
-            <div className="home-hero-doors">
-              <Link href="/shop" className="btn focus-ring btn-primary btn-lg">
-                {t('hero.shopCurated')}
-              </Link>
-              {FEATURES.designYourOwn && (
-                <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
-                  {t('hero.designYourOwn')}
+          <div className="home-hero-top">
+            <h1 className="home-hero-headline">
+              {headlineLines.map((line, i) => (
+                <span key={i} className={`hero-mask home-hero-line home-hero-line-${i + 1}`}>
+                  <span className="hero-rise">{line}</span>
+                </span>
+              ))}
+            </h1>
+            <div className="home-hero-aside">
+              <p className="home-hero-subhead">{t('hero.subhead')}</p>
+              <div className="home-hero-doors">
+                <Link href="/shop" className="btn focus-ring btn-primary btn-lg">
+                  {t('hero.shopCurated')}
                 </Link>
-              )}
+                {FEATURES.designYourOwn && (
+                  <Link href="/design-your-own" className="btn focus-ring btn-secondary btn-lg">
+                    {t('hero.designYourOwn')}
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
+          <HeroShowcase
+            slides={heroSlides}
+            labels={{
+              region: t('hero.slider.region'),
+              previous: t('hero.slider.previous'),
+              next: t('hero.slider.next'),
+              pause: t('hero.slider.pause'),
+              play: t('hero.slider.play'),
+              slideOf: heroSlides.map((_, i) => t('hero.slider.slideOf', { n: i + 1, total: heroSlides.length })),
+              view: t('hero.slider.view'),
+            }}
+          />
         </div>
       </section>
 

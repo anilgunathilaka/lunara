@@ -262,7 +262,16 @@
       "headline": "See it before you wear it",
       "subhead": "Cotton sarees with unstitched jacket material — recolour any design, compare Plain and Super Cotton, and preview it draped either way before you buy.",
       "shopCurated": "Shop curated pairings",
-      "designYourOwn": "Design your own"
+      "designYourOwn": "Design your own",
+      "slider": {
+        "region": "Featured sarees",
+        "previous": "Previous saree",
+        "next": "Next saree",
+        "pause": "Pause the showcase",
+        "play": "Play the showcase",
+        "slideOf": "{n} of {total}",
+        "view": "View"
+      }
     },
     "trust": {
       "colourPromise": "Colour-accurate photography",
