@@ -3497,3 +3497,90 @@ body {
     inset-inline-end: var(--hero-inset);
   }
 }
+
+/* Hero arrows: two round buttons at the bottom left of the banner, on the
+   page-container edge (founder decision 2026-11-10). */
+.hero-card-arrows {
+  position: absolute;
+  z-index: 3;
+  inset-inline-start: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+@media (min-width: 768px) {
+  .hero-card-arrows {
+    inset-inline-start: var(--hero-inset);
+    bottom: var(--space-5);
+  }
+}
+.hero-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--lun-surface);
+  color: var(--lun-plum-deep);
+  transition:
+    background var(--motion-standard),
+    color var(--motion-standard);
+}
+.hero-card-arrow:hover {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+
+/* The four facts in a row beneath the banner, each with its icon. */
+.home-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Block margins only: the inline ones centre it in the page container. */
+  margin-block: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--lun-line);
+}
+@media (min-width: 1024px) {
+  .home-facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .home-facts > li + li {
+    border-inline-start: 1px solid var(--lun-line);
+  }
+}
+.home-fact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-4) var(--space-3);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+  text-align: center;
+  text-decoration: none;
+}
+.home-fact .icon {
+  flex-shrink: 0;
+  color: var(--lun-plum);
+}
+.home-fact:hover span {
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+
+/* Phones: the centred logo leaves each side about 95px at 360px; account and
+   cart (44px targets each) sit flush together and the edges tighten, so
+   they never run into the logo. */
+@media (max-width: 767px) {
+  .site-header {
+    gap: var(--space-2);
+    padding-inline: var(--space-2);
+  }
+  .site-header-actions {
+    gap: 0;
+  }
+}

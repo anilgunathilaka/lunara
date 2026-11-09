@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import Image from 'next/image';
-import { ArrowUpRight, Pause, Play } from 'lucide-react';
-import { Link } from '@/i18n/navigation';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Icon } from '@/components/primitives/Icon';
 import { cn } from '@/lib/utils';
 
@@ -24,18 +23,14 @@ export interface HeroSlide {
 
 export interface HeroShowcaseProps {
   slides: HeroSlide[];
-  /** Facts as pills at the bottom left, each linking to where it is explained. */
-  pills: { label: string; href: string }[];
-  /** Top right: a way to reach us. */
-  contact: { label: string; href: string };
   /** Bottom right: real review proof, or nothing. */
   proof: { initials: string[]; text: string } | null;
   /** Where the vertical "scroll" cue points. */
   scrollTarget: string;
   labels: {
     region: string;
-    pause: string;
-    play: string;
+    previous: string;
+    next: string;
     /** "{n} of {total}", already formatted per slide. */
     slideOf: string[];
     scroll: string;
@@ -44,56 +39,26 @@ export interface HeroShowcaseProps {
 
 /** Distance a swipe must travel before it counts, as a share of the frame's width. */
 const SWIPE_SHARE = 0.12;
-/** Characters the decoding line cycles through before settling. */
-const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-/** Animation frames each character takes to settle, and the extra per position. */
-const DECODE_FRAMES = 10;
-const DECODE_STAGGER = 1;
-
-/** Text that "decodes" into place, character by character (docs/2-ui.md §7.2). */
-function useDecoded(text: string, enabled: boolean): string {
-  const [shown, setShown] = useState(text);
-  useEffect(() => {
-    if (!enabled) return;
-    let frame = 0;
-    let handle = 0;
-    const total = DECODE_FRAMES + text.length * DECODE_STAGGER;
-    const step = () => {
-      frame += 1;
-      setShown(
-        [...text]
-          .map((ch, i) => {
-            if (ch === ' ' || frame >= DECODE_FRAMES + i * DECODE_STAGGER) return ch;
-            return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
-          })
-          .join(''),
-      );
-      if (frame < total) handle = requestAnimationFrame(step);
-    };
-    handle = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(handle);
-  }, [text, enabled]);
-  return enabled ? shown : text;
-}
-
 /**
- * Home hero card (docs/2-ui.md §7.2): featured sarees in one rounded frame,
- * with the current saree's name decoding at the top left, a way to reach us
- * at the top right, facts as pills at the bottom left and real review proof
- * at the bottom right. A slide changes by a wipe of the frame — the
- * photograph itself is never moved, scaled or tinted (§7.1). The timer is a
- * CSS animation on an invisible element, so pausing (button, hover, focus)
- * pauses it, and under prefers-reduced-motion nothing advances on its own.
+ * Home hero banner (docs/2-ui.md §7.2): banners and featured sarees, full
+ * width, with round previous / next arrows at the bottom left and real
+ * review proof at the bottom right. A slide changes by a wipe of the frame —
+ * the photograph itself is never moved, scaled or tinted (§7.1).
+ *
+ * It advances on its own every --motion-hero-interval (the timer is a CSS
+ * animation on an invisible element) and waits while the pointer is over it
+ * or anything in it has focus. Using an arrow hands control to the customer:
+ * it stops advancing on its own (WCAG 2.2.2). Under prefers-reduced-motion
+ * nothing advances on its own.
  */
-export function HeroShowcase({ slides, pills, contact, proof, scrollTarget, labels }: HeroShowcaseProps) {
+export function HeroShowcase({ slides, proof, scrollTarget, labels }: HeroShowcaseProps) {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
-  const [userPaused, setUserPaused] = useState(false);
+  // Once the customer uses an arrow, the slides stop moving on their own.
+  const [userStopped, setUserStopped] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const swipeFrom = useRef<number | null>(null);
   const count = slides.length;
-  const current = slides[active]!;
-  const decoded = useDecoded(current.caption ? `${current.title} · ${current.caption}` : current.title, !reducedMotion);
 
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -122,7 +87,11 @@ export function HeroShowcase({ slides, pills, contact, proof, scrollTarget, labe
     if (Math.abs(travel) > event.currentTarget.clientWidth * SWIPE_SHARE) go(active + (travel < 0 ? 1 : -1));
   }
 
-  const autoplay = count > 1 && !reducedMotion && !userPaused;
+  const autoplay = count > 1 && !reducedMotion && !userStopped;
+  const step = (direction: 1 | -1) => {
+    setUserStopped(true);
+    go(active + direction);
+  };
 
   return (
     <section className="hero-card" aria-roledescription="carousel" aria-label={labels.region}>
@@ -163,47 +132,21 @@ export function HeroShowcase({ slides, pills, contact, proof, scrollTarget, labe
         {/* The timer: an invisible CSS animation whose end advances the slide. */}
         {autoplay && <span key={active} className="hero-card-timer" aria-hidden="true" onAnimationEnd={() => go(active + 1)} />}
 
-        <div className="hero-card-corner hero-card-top-start hero-card-in">
-          {count > 1 && !reducedMotion && (
-            <button
-              type="button"
-              className="hero-card-pause focus-ring"
-              onClick={() => setUserPaused((p) => !p)}
-              aria-label={userPaused ? labels.play : labels.pause}
-            >
-              <Icon icon={userPaused ? Play : Pause} size="inline" />
-            </button>
-          )}
-          <Link href={current.href} className="hero-card-meta focus-ring" aria-live="polite">
-            <span aria-hidden="true">{decoded}</span>
-            <span className="sr-only">{current.caption ? `${current.title} · ${current.caption}` : current.title}</span>
-          </Link>
-          {count > 1 && (
-            <span className="hero-card-count" aria-hidden="true">
-              {String(active + 1).padStart(2, '0')}/{String(count).padStart(2, '0')}
-            </span>
-          )}
-        </div>
-
-        <a href={contact.href} target="_blank" rel="noopener noreferrer" className="hero-card-corner hero-card-top-end hero-card-meta hero-card-in focus-ring">
-          {contact.label}
-        </a>
-
         <a href={scrollTarget} className="hero-card-scroll focus-ring hero-card-in">
           <span className="hero-card-scroll-line" aria-hidden="true" />
           <span className="hero-card-scroll-text">{labels.scroll}</span>
         </a>
 
-        <ul className="hero-card-pills">
-          {pills.map((pill, i) => (
-            <li key={pill.href + i} className="hero-card-in" style={{ '--i': i } as CSSProperties}>
-              <Link href={pill.href} className="hero-pill focus-ring">
-                {pill.label}
-                <Icon icon={ArrowUpRight} size="inline" />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {count > 1 && (
+          <div className="hero-card-arrows hero-card-in">
+            <button type="button" className="hero-card-arrow focus-ring" onClick={() => step(-1)} aria-label={labels.previous}>
+              <Icon icon={ArrowLeft} size="inline" />
+            </button>
+            <button type="button" className="hero-card-arrow focus-ring" onClick={() => step(1)} aria-label={labels.next}>
+              <Icon icon={ArrowRight} size="inline" />
+            </button>
+          </div>
+        )}
 
         {proof && (
           <div className="hero-card-proof hero-card-in">

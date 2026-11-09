@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Camera, RotateCcw, Scissors, Truck } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
@@ -90,23 +90,32 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <div className="home-hero-inner">
           <HeroShowcase
             slides={heroSlides}
-            pills={[
-              { label: tJacket('shipsUnstitched'), href: '/support/shipping' },
-              { label: t('trust.returns'), href: '/support/returns' },
-              { label: t('trust.dispatch'), href: '/support/shipping' },
-              { label: t('trust.colourPromise'), href: '/support/care-guide' },
-            ]}
-            contact={{ label: t('trust.whatsapp'), href: whatsappLink() }}
             proof={proof}
             scrollTarget="#home-after-hero"
             labels={{
               region: t('hero.slider.region'),
-              pause: t('hero.slider.pause'),
-              play: t('hero.slider.play'),
+              previous: t('hero.slider.previous'),
+              next: t('hero.slider.next'),
               slideOf: heroSlides.map((_, i) => t('hero.slider.slideOf', { n: i + 1, total: heroSlides.length })),
               scroll: t('hero.card.scroll'),
             }}
           />
+          {/* The facts in a row beneath the banner, each with its icon and a link to where it is explained. */}
+          <ul className="home-facts">
+            {[
+              { icon: Scissors, label: tJacket('shipsUnstitched'), href: '/support/shipping' },
+              { icon: RotateCcw, label: t('trust.returns'), href: '/support/returns' },
+              { icon: Truck, label: t('trust.dispatch'), href: '/support/shipping' },
+              { icon: Camera, label: t('trust.colourPromise'), href: '/support/care-guide' },
+            ].map((fact) => (
+              <li key={fact.label}>
+                <Link href={fact.href} className="home-fact focus-ring">
+                  <fact.icon className="icon" aria-hidden="true" />
+                  <span>{fact.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
           <h1 className="home-hero-headline">
             {headlineWords.map((word, i) => (
               <span key={i} className="home-hero-word" style={{ '--i': i } as CSSProperties}>
