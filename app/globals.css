@@ -1089,9 +1089,11 @@ body {
  * pill so it never reads as one plain link among five.
  */
 .site-header {
-  display: flex;
+  /* Logo in the centre of the page (founder decision 2026-11-09): menu on
+     the left, account and cart on the right, each side taking equal room. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
@@ -1217,12 +1219,37 @@ body {
   }
   .site-header-nav {
     gap: var(--space-6);
-    /* Beside the logo, as in the reference: the actions keep the far end. */
-    margin-inline-start: var(--space-5);
-    margin-inline-end: auto;
   }
   .site-header .wordmark-logo {
-    height: calc(var(--space-6) + var(--space-2));
+    height: calc((var(--space-6) + var(--space-2)) * 1.2);
+  }
+}
+.site-header-logo {
+  grid-column: 2;
+  grid-row: 1;
+}
+.site-header-nav {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+.site-header-actions {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+/* The logo 20% larger than before (founder decision 2026-11-09). */
+.site-header .wordmark-logo {
+  height: calc(var(--space-7) * 1.2);
+}
+@media (max-width: 767px) {
+  .site-header .wordmark-logo {
+    height: calc(var(--space-6) * 1.2);
+  }
+}
+@media (min-width: 1024px) {
+  .site-header .wordmark-logo {
+    height: calc((var(--space-6) + var(--space-2)) * 1.2);
   }
 }
 /* Header actions: WhatsApp as an icon (named for screen readers), the
