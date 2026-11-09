@@ -95,7 +95,7 @@ export default async function LocaleLayout({
   };
   const announcement = {
     items: [tJacket('shipsUnstitched'), tTrust('dispatch'), tTrust('returns'), tTrust('colourPromise')],
-    labels: { region: tAnnouncement('region'), previous: tAnnouncement('previous'), next: tAnnouncement('next') },
+    labels: { region: tAnnouncement('region'), pause: tAnnouncement('pause'), play: tAnnouncement('play') },
   };
 
   const languageLabels = {

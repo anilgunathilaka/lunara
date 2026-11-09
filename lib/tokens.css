@@ -138,7 +138,8 @@
   --motion-menu-duration: 300ms;
   --motion-menu: var(--motion-menu-duration) var(--motion-menu-ease);
   --motion-header: 500ms var(--motion-menu-ease);
-  --motion-announcement-interval: 5000ms;
+  /* One full loop of the utility bar marquee (§7.2). */
+  --motion-marquee: 64s;
   /* Words rising into place as a section scrolls into view (docs/2-ui.md §7.4). */
   --motion-section: 800ms var(--motion-menu-ease);
 

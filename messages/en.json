@@ -205,8 +205,8 @@
     },
     "announcement": {
       "region": "Announcements",
-      "previous": "Previous announcement",
-      "next": "Next announcement"
+      "pause": "Pause the announcements",
+      "play": "Play the announcements"
     }
   },
   "feedback": {
