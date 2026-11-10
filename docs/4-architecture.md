@@ -361,6 +361,18 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 
 Delivery and fees (`lib/commerce/delivery.ts`): every one of the 25 districts maps to a zone; each zone has a fee and an honest working-day range. The COD fee applies only to COD and is shown with its waiver. Values are PLACEHOLDERS until PRD Q5 and courier contracts settle them; they move to the operations panel with it. Payment methods offered now: COD and bank transfer. LankaQR and card appear when a payment gateway is contracted (§6).
 
+3.14 Operations dashboard and frame (`/[locale]/ops`; founder request 2026-11-10)
+
+The operations panel has its own frame (`app/[locale]/ops/OpsChrome.tsx`): the store's header, footer, bars and WhatsApp button are left out on /ops (SiteChrome passes those pages straight through). A --lun-plum-deep sidebar groups the sections: Overview; Sales (orders, bank transfers, office sales); Catalogue (products, inventory, prices, costs, photos); Customers (messages, reviews); Reports (insights). Beside a section it shows how much is waiting: orders needing action, bank transfers to check, messages to send (`opsBadges`, three counts). A white top bar names the page and shows who is signed in, with sign out; "View store" sits at the foot of the sidebar. On phones the sidebar is a drawer behind a menu button (Escape or the dimmed page closes it).
+
+/ops is the dashboard (`lib/ops/dashboard.ts` `dashboardSnapshot`), read in one go from the same records every other ops page reads, nothing stored twice:
+- Four figures: online sales and orders over the last 30 Sri Lankan days (cancelled and refunded orders excluded), with the change on the 30 days before in words with an arrow, never colour alone; orders needing action (placed, awaiting payment, confirmed, packed); the office balance due and how much of it is overdue.
+- Online sales by day for 30 days: one plum bar a day; hover or focus shows the day, amount and orders, and the same figures are a table for screen readers.
+- Needs attention: bank transfers to check (their total and the oldest's age), messages to send, items out of stock and running low, office sales overdue, new reviews this week; each links to the page where the work is done.
+- The order pipeline (a count per action status, each opening the orders list filtered to it), what is running low, and the six most recent orders.
+
+The orders list moved from /ops to /ops/orders, beside the order pages; staff signing in still land on /ops, now the dashboard. The existing ops pages are unchanged inside, each set in a white card in the new frame.
+
 4. Colour Management Pipeline
 
 Colour is a contractual property of this product. The pipeline below exists so that what is captured, what is displayed, and what is delivered stay in agreement.

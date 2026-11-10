@@ -71,6 +71,10 @@ function SiteChromeInner({
   const pathname = usePathname();
   const { itemCount } = useCart();
 
+  // The operations panel has its own frame (app/[locale]/ops/OpsChrome.tsx):
+  // none of the store's header, footer, bars or WhatsApp button there.
+  if (pathname === '/ops' || pathname.startsWith('/ops/')) return <>{children}</>;
+
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main-content" className="sr-only focus:not-sr-only">

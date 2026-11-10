@@ -459,7 +459,8 @@
       "insights": "Insights",
       "products": "Products",
       "costs": "Costs",
-      "office": "Office sales"
+      "office": "Office sales",
+      "overview": "Overview"
     },
     "columns": {
       "number": "Order",
@@ -919,6 +920,71 @@
       "bought": "Bought",
       "customerDetails": "Customer details",
       "saveCustomer": "Save details"
+    },
+    "navGroup": {
+      "sales": "Sales",
+      "catalogue": "Catalogue",
+      "customers": "Customers",
+      "reports": "Reports"
+    },
+    "viewStore": "View store",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "dashboard": {
+      "title": "Overview",
+      "today": "Today, {date}",
+      "newOfficeSale": "New office sale",
+      "newProduct": "Add product",
+      "kpi": {
+        "sales": "Online sales · 30 days",
+        "orders": "Online orders · 30 days",
+        "average": "Average order {amount}",
+        "up": "Up {percent}% on the previous 30 days",
+        "down": "Down {percent}% on the previous 30 days",
+        "flat": "Level with the previous 30 days",
+        "noPrevious": "No sales in the previous 30 days",
+        "action": "Orders needing action",
+        "seeOrders": "See orders",
+        "officeDue": "Office balance due",
+        "officeOverdue": "{amount} overdue",
+        "officeNoneOverdue": "Nothing overdue"
+      },
+      "attention": {
+        "heading": "Needs attention",
+        "payments": "{count, plural, =0 {No bank transfers to check} one {# bank transfer to check} other {# bank transfers to check}}",
+        "paymentsMeta": "{amount} · oldest {age}",
+        "messages": "{count, plural, =0 {No messages to send} one {# message to send} other {# messages to send}}",
+        "stockOut": "{count, plural, =0 {Nothing out of stock} one {# item out of stock} other {# items out of stock}}",
+        "stockLow": "{count, plural, =0 {Nothing running low} one {# item running low} other {# items running low}}",
+        "office": "{count, plural, =0 {No office sales overdue} one {# office sale overdue} other {# office sales overdue}}",
+        "reviews": "{count, plural, =0 {No new reviews this week} one {# new review this week} other {# new reviews this week}}",
+        "clear": "Clear"
+      },
+      "chart": {
+        "heading": "Online sales, last 30 days",
+        "today": "Today: {amount} from {count, plural, one {# order} other {# orders}}",
+        "caption": "Online sales by day, last 30 days",
+        "day": "Day",
+        "total": "Sales",
+        "orders": "Orders",
+        "point": "{day}: {amount}, {count, plural, one {# order} other {# orders}}",
+        "empty": "No online sales in the last 30 days yet."
+      },
+      "pipeline": {
+        "heading": "Order pipeline"
+      },
+      "recent": {
+        "heading": "Recent orders",
+        "viewAll": "View all",
+        "empty": "No orders yet."
+      },
+      "lowStock": {
+        "heading": "Running low",
+        "empty": "Everything is in stock.",
+        "left": "{count} left",
+        "out": "Out",
+        "manage": "Manage inventory"
+      }
     }
   },
   "notifications": {

@@ -459,7 +459,8 @@
       "insights": "විශ්ලේෂණ",
       "products": "නිෂ්පාදන",
       "costs": "පිරිවැය",
-      "office": "Office විකුණුම්"
+      "office": "Office විකුණුම්",
+      "overview": "දළ විශ්ලේෂණය"
     },
     "columns": {
       "number": "ඇණවුම",
@@ -919,6 +920,71 @@
       "bought": "මිලදී ගත්",
       "customerDetails": "පාරිභෝගික විස්තර",
       "saveCustomer": "විස්තර සුරකින්න"
+    },
+    "navGroup": {
+      "sales": "විකුණුම්",
+      "catalogue": "නිෂ්පාදන නාමාවලිය",
+      "customers": "පාරිභෝගිකයන්",
+      "reports": "වාර්තා"
+    },
+    "viewStore": "වෙළඳසැල බලන්න",
+    "openMenu": "මෙනුව විවෘත කරන්න",
+    "closeMenu": "මෙනුව වසන්න",
+    "dashboard": {
+      "title": "දළ විශ්ලේෂණය",
+      "today": "අද, {date}",
+      "newOfficeSale": "නව office විකුණුමක්",
+      "newProduct": "නිෂ්පාදනයක් එක් කරන්න",
+      "kpi": {
+        "sales": "ඔන්ලයින් විකුණුම් · දින 30",
+        "orders": "ඔන්ලයින් ඇණවුම් · දින 30",
+        "average": "සාමාන්‍ය ඇණවුම {amount}",
+        "up": "පෙර දින 30 ට වඩා {percent}% ක් වැඩියි",
+        "down": "පෙර දින 30 ට වඩා {percent}% ක් අඩුයි",
+        "flat": "පෙර දින 30 ට සමානයි",
+        "noPrevious": "පෙර දින 30 තුළ විකුණුම් නැත",
+        "action": "ක්‍රියාමාර්ග අවශ්‍ය ඇණවුම්",
+        "seeOrders": "ඇණවුම් බලන්න",
+        "officeDue": "Office ගෙවිය යුතු ශේෂය",
+        "officeOverdue": "{amount} කල් ඉකුත් වී ඇත",
+        "officeNoneOverdue": "කල් ඉකුත් වූ කිසිවක් නැත"
+      },
+      "attention": {
+        "heading": "අවධානය අවශ්‍යයි",
+        "payments": "{count, plural, =0 {පරීක්ෂා කිරීමට බැංකු මාරු නැත} other {පරීක්ෂා කිරීමට බැංකු මාරු #}}",
+        "paymentsMeta": "{amount} · පැරණිම {age}",
+        "messages": "{count, plural, =0 {යැවීමට පණිවිඩ නැත} other {යැවීමට පණිවිඩ #}}",
+        "stockOut": "{count, plural, =0 {තොග අවසන් වූ කිසිවක් නැත} other {තොග අවසන් අයිතම #}}",
+        "stockLow": "{count, plural, =0 {අඩු තොග කිසිවක් නැත} other {අඩු තොග අයිතම #}}",
+        "office": "{count, plural, =0 {කල් ඉකුත් office විකුණුම් නැත} other {කල් ඉකුත් office විකුණුම් #}}",
+        "reviews": "{count, plural, =0 {මෙම සතියේ නව සමාලෝචන නැත} other {මෙම සතියේ නව සමාලෝචන #}}",
+        "clear": "හරි"
+      },
+      "chart": {
+        "heading": "ඔන්ලයින් විකුණුම්, පසුගිය දින 30",
+        "today": "අද: ඇණවුම් {count} කින් {amount}",
+        "caption": "දිනපතා ඔන්ලයින් විකුණුම්, පසුගිය දින 30",
+        "day": "දිනය",
+        "total": "විකුණුම්",
+        "orders": "ඇණවුම්",
+        "point": "{day}: {amount}, ඇණවුම් {count}",
+        "empty": "පසුගිය දින 30 තුළ තවම ඔන්ලයින් විකුණුම් නැත."
+      },
+      "pipeline": {
+        "heading": "ඇණවුම් ක්‍රියාවලිය"
+      },
+      "recent": {
+        "heading": "මෑත ඇණවුම්",
+        "viewAll": "සියල්ල බලන්න",
+        "empty": "තවම ඇණවුම් නැත."
+      },
+      "lowStock": {
+        "heading": "අඩු තොග",
+        "empty": "සියල්ල තොගයේ ඇත.",
+        "left": "{count} ක් ඉතිරියි",
+        "out": "අවසන්",
+        "manage": "තොග කළමනාකරණය"
+      }
     }
   },
   "notifications": {
