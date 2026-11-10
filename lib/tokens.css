@@ -101,9 +101,10 @@
   --space-8: 64px;
   --space-9: 96px;
 
-  /* Widest the site content runs: header, sections, footer (founder decision 2026-11-09).
-     The home hero banner alone runs the full width of the page. */
-  --container-max: 1360px;
+  /* Widest the site content runs: header, sections, footer. 90% of the
+     screen, a 5vw edge each side, the same width as the home hero banner
+     photograph (founder decision 2026-11-10; was 1360px). */
+  --container-max: 90vw;
 
   /* ---------------------------------------------------------------- */
   /* Shape — radii stay small and disciplined                          */
@@ -138,7 +139,14 @@
   --motion-reveal: 1150ms cubic-bezier(0.58, 0, 0.28, 0.99);
   --motion-reveal-delay: 400ms;
   --motion-stagger: 80ms;
-  --motion-hero-interval: 7000ms;
+  /* Hero slider (founder decision 2026-11-10, after secchiariboots.com):
+     a slide every 4s, the row sliding across in 1s, the current dash
+     growing in 0.8s. */
+  --motion-hero-interval: 4000ms;
+  --motion-hero-slide: 1000ms ease;
+  --motion-hero-dash: 800ms ease-in-out;
+  /* The facts beneath the banner drift one loop in this time. */
+  --motion-marquee: 120000ms;
   /* Header (docs/2-ui.md §7.2): menu panels fade, the strip slides. */
   --motion-menu-ease: cubic-bezier(0.33, 0, 0, 1);
   --motion-menu-duration: 300ms;
@@ -232,5 +240,7 @@
     --motion-panel: 0ms;
     --motion-announcement-fade: 0ms;
     --motion-pane: 0ms;
+    --motion-hero-slide: 0ms;
+    --motion-hero-dash: 0ms;
   }
 }

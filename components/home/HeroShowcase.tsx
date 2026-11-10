@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Icon } from '@/components/primitives/Icon';
@@ -12,7 +12,7 @@ export interface HeroSlide {
     src: string;
     alt: string;
     /** Where the subject sits, so a narrow crop keeps it in frame. */
-    focus?: 'center' | 'end';
+    focus?: 'start' | 'center' | 'end';
     /** Already sized and compressed (a founder banner on R2): skip the optimiser. */
     unoptimized?: boolean;
   };
@@ -26,49 +26,48 @@ export interface HeroMore {
   slides: HeroSlide[];
   /** "{n} of {total}" for every slide, the first ones included. */
   slideOf: string[];
-  proof: { initials: string[]; text: string } | null;
 }
 
 export interface HeroShowcaseProps {
   /** Shown at once: the founder's banners (no database needed). */
   slides: HeroSlide[];
-  /** Featured sarees and review proof, joined on when the database answers. */
+  /** Featured sarees, joined on when the database answers. */
   more?: Promise<HeroMore>;
-  /** Where the vertical "scroll" cue points. */
-  scrollTarget: string;
   labels: {
     region: string;
     previous: string;
     next: string;
     /** "{n} of {total}", already formatted per slide. */
     slideOf: string[];
-    scroll: string;
   };
 }
 
 /** Distance a swipe must travel before it counts, as a share of the frame's width. */
 const SWIPE_SHARE = 0.12;
+
 /**
- * Home hero banner (docs/2-ui.md §7.2): banners and featured sarees, full
- * width, with round previous / next arrows at the bottom left and real
- * review proof at the bottom right. A slide changes by a wipe of the frame —
- * the photograph itself is never moved, scaled or tinted (§7.1).
+ * Home hero banner (docs/2-ui.md §7.2; founder decision 2026-11-10, after
+ * secchiariboots.com): photographs only, no words on them. The slides sit
+ * side by side and the row slides across (--motion-hero-slide); each
+ * photograph is inset from the page edges. Dashes at the bottom left show
+ * where you are (the current one twice as long) and take you to a slide;
+ * thin arrows sit at the bottom right. No parallax and no dimming of the
+ * neighbouring slides: a photograph is never tinted or drifted (§7.1).
  *
  * It advances on its own every --motion-hero-interval (the timer is a CSS
  * animation on an invisible element) and waits while the pointer is over it
- * or anything in it has focus. Using an arrow hands control to the customer:
- * it stops advancing on its own (WCAG 2.2.2). Under prefers-reduced-motion
- * nothing advances on its own.
+ * or anything in it has focus. Using an arrow or a dash hands control to the
+ * customer: it stops advancing on its own (WCAG 2.2.2). Under
+ * prefers-reduced-motion nothing advances on its own and slides change at once.
  */
-export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }: HeroShowcaseProps) {
+export function HeroShowcase({ slides: firstSlides, more, labels }: HeroShowcaseProps) {
   const [active, setActive] = useState(0);
-  const [leaving, setLeaving] = useState<number | null>(null);
-  // Once the customer uses an arrow, the slides stop moving on their own.
+  // Once the customer uses an arrow or a dash, the slides stop moving on their own.
   const [userStopped, setUserStopped] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const swipeFrom = useRef<number | null>(null);
-  // The banners paint at once; featured sarees and review proof join the
-  // end of the row when the database answers, without restarting it.
+  // The banners paint at once; featured sarees join the end of the row when
+  // the database answers, without restarting it.
   const [extra, setExtra] = useState<HeroMore | null>(null);
   useEffect(() => {
     let live = true;
@@ -85,7 +84,6 @@ export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }
   }, [more]);
   const slides = extra ? [...firstSlides, ...extra.slides] : firstSlides;
   const slideOf = extra ? extra.slideOf : labels.slideOf;
-  const proof = extra?.proof ?? null;
   const count = slides.length;
 
   useEffect(() => {
@@ -98,10 +96,11 @@ export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }
 
   function go(next: number) {
     if (count < 2) return;
-    const target = (next + count) % count;
-    if (target === active) return;
-    setLeaving(active);
-    setActive(target);
+    setActive((next + count) % count);
+  }
+  function choose(next: number) {
+    setUserStopped(true);
+    go(next);
   }
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
@@ -112,14 +111,10 @@ export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }
     swipeFrom.current = null;
     if (from === null) return;
     const travel = event.clientX - from;
-    if (Math.abs(travel) > event.currentTarget.clientWidth * SWIPE_SHARE) go(active + (travel < 0 ? 1 : -1));
+    if (Math.abs(travel) > event.currentTarget.clientWidth * SWIPE_SHARE) choose(active + (travel < 0 ? 1 : -1));
   }
 
   const autoplay = count > 1 && !reducedMotion && !userStopped;
-  const step = (direction: 1 | -1) => {
-    setUserStopped(true);
-    go(active + direction);
-  };
 
   return (
     <section className="hero-card" aria-roledescription="carousel" aria-label={labels.region}>
@@ -129,64 +124,67 @@ export function HeroShowcase({ slides: firstSlides, more, scrollTarget, labels }
         onPointerUp={onPointerUp}
         onPointerCancel={() => (swipeFrom.current = null)}
       >
-        {slides.map((slide, i) => {
-          const isActive = i === active;
-          return (
-            <div
-              key={slide.href + i}
-              className={cn('hero-slide', isActive && 'is-active', i === leaving && 'is-leaving')}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={slideOf[i]}
-              aria-hidden={!isActive}
-              inert={!isActive}
-              onTransitionEnd={(e) => {
-                if (isActive && e.target === e.currentTarget) setLeaving(null);
-              }}
-            >
-              <Image
-                src={slide.image.src}
-                alt={slide.image.alt}
-                fill
-                sizes="100vw"
-                priority={i === 0}
-                unoptimized={slide.image.unoptimized}
-                className={cn('hero-slide-image', slide.image.focus === 'end' && 'hero-slide-image-end')}
-              />
-            </div>
-          );
-        })}
+        <div className="hero-track" style={{ '--hero-active': active } as CSSProperties}>
+          {slides.map((slide, i) => {
+            const isActive = i === active;
+            return (
+              <div
+                key={slide.href + i}
+                className={cn('hero-slide', isActive && 'is-active')}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={slideOf[i]}
+                aria-hidden={!isActive}
+                inert={!isActive}
+              >
+                <div className="hero-slide-media">
+                  <Image
+                    src={slide.image.src}
+                    alt={slide.image.alt}
+                    fill
+                    sizes="100vw"
+                    priority={i === 0}
+                    // Off-screen slides would wait to load until they slide into view: fetch all (four at most).
+                    loading={i === 0 ? undefined : 'eager'}
+                    unoptimized={slide.image.unoptimized}
+                    className={cn(
+                      'hero-slide-image',
+                      slide.image.focus === 'end' && 'hero-slide-image-end',
+                      slide.image.focus === 'start' && 'hero-slide-image-start',
+                    )}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
         {/* The timer: an invisible CSS animation whose end advances the slide. */}
         {autoplay && <span key={active} className="hero-card-timer" aria-hidden="true" onAnimationEnd={() => go(active + 1)} />}
 
-        <a href={scrollTarget} className="hero-card-scroll focus-ring hero-card-in">
-          <span className="hero-card-scroll-line" aria-hidden="true" />
-          <span className="hero-card-scroll-text">{labels.scroll}</span>
-        </a>
-
         {count > 1 && (
-          <div className="hero-card-arrows hero-card-in">
-            <button type="button" className="hero-card-arrow focus-ring" onClick={() => step(-1)} aria-label={labels.previous}>
-              <Icon icon={ArrowLeft} size="inline" />
-            </button>
-            <button type="button" className="hero-card-arrow focus-ring" onClick={() => step(1)} aria-label={labels.next}>
-              <Icon icon={ArrowRight} size="inline" />
-            </button>
-          </div>
-        )}
-
-        {proof && (
-          <div className="hero-card-proof hero-card-in">
-            <span className="hero-card-avatars" aria-hidden="true">
-              {proof.initials.map((initial, i) => (
-                <span key={i} className="hero-card-avatar">
-                  {initial}
-                </span>
+          <>
+            <div className="hero-dashes">
+              {slides.map((slide, i) => (
+                <button
+                  key={slide.href + i}
+                  type="button"
+                  className="hero-dash focus-ring"
+                  aria-label={slideOf[i]}
+                  aria-current={i === active ? 'true' : undefined}
+                  onClick={() => choose(i)}
+                />
               ))}
-            </span>
-            <span className="hero-card-proof-text">{proof.text}</span>
-          </div>
+            </div>
+            <div className="hero-card-arrows">
+              <button type="button" className="hero-card-arrow focus-ring" onClick={() => choose(active - 1)} aria-label={labels.previous}>
+                <Icon icon={ArrowLeft} size="inline" />
+              </button>
+              <button type="button" className="hero-card-arrow focus-ring" onClick={() => choose(active + 1)} aria-label={labels.next}>
+                <Icon icon={ArrowRight} size="inline" />
+              </button>
+            </div>
+          </>
         )}
       </div>
     </section>

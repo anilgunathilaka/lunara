@@ -9,13 +9,28 @@ export interface HeroBanner {
   /** Message key (home.hero.banners.*) for the alt text, in all three languages. */
   altKey: string;
   /** Where the subject sits, so a narrow crop (4:5 on phones) keeps it in frame. */
-  focus: 'center' | 'end';
+  focus: 'start' | 'center' | 'end';
 }
 
 export const HERO_BANNERS: HeroBanner[] = [
   {
     src: 'https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev/images/hero-banner-1.webp',
     altKey: 'banner1Alt',
+    focus: 'end',
+  },
+  {
+    src: 'https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev/images/hero-banner-2.webp',
+    altKey: 'banner2Alt',
+    focus: 'end',
+  },
+  {
+    src: 'https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev/images/hero-banner-3.webp',
+    altKey: 'banner3Alt',
+    focus: 'start',
+  },
+  {
+    src: 'https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev/images/hero-banner-4.webp',
+    altKey: 'banner4Alt',
     focus: 'end',
   },
 ];

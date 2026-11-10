@@ -290,7 +290,10 @@
         "proof": "පාරිභෝගිකයන් {count} දෙනෙකු 5 න් {average} ක් ලෙස ශ්‍රේණිගත කර ඇත."
       },
       "banners": {
-        "banner1Alt": "හිරු එළිය වැටෙන ක්‍රීම් පාට බිත්තියක් ඉදිරියේ ලී හැංගර් මත එල්ලා ඇති රෝස සහ සුදු කපු සාරි දෙකක්"
+        "banner1Alt": "හිරු එළිය වැටෙන ක්‍රීම් පාට බිත්තියක් ඉදිරියේ ලී හැංගර් මත එල්ලා ඇති රෝස සහ සුදු කපු සාරි දෙකක්",
+        "banner2Alt": "Exquisite embroidery on the finest fabrics: අඳුරු අළු පසුබිමක, වියන ලද කූඩයක් මත නවා තබා ඇති සුදු එම්බ්‍රොයිඩරි සහිත මින්ට් පාට සාරියක්, සුදු මල් සමඟ",
+        "banner3Alt": "Elegance in every thread: discover our handcrafted eyelet embroidery. නාවික නිල් බිත්තියක් ඉදිරියේ ලී හැංගර් මත එල්ලා ඇති සුදු අයිලට් එම්බ්‍රොයිඩරි සාරි දෙකක්",
+        "banner4Alt": "Modern ethnic elegance: discover our new patterned saree collection with traditional accents and natural olive borders. අළු කොන්ක්‍රීට් බිත්තියක් ඉදිරියේ ලී හැංගර් මත එල්ලා ඇති ඔලිව් පාට දාර සහිත බෙජ් පාට රටා සාරි දෙකක්"
       }
     },
     "trust": {
