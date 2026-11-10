@@ -1,17 +1,17 @@
 import Image from 'next/image';
-import { Suspense, type CSSProperties, type ReactNode } from 'react';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { Suspense, type ReactNode } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
-import { latestReviews, siteReviewSummary, type PublicReview } from '@/lib/reviews/reviews';
+import { latestReviews, type PublicReview } from '@/lib/reviews/reviews';
 import type { CatalogueProduct } from '@/lib/catalogue/types';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
-import { FEATURES } from '@/lib/features';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
 import { HERO_BANNERS } from '@/lib/home/hero';
+import { FactMarquee } from '@/components/home/FactMarquee';
 import { ProductRail } from '@/components/home/ProductRail';
 import { Reveal } from '@/components/motion/Reveal';
 
@@ -34,7 +34,7 @@ function CardSkeleton() {
 // Rendered per request: "New arrivals" shows live price and stock
 // (docs/4-architecture.md §3.3). Streamed (founder report 2026-11-10: a
 // refresh felt slow): nothing waits for the database before the first
-// paint. The header, the banner, the fact tiles, the headline and every
+// paint. The header, the banner, the sliding facts, the headline and every
 // section of words go out at once; the featured sarees, the rail, the
 // tiles' photographs and the reviews follow as the reads answer, each in
 // a space the same size, so nothing shifts.
@@ -44,7 +44,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // Started together, awaited only where each is shown.
   const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
   const reviewsP = latestReviews(3);
-  const summaryP = siteReviewSummary();
   const t = await getTranslations('home');
   const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
@@ -59,7 +58,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
   // Featured sarees for the hero card; until there are any, the hero photograph.
-  // Founder banners first, then featured sarees, five slides at most.
+  // Founder banners first, then featured sarees, four slides at most (founder decision 2026-11-10).
   const bannerSlides: HeroSlide[] = HERO_BANNERS.map((banner) => ({
     href: '/shop',
     image: { src: banner.src, alt: t(`hero.banners.${banner.altKey}`), focus: banner.focus, unoptimized: true },
@@ -73,24 +72,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const slideLabels = (total: number) =>
     Array.from({ length: total }, (_, i) => t('hero.slider.slideOf', { n: i + 1, total }));
 
-  // Featured sarees after the banners, five slides at most, and real review
-  // proof only (initials of the latest reviewers and the true count and
-  // average); nothing is shown until there are reviews.
-  const heroMore: Promise<HeroMore> = Promise.all([arrivalsP, reviewsP, summaryP]).then(([arrivals, reviews, summary]) => {
-    const slides: HeroSlide[] = arrivals.slice(0, Math.max(0, 5 - firstSlides.length)).map((item) => ({
+  // Featured sarees after the banners, four slides at most.
+  const heroMore: Promise<HeroMore> = arrivalsP.then((arrivals) => {
+    const slides: HeroSlide[] = arrivals.slice(0, Math.max(0, 4 - firstSlides.length)).map((item) => ({
       href: `/shop/${item.id}`,
       image: { src: item.imageUrl, alt: item.name },
       title: item.name,
       caption: materialLabel[item.material],
     }));
-    const proof =
-      summary.count > 0 && summary.average !== null
-        ? {
-            initials: reviews.slice(0, 4).map((r) => r.displayName.trim().charAt(0).toUpperCase() || '·'),
-            text: t('hero.card.proof', { average: summary.average, count: summary.count }),
-          }
-        : null;
-    return { slides, slideOf: slideLabels(firstSlides.length + slides.length), proof };
+    return { slides, slideOf: slideLabels(firstSlides.length + slides.length) };
   });
 
   // Ways in: a real saree photograph of each cotton where one exists.
@@ -161,69 +151,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     );
   const drapeImage = '/placeholder/product.jpg';
 
-  const headlineWords = t('hero.headline').split(' ');
-
   return (
     <>
       {/* Hero (docs/1-ux.md §4.1; layout and motion per docs/2-ui.md §7.2):
-          a rounded card of featured sarees carrying the trust facts as pills,
-          then the promise set very large beneath it. */}
+          a slider of photographs with no words on them, the four facts
+          sliding beneath it. */}
       <section className="home-hero">
         <div className="home-hero-inner">
           <HeroShowcase
             slides={firstSlides}
             more={heroMore}
-            scrollTarget="#home-after-hero"
             labels={{
               region: t('hero.slider.region'),
               previous: t('hero.slider.previous'),
               next: t('hero.slider.next'),
               slideOf: slideLabels(firstSlides.length),
-              scroll: t('hero.card.scroll'),
             }}
           />
-          {/* The four facts as coloured tiles, edge to edge beneath the banner
-              (docs/2-ui.md §7.2), each a link to where it is explained. */}
-          <ul className="home-facts">
-            {[
-              { tone: 'plum', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
-              { tone: 'pale', label: t('trust.returns'), href: '/support/returns' },
-              { tone: 'light', label: t('trust.dispatch'), href: '/support/shipping' },
-              { tone: 'deep', label: t('trust.colourPromise'), href: '/support/care-guide' },
-            ].map((fact) => (
-              <li key={fact.label}>
-                <Link href={fact.href} className={`home-fact home-fact-${fact.tone} focus-ring`}>
-                  {fact.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <h1 className="home-hero-headline">
-            {headlineWords.map((word, i) => (
-              <span key={i} className="home-hero-word" style={{ '--i': i } as CSSProperties}>
-                {word}
-              </span>
-            ))}
-          </h1>
-          <div className="home-hero-foot">
-            <p className="home-hero-subhead">{t('hero.subhead')}</p>
-            <div className="home-hero-doors">
-              <Link href="/shop" className="home-hero-door focus-ring">
-                {t('hero.shopCurated')}
-                <ArrowUpRight className="icon icon-inline" aria-hidden="true" />
-              </Link>
-              {FEATURES.designYourOwn && (
-                <Link href="/design-your-own" className="home-hero-door focus-ring">
-                  {t('hero.designYourOwn')}
-                  <ArrowUpRight className="icon icon-inline" aria-hidden="true" />
-                </Link>
-              )}
-            </div>
-          </div>
+          {/* The four facts as sliding words beneath the banner (docs/2-ui.md §7.2). */}
+          <FactMarquee
+            facts={[tJacket('shipsUnstitched'), t('trust.returns'), t('trust.dispatch'), t('trust.colourPromise')]}
+          />
+          {/* The promise stays the page heading for search engines and screen readers, not shown. */}
+          <h1 className="sr-only">{t('hero.headline')}</h1>
         </div>
       </section>
-
-      <div id="home-after-hero" />
 
       {/* Sections after the hero follow the reference layout (docs/2-ui.md §7.4):
           a product rail, ways in, a two-drape split, a statement, a panel

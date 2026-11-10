@@ -1113,7 +1113,7 @@ body {
   position: sticky;
   /* Sticks with the utility bar's height above the top edge: the bar
      scrolls away with the page and the header below it stays. */
-  top: -44px;
+  top: calc(var(--utility-h) * -1);
   z-index: 30;
   background: var(--lun-surface);
   animation: header-in var(--motion-page) both;
@@ -1129,8 +1129,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 44px: the height the header group sticks above the top edge, and a full touch target. */
-  min-height: 44px;
+  /* --utility-h (40px, founder decision 2026-11-10: 10% lower than 44px): the height the header group sticks above the top edge. */
+  min-height: var(--utility-h);
   padding-inline: calc(44px + var(--space-2));
   background: var(--lun-plum-deep);
   color: var(--lun-surface);
@@ -1153,7 +1153,7 @@ body {
 .site-announcement-link {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  min-height: var(--utility-h);
   overflow: hidden;
   /* 15px, light, as in the reference. */
   font: var(--type-body) var(--font-body);
@@ -1621,7 +1621,9 @@ body {
   margin: 0;
   padding: var(--space-6) var(--space-4);
   list-style: none;
-  background: color-mix(in srgb, var(--lun-gold-pale) 35%, var(--lun-surface));
+  /* White, like the whole site (founder decision 2026-11-10); hairlines mark the band. */
+  background: var(--lun-surface);
+  border-block: 1px solid var(--lun-line);
 }
 @media (min-width: 768px) {
   .site-trust {
@@ -1649,7 +1651,9 @@ body {
 }
 .site-footer {
   padding: var(--space-7) var(--space-4) var(--space-5);
-  background: var(--lun-gold-pale);
+  /* White, like the whole site (founder decision 2026-11-10); a hairline above. */
+  background: var(--lun-surface);
+  border-top: 1px solid var(--lun-line);
   color: var(--lun-ink);
 }
 @media (min-width: 768px) {
@@ -2327,41 +2331,35 @@ body {
   margin-inline: auto;
 }
 
-/* The card. */
+/* The slider (founder decision 2026-11-10, after secchiariboots.com): the
+   slides sit side by side and the row slides across; each photograph is
+   inset from the page edges by --hero-gutter. */
+/* The photograph lines up with the site content: --container-max wide, centred. */
+.hero-card {
+  --hero-gutter: max(var(--space-4), calc((100% - var(--container-max)) / 2));
+}
 .hero-card-frame {
   position: relative;
-  aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--lun-plum-deep);
   touch-action: pan-y;
 }
-@media (min-width: 768px) {
-  .hero-card-frame {
-    aspect-ratio: 16 / 9;
-  }
-}
-@media (min-width: 1280px) {
-  .hero-card-frame {
-    aspect-ratio: 5 / 2;
-  }
+.hero-track {
+  display: flex;
+  height: 100%;
+  transform: translateX(calc(var(--hero-active, 0) * -100%));
+  transition: transform var(--motion-hero-slide);
 }
 .hero-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+.hero-slide-media {
   position: absolute;
-  inset: 0;
-  z-index: 0;
-  visibility: hidden;
-  clip-path: inset(0 0 0 100%);
-}
-.hero-slide.is-leaving {
-  z-index: 1;
-  visibility: visible;
-  clip-path: inset(0);
-}
-.hero-slide.is-active {
-  z-index: 2;
-  visibility: visible;
-  clip-path: inset(0);
-  transition: clip-path var(--motion-reveal);
+  inset-block: 0;
+  inset-inline: var(--hero-gutter);
+  overflow: hidden;
+  background: var(--lun-gold-pale);
 }
 .hero-slide-image {
   object-fit: cover;
@@ -2369,6 +2367,10 @@ body {
 /* Subject on the right of a wide banner: a narrow crop keeps it in frame. */
 .hero-slide-image-end {
   object-position: 85% 50%;
+}
+/* Subject on the left of a wide banner. */
+.hero-slide-image-start {
+  object-position: 15% 50%;
 }
 /* Invisible timer: its animation ending advances the slide. */
 .hero-card-timer {
@@ -2382,316 +2384,12 @@ body {
   animation-play-state: paused;
 }
 
-/* Words on the card are white with a soft plum halo on the letters only —
-   never an overlay, gradient or tint on the photograph. */
-.hero-card-corner {
-  position: absolute;
-  z-index: 3;
-  top: var(--space-3);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-.hero-card-top-start {
-  inset-inline-start: var(--space-3);
-  max-width: calc(100% - var(--space-3) * 2);
-}
-.hero-card-top-end {
-  inset-inline-end: var(--space-5);
-  display: none;
-}
-@media (min-width: 768px) {
-  .hero-card-corner {
-    top: var(--space-4);
-  }
-  .hero-card-top-start {
-    inset-inline-start: var(--space-5);
-    max-width: 60%;
-  }
-  .hero-card-top-end {
-    display: flex;
-  }
-}
-.hero-card-meta,
-.hero-card-count {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  font-variant-numeric: tabular-nums;
-  color: var(--lun-surface);
-  text-decoration: none;
-  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
-}
-.hero-card-meta:lang(en),
-.hero-card-count:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
-}
-/* Phones: the top right stays clear (WhatsApp floats at the bottom instead). */
-@media (max-width: 767px) {
-  .hero-card-top-end.hero-card-meta {
-    display: none;
-  }
-}
-.hero-card-pause {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid color-mix(in srgb, var(--lun-surface) 45%, transparent);
-  border-radius: var(--radius-full);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
-  cursor: pointer;
-}
-
-/* Vertical "scroll" cue on the right, its line carrying a moving light. */
-.hero-card-scroll {
-  position: absolute;
-  z-index: 3;
-  inset-inline-end: var(--space-5);
-  top: 50%;
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  color: var(--lun-surface);
-  text-decoration: none;
-  transform: translateY(-50%);
-}
-@media (min-width: 768px) {
-  .hero-card-scroll {
-    display: flex;
-  }
-}
-.hero-card-scroll-line {
-  position: relative;
-  width: 1px;
-  height: var(--space-8);
-  overflow: hidden;
-  background: color-mix(in srgb, var(--lun-surface) 45%, transparent);
-}
-.hero-card-scroll-line::after {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 40%;
-  background: var(--lun-surface);
-  animation: hero-scroll-cue var(--motion-pulse-duration) ease-in-out infinite;
-}
-.hero-card-scroll-text {
-  writing-mode: vertical-rl;
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
-}
-.hero-card-scroll-text:lang(en) {
-  text-transform: uppercase;
-  letter-spacing: var(--type-label-tracking);
-}
-
-/* Facts as pills, bottom left. Solid plum, so they read on any photograph. */
-.hero-card-pills {
-  position: absolute;
-  z-index: 3;
-  inset-inline-start: var(--space-3);
-  bottom: var(--space-3);
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  max-width: calc(100% - var(--space-3) * 2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-@media (min-width: 768px) {
-  .hero-card-pills {
-    inset-inline-start: var(--space-5);
-    bottom: var(--space-5);
-    max-width: 55%;
-  }
-}
-.hero-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: 44px;
-  padding-inline: var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--lun-surface) 40%, transparent);
-  border-radius: var(--radius-full);
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
-  font: var(--type-body-s) var(--font-body);
-  font-weight: var(--weight-medium);
-  text-decoration: none;
-  transition: background-color var(--motion-standard);
-}
-.hero-pill:hover {
-  background: var(--lun-plum);
-}
-
-/* Real review proof, bottom right. */
-.hero-card-proof {
-  position: absolute;
-  z-index: 3;
-  inset-inline-end: var(--space-5);
-  bottom: var(--space-5);
-  display: none;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-2);
-  max-width: 24ch;
-  font: var(--type-body-s) var(--font-body);
-  font-weight: var(--weight-medium);
-  color: var(--lun-surface);
-  text-align: end;
-  text-shadow: 0 0 var(--space-3) color-mix(in srgb, var(--lun-plum-deep) 85%, transparent);
-}
-@media (min-width: 1024px) {
-  .hero-card-proof {
-    display: flex;
-  }
-}
-.hero-card-avatars {
-  display: flex;
-  padding-inline-start: var(--space-2);
-}
-.hero-card-avatar {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--space-6);
-  height: var(--space-6);
-  margin-inline-start: calc(var(--space-2) * -1);
-  border: 2px solid var(--lun-surface);
-  border-radius: var(--radius-full);
-  background: var(--lun-plum-light);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  text-shadow: none;
-}
-.hero-card-avatar:nth-child(even) {
-  background: var(--lun-gold-deep);
-}
-/* Card words arrive after the headline begins, one after another. */
-.hero-card-in {
-  animation: hero-fade var(--motion-reveal) both;
-  animation-delay: calc(var(--motion-reveal-delay) * (1.5 + var(--i, 0) * 0.25));
-}
-
-/* The promise, very large, each word arriving out of a blur. */
-.home-hero-headline {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  column-gap: 0.25em;
-  margin: 0;
-  font: var(--type-display-hero) var(--font-display);
-  font-size: clamp(2.5rem, 9.4vw, 12rem);
-  line-height: 1.05;
-  font-weight: var(--weight-semibold);
-  letter-spacing: -0.01em;
-  color: var(--lun-plum);
-  text-align: center;
-}
-.home-hero-headline:not(:lang(en)) {
-  font-size: clamp(2rem, 5vw, 6rem);
-  line-height: 1.35;
-  letter-spacing: 0;
-}
-.home-hero-word {
-  display: inline-block;
-  animation: hero-blur-up var(--motion-reveal) both;
-  animation-delay: calc(var(--motion-reveal-delay) * 0.5 + var(--i) * var(--motion-stagger));
-}
-.home-hero-foot {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding-block-end: var(--space-6);
-  border-bottom: 1px solid var(--lun-line);
-  animation: hero-fade var(--motion-reveal) both;
-  animation-delay: calc(var(--motion-reveal-delay) * 2);
-}
-@media (min-width: 768px) {
-  .home-hero-foot {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--space-6);
-  }
-}
-.home-hero-subhead {
-  margin: 0;
-  max-width: 60ch;
-  font: var(--type-body-s) var(--font-body);
-  color: var(--lun-ink-muted);
-}
-.home-hero-doors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-5);
-}
-.home-hero-door {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: 44px;
-  font: var(--type-body-s) var(--font-body);
-  font-weight: var(--weight-medium);
-  color: var(--lun-ink);
-  text-decoration: underline;
-  text-underline-offset: var(--space-1);
-}
-.home-hero-door:hover {
-  color: var(--lun-plum);
-}
 @keyframes hero-timer {
   from {
     opacity: 0;
   }
   to {
     opacity: 1;
-  }
-}
-@keyframes hero-fade {
-  from {
-    opacity: 0;
-    transform: translateY(var(--space-3));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes hero-blur-up {
-  from {
-    opacity: 0;
-    transform: translateY(0.3em);
-    filter: blur(var(--space-2));
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-}
-@keyframes hero-scroll-cue {
-  from {
-    transform: translateY(-100%);
-  }
-  to {
-    transform: translateY(250%);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-card-scroll-line::after {
-    animation: none;
   }
 }
 
@@ -3028,10 +2726,10 @@ body {
   max-width: 68ch;
 }
 
-/* A gold-pale panel beside a photograph. */
+/* A panel beside a photograph, white like the whole site (founder decision 2026-11-10). */
 .home-feature {
   display: grid;
-  background: var(--lun-gold-pale);
+  background: var(--lun-surface);
 }
 @media (min-width: 768px) {
   .home-feature {
@@ -3481,123 +3179,169 @@ body {
   border-color: var(--lun-danger);
 }
 
-/* The hero banner runs full width, but its words, pills and controls keep
-   the page edges: the --container-max column, centred (docs/2-ui.md §7.4). */
-@media (min-width: 768px) {
-  .hero-card {
-    --hero-inset: max(var(--space-5), calc((100% - var(--container-max)) / 2));
-  }
-  .hero-card-top-start,
-  .hero-card-pills {
-    inset-inline-start: var(--hero-inset);
-  }
-  .hero-card-top-end,
-  .hero-card-scroll,
-  .hero-card-proof {
-    inset-inline-end: var(--hero-inset);
-  }
+/* Dashes at the bottom left of the photograph: one per slide, the current
+   one twice as long and darker; each takes you to its slide. The button is
+   a 44px target, the dash a 3px line inside it. */
+.hero-dashes {
+  position: absolute;
+  z-index: 3;
+  inset-inline-start: var(--hero-gutter);
+  bottom: max(var(--space-2), 2.5vw);
+  display: flex;
+}
+.hero-dash {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding-inline: var(--space-2);
+  cursor: pointer;
+}
+.hero-dash::before {
+  content: '';
+  display: block;
+  width: var(--space-6);
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--lun-plum-deep) 35%, transparent);
+  transition:
+    width var(--motion-hero-dash),
+    background-color var(--motion-hero-dash);
+}
+.hero-dash[aria-current='true']::before {
+  width: var(--space-8);
+  background: var(--lun-plum-deep);
 }
 
-/* Hero arrows: two round buttons at the bottom left of the banner, on the
-   page-container edge (founder decision 2026-11-10). */
+/* Thin arrows at the bottom right of the photograph. Phones swipe or use
+   the dashes instead: there is no room for both beside five dashes. */
 .hero-card-arrows {
   position: absolute;
   z-index: 3;
-  inset-inline-start: var(--space-3);
-  bottom: var(--space-3);
+  inset-inline-end: var(--hero-gutter);
+  bottom: max(var(--space-2), 2.5vw);
   display: flex;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
-@media (min-width: 768px) {
+@media (max-width: 767px) {
   .hero-card-arrows {
-    inset-inline-start: var(--hero-inset);
-    bottom: var(--space-5);
+    display: none;
   }
 }
 .hero-card-arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: var(--lun-surface);
+  width: 44px;
+  height: 44px;
   color: var(--lun-plum-deep);
+  opacity: 0.8;
   transition:
-    background var(--motion-standard),
-    color var(--motion-standard);
+    opacity var(--motion-standard),
+    transform var(--motion-standard);
 }
 .hero-card-arrow:hover {
-  background: var(--lun-plum-deep);
-  color: var(--lun-surface);
+  opacity: 1;
+}
+.hero-card-arrow:first-child:hover {
+  transform: translateX(calc(var(--space-1) * -1));
+}
+.hero-card-arrow:last-child:hover {
+  transform: translateX(var(--space-1));
 }
 
 /*
- * The four facts beneath the banner (founder decision 2026-11-10, after the
- * founder's reference): equal coloured tiles running edge to edge, flush
- * under the banner, each with its fact set large in the display face. Two
- * by two on phones, four across from 1024px. Colours from the brand only:
- * plum, gold-pale, plum-light, plum-deep (gold as words on plum-deep, never
- * on white).
+ * The facts beneath the banner as sliding words (founder decision
+ * 2026-11-10, after secchiariboots.com): one row of large plum words in the
+ * display face, drifting on its own and sliding further as the page
+ * scrolls. The plum is mixed into the ground no further than 3:1 contrast
+ * for large text. (The second, faint row was removed the same day.)
  */
-.home-hero-inner > .home-facts {
+:root {
+  /* 20% smaller than first set (founder decision 2026-11-10). */
+  --marquee-large: clamp(2rem, 4.96vw, 6rem);
+  --marquee-line: 1.2;
+  --marquee-pad-top: var(--space-5);
+  --marquee-pad-bottom: var(--space-4);
+  --marquee-h: calc(
+    var(--marquee-pad-top) + var(--marquee-pad-bottom) + var(--marquee-large) * var(--marquee-line)
+  );
+}
+@media (min-width: 1024px) {
+  :root {
+    --marquee-pad-top: var(--space-6);
+    --marquee-pad-bottom: var(--space-5);
+  }
+}
+.home-hero-inner > .fact-marquee {
   width: 100%;
   margin: calc(var(--space-5) * -1) 0 0;
 }
-.home-facts {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding: 0;
-  list-style: none;
+.fact-marquee {
+  padding-block: var(--marquee-pad-top) var(--marquee-pad-bottom);
+  overflow-x: clip;
 }
-@media (min-width: 1024px) {
-  .home-facts {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.fact-marquee-row {
+  overflow-x: clip;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  line-height: var(--marquee-line);
+  font-variant-numeric: lining-nums;
 }
-.home-facts > li {
+.fact-marquee-large {
+  font-size: var(--marquee-large);
+  color: color-mix(in srgb, var(--lun-plum) 62%, var(--lun-ground));
+}
+.fact-marquee-row:not(:lang(en)) {
+  font-family: var(--font-body);
+}
+.fact-marquee-track {
   display: flex;
+  width: max-content;
+  animation: marquee-drift var(--motion-marquee) linear infinite;
 }
-.home-fact {
+.fact-marquee-half {
   display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(var(--space-9) + var(--space-5));
-  padding: var(--space-5) var(--space-4);
-  font: var(--type-display-m) var(--font-display);
-  font-size: clamp(1.25rem, 0.8rem + 1.6vw, 2.5rem);
+  flex: none;
+}
+.fact-marquee-word {
+  margin-inline: 0.3em;
   font-weight: var(--weight-medium);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  text-align: center;
-  text-wrap: balance;
-  text-decoration: none;
 }
-.home-fact:not(:lang(en)) {
-  font: var(--type-body-l) var(--font-body);
+.fact-marquee-word:nth-child(even) {
   font-weight: var(--weight-semibold);
 }
-.home-fact:hover {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: var(--space-2);
+.fact-marquee-row:lang(en) .fact-marquee-word {
+  font-weight: 400;
+  text-transform: uppercase;
 }
-.home-fact-plum {
-  background: var(--lun-plum);
-  color: var(--lun-surface);
+.fact-marquee-row:lang(en) .fact-marquee-word:nth-child(even) {
+  font-weight: var(--weight-semibold);
 }
-.home-fact-pale {
-  background: var(--lun-gold-pale);
-  color: var(--lun-plum-deep);
+/* Scrolling the page slides the rows further, in opposite directions. */
+@supports (animation-timeline: view()) {
+  .fact-marquee-shift {
+    animation: marquee-shift-left linear both;
+    animation-timeline: view();
+  }
 }
-.home-fact-light {
-  background: var(--lun-plum-light);
-  color: var(--lun-surface);
+@keyframes marquee-drift {
+  to {
+    transform: translateX(-50%);
+  }
 }
-.home-fact-deep {
-  background: var(--lun-plum-deep);
-  color: var(--lun-gold);
+@keyframes marquee-shift-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-20vw);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fact-marquee-track,
+  .fact-marquee-shift {
+    animation: none;
+  }
 }
 
 /* Phones: the centred logo leaves each side about 95px at 360px; account and
@@ -3614,19 +3358,19 @@ body {
 }
 
 /*
- * First view (founder decision 2026-11-10): the utility bar, the header, the
- * hero banner and the fact tiles beneath it all fit on the first screen.
- * The bar, the header and the tiles have fixed heights; the banner takes
- * what is left of the screen (svh: the browser's toolbars already
- * allowed for), never less than 18rem.
+ * First view (founder decision 2026-11-10, revised the same day): the hero
+ * banner is 80% of the screen below the sticky header (svh: the
+ * browser's toolbars already allowed for), never less than 18rem. The
+ * utility bar scrolls away above it and the sliding facts start below the
+ * fold; the first screen need not show them.
  */
 :root {
-  --utility-h: 44px;
+  --utility-h: 40px;
   --logo-h: calc(var(--space-6) * 1.2);
   /* The header is as tall as its tallest item: the logo, or the 44px icons. */
-  --header-h: calc(var(--space-3) * 2 + max(var(--logo-h), 44px) + 1px);
-  --facts-row: 104px;
-  --facts-rows: 2;
+  --header-h: calc(var(--header-pad-top) + var(--header-pad-bottom) + max(var(--logo-h), 44px) + 1px);
+  --header-pad-top: var(--space-3);
+  --header-pad-bottom: var(--space-3);
   /* Phones: the fixed bottom bar covers the foot of the screen. */
   --bottom-bar-h: calc(var(--control-height-lg) + var(--space-2) + env(safe-area-inset-bottom, 0px));
 }
@@ -3651,24 +3395,18 @@ body {
 @media (min-width: 1024px) {
   :root {
     --logo-h: calc((var(--space-6) + var(--space-2)) * 1.2);
-    --facts-rows: 1;
+    --header-pad-top: var(--space-7);
+    --header-pad-bottom: var(--space-5);
   }
 }
 .site-header .wordmark-logo {
   height: var(--logo-h);
 }
 .hero-card-frame {
-  aspect-ratio: auto;
   height: max(
     18rem,
-    calc(100svh - var(--utility-h) - var(--header-h) - var(--facts-row) * var(--facts-rows) - var(--bottom-bar-h))
+    calc((100svh - var(--header-h) - var(--bottom-bar-h)) * 0.8)
   );
-}
-.home-fact {
-  height: var(--facts-row);
-  min-height: 0;
-  padding-block: var(--space-3);
-  font-size: clamp(1.125rem, 0.7rem + 1.2vw, 2rem);
 }
 
 /* The phone bottom bar has one known height, used for the first view above
@@ -4294,4 +4032,134 @@ body {
   border-radius: var(--radius-l);
   background: var(--lun-surface);
   box-shadow: var(--elev-1);
+}
+
+/*
+ * Header styling (founder decision 2026-11-10, after secchiariboots.com),
+ * same layout and content: generous room above the logo and menu at the top
+ * of the page, drawing in once the page moves; menu words in capitals,
+ * medium weight, lightly spaced; a thin plum line drawing in from the left
+ * under the word pointed at, and back to the left when the pointer leaves.
+ */
+.site-header {
+  padding-block: var(--header-pad-top) var(--header-pad-bottom);
+  transition:
+    border-color var(--motion-header),
+    padding var(--motion-header);
+}
+.site-header-group.is-scrolled {
+  --header-pad-top: var(--space-3);
+  --header-pad-bottom: var(--space-3);
+}
+.site-header-item {
+  margin-block: calc(var(--header-pad-top) * -1) calc(var(--header-pad-bottom) * -1);
+  padding-block: var(--header-pad-top) var(--header-pad-bottom);
+  transition:
+    margin var(--motion-header),
+    padding var(--motion-header);
+}
+.site-header-link:lang(en) {
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.site-header-link {
+  color: var(--lun-ink);
+}
+.site-header-link::after {
+  transform-origin: left;
+  transition: transform var(--motion-menu);
+}
+.site-header-link:hover {
+  color: var(--lun-ink);
+}
+@media (min-width: 1280px) {
+  .site-header-nav {
+    gap: var(--space-7);
+  }
+}
+
+/*
+ * New arrivals rail styling (founder decision 2026-11-10, after
+ * perniaspopupshop.com "The most-loved shaadi styles"); the rail itself is
+ * unchanged and so is what each card says. Scoped to the rail: shop and
+ * product pages keep their cards. The heading in capitals in the body face;
+ * View all as plain capitals in muted ink; tall 2:3 photographs with square
+ * corners; under each, the name in capitals on one line, the cotton on one
+ * line in muted ink, then the price, the stock note and the jacket. The
+ * reference's zoom on hover is left out: a photograph is never scaled
+ * (§7.1).
+ */
+.product-rail-head {
+  align-items: center;
+}
+.product-rail-head .section-title:lang(en) {
+  font: var(--type-display-m) var(--font-body);
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.product-rail-controls .text-link {
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink-muted);
+  text-decoration: none;
+  transition: color var(--motion-standard);
+}
+.product-rail-controls .text-link:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.product-rail-controls .text-link:hover {
+  color: var(--lun-plum);
+}
+.product-rail .product-card {
+  gap: var(--space-1);
+}
+.product-rail .product-card-image {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-none);
+  margin-block-end: var(--space-1);
+}
+.product-rail .product-card-name,
+.product-rail .product-card-name:lang(en) {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+  order: 1;
+}
+.product-rail .product-card-name:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.product-rail .product-card-material {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+  order: 2;
+}
+.product-rail .product-card .price-display {
+  margin-block-start: var(--space-2);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  order: 3;
+}
+.product-rail .product-card .stock-badge {
+  font: var(--type-body-s) var(--font-body);
+  order: 4;
+  align-self: flex-start;
+}
+.product-rail .product-card-jacket-row {
+  margin-block-start: var(--space-1);
+  font: var(--type-label) var(--font-body);
+  order: 5;
 }

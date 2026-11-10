@@ -290,7 +290,10 @@
         "proof": "Rated {average} out of 5 by {count, plural, one {# customer} other {# customers}}."
       },
       "banners": {
-        "banner1Alt": "Two pink and white cotton sarees on wooden hangers against a sunlit cream wall"
+        "banner1Alt": "Two pink and white cotton sarees on wooden hangers against a sunlit cream wall",
+        "banner2Alt": "Exquisite embroidery on the finest fabrics: a folded mint saree with white embroidery on a woven basket, with white flowers, against a dark grey ground",
+        "banner3Alt": "Elegance in every thread: discover our handcrafted eyelet embroidery. Two white eyelet-embroidered sarees on wooden hangers against a navy wall",
+        "banner4Alt": "Modern ethnic elegance: discover our new patterned saree collection with traditional accents and natural olive borders. Two beige patterned sarees with olive borders on wooden hangers against a grey concrete wall"
       }
     },
     "trust": {
