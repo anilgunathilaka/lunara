@@ -49,7 +49,7 @@ export default async function OpsOrderPage({
 
   return (
     <div className="flex flex-col gap-6" style={{ maxWidth: '720px' }}>
-      <Link href="/ops" className="btn focus-ring btn-tertiary btn-sm" style={{ alignSelf: 'flex-start' }}>
+      <Link href="/ops/orders" className="btn focus-ring btn-tertiary btn-sm" style={{ alignSelf: 'flex-start' }}>
         {t('back')}
       </Link>
       <h2 className="checkout-step-title">
