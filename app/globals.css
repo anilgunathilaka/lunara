@@ -4840,3 +4840,99 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   color: var(--lun-ink-muted);
   font-variant-numeric: tabular-nums;
 }
+
+/*
+ * Temporary landing page (founder decision 2026-11-14): the logo, a gold
+ * rule, the promise in three languages and two ways to reach us, centred on
+ * white and fitting one screen on a 360px phone.
+ */
+.coming-soon {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: var(--space-7) var(--space-4);
+  background: var(--lun-surface);
+  color: var(--lun-ink);
+  text-align: center;
+}
+.coming-soon-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: 36rem;
+}
+.coming-soon-logo .wordmark-logo {
+  width: auto;
+  height: calc(var(--space-8) + var(--space-4));
+}
+.coming-soon-rule {
+  display: block;
+  width: var(--space-6);
+  height: 2px;
+  background: var(--lun-gold);
+}
+.coming-soon-eyebrow {
+  margin: 0;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lun-plum);
+}
+.coming-soon-title {
+  margin: 0;
+  font: var(--type-display-xl) var(--font-display);
+  font-weight: var(--weight-medium);
+  color: var(--lun-plum-deep);
+}
+.coming-soon-body {
+  margin: 0;
+  font: var(--type-body-l) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.coming-soon-other {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.coming-soon-other:lang(si) {
+  font-family: var(--font-sinhala);
+}
+.coming-soon-other:lang(ta) {
+  font-family: var(--font-tamil);
+}
+.coming-soon-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+}
+.coming-soon-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding-inline: var(--space-5);
+  border: 1px solid var(--lun-plum-deep);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum-deep);
+  text-decoration: none;
+  transition:
+    background-color var(--motion-standard),
+    color var(--motion-standard);
+}
+.coming-soon-action:hover {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.coming-soon-action-primary {
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
+.coming-soon-action-primary:hover {
+  background: var(--lun-plum);
+  border-color: var(--lun-plum);
+}
