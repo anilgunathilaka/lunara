@@ -40,6 +40,9 @@ export default async function OpsProductsPage({
           <Link href="/ops/products/new" className="btn focus-ring btn-primary btn-sm">
             {t('addSaree')}
           </Link>
+          <Link href="/ops/products/categories" className="btn focus-ring btn-secondary btn-sm">
+            {t('manageCategories')}
+          </Link>
         </div>
         <div className="ops-table-wrap">
           <table className="ops-table">
@@ -66,6 +69,7 @@ export default async function OpsProductsPage({
                   </td>
                   <td>
                     <strong>{row.name}</strong>
+                    {row.code && <span className="ops-muted"> · {row.code}</span>}
                     <br />
                     <span className="ops-muted">
                       <span className="ops-swatch" style={{ background: row.colourHex }} aria-hidden="true" />

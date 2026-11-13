@@ -8,6 +8,7 @@
   },
   "product": {
     "fabric": {
+      "category": "සාරි වර්ගය",
       "material": "ද්‍රව්‍යය",
       "materialPlain": "සාමාන්‍ය කපු",
       "materialSuper": "සුපිරි කපු",
@@ -36,6 +37,12 @@
       "photoAlt": "{name}, ඡායාරූපය {n}",
       "referenceAlt": "{name}, සංස්කරණය නොකළ දිවා ආලෝක වර්ණ යොමුව",
       "placeholderAlt": "{name} හි ඡායාරූපය ඉක්මනින්"
+    },
+    "categories": {
+      "cotton": "කපු සාරි",
+      "handloom": "අත්යන්ත්‍ර සාරි",
+      "batik": "බතික් සාරි",
+      "handPainting": "අතින් පින්තාරු කළ සාරි"
     }
   },
   "commerce": {
@@ -328,7 +335,7 @@
     "title": "නිර්මාණය කළ යුගල සාප්පු කරන්න",
     "resultsCount": "සාරි {count}",
     "filters": {
-      "material": "ද්‍රව්‍යය",
+      "category": "සාරි වර්ගය",
       "occasion": "අවස්ථාව",
       "priceBand": "මිල",
       "opacity": "විනිවිදභාවය",
@@ -350,6 +357,12 @@
     "noResultsAction": "පෙරහන් ඉවත් කරන්න"
   },
   "pdp": {
+    "breadcrumb": "පිටු මාර්ගය",
+    "home": "මුල් පිටුව",
+    "previous": "පෙර",
+    "next": "ඊළඟ",
+    "previousNamed": "පෙර සාරිය: {name}",
+    "nextNamed": "ඊළඟ සාරිය: {name}",
     "addToCart": "කරත්තයට එක් කරන්න",
     "customiseThis": "මෙය අභිරුචිකරණය කරන්න",
     "sendSwatches": "මට රෙදි නමුනා එවන්න",
@@ -632,8 +645,6 @@
       "codShare": "භාණ්ඩ ලැබුණු විට ගෙවීම",
       "bankShare": "බැංකු මාරු",
       "productHeading": "පාරිභෝගිකයන් තෝරන දේ",
-      "superUpgrade": "Super Cotton තෝරන අනුපාතය",
-      "superUpgradeNote": "Super Cotton සාරි ඒකක. ඉතා අඩු නම් මිල වෙනස විශාල වැඩි හෝ හොඳින් පැහැදිලි කර නැත.",
       "jacketAttachment": "වෙනම ජැකට් රෙදි සහිත ඇණවුම්",
       "jacketAttachmentNote": "වෙනම විකුණූ ජැකට් කෑලි {units}.",
       "osariya": "මහනුවර ඔසරිය (Design Your Own ඇණවුම්)",
@@ -678,7 +689,9 @@
           "metric": "බෙදා හැරි සහ ගෙවූ ඇණවුමකට වියදම",
           "why": "බෙදා හැරීම්, ආපසු දීම් සහ අලෙවිකරණ වියදම් සටහන් කිරීම අවශ්‍යයි."
         }
-      }
+      },
+      "categoriesHeading": "වර්ගය අනුව විකුණූ සාරි",
+      "category": "වර්ගය"
     },
     "products": {
       "intro": "ඔබ විකුණන දේ එකතු කරන්න, සංස්කරණය කරන්න, සංරක්ෂණය කරන්න. සංරක්ෂිත අයිතම සාප්පුවෙන් ඉවත් වන නමුත් ඉතිහාසය තබා ගනී; කිසි දිනෙක නොවිකුණූ ඒවා මැකිය හැක.",
@@ -715,7 +728,7 @@
       "priceLegend": "මිල",
       "sareePrice": "මෙම design එකේ මෙම කපු රෙද්දෙන් සාරි මිල (රු.)",
       "sareePriceFor": "{cotton} හි {design} සාරි මිල (රු.)",
-      "sareePriceNote": "design එකකට සහ කපු රෙද්දකට එක් මිලක්: එය වෙනස් කළොත් සාප්පුවේ සහ Design Your Own හි මෙම design එකේ මෙම කපු රෙද්දේ සියලු වර්ණවලට වෙනස් වේ. ජැකට් අමතර මිල ඊට එකතු වේ.",
+      "sareePriceNote": "design එකකට සහ සාරි වර්ගයකට එක් මිලක්: එය වෙනස් කළොත් සාප්පුවේ සහ Design Your Own හි මෙම design එකේ මෙම වර්ගයේ සියලු වර්ණවලට වෙනස් වේ. ජැකට් අමතර මිල ඊට එකතු වේ.",
       "currentPrices": "design අනුව දැනට ඇති මිල",
       "jacketLegend": "ජැකට් රෙද්ද",
       "pairedJacket": "යුගල කළ ජැකට් රෙද්ද සහ වර්ණය",
@@ -749,7 +762,11 @@
       "composition": "සංයුතිය",
       "compositionHint": "උදා: 100% කපු",
       "pieceLength": "කෑල්ලේ දිග (මීටර්)",
-      "jacketPriceNote": "මෙම මිල {material} ට අයත් වන අතර එහි සියලු වර්ණවලට අදාළ වේ."
+      "jacketPriceNote": "මෙම මිල {material} ට අයත් වන අතර එහි සියලු වර්ණවලට අදාළ වේ.",
+      "category": "සාරි වර්ගය",
+      "nextCode": "ඊළඟ කේතය {code}",
+      "categoryNote": "වර්ගය අනුව නිෂ්පාදන කේතය සුරකින විට ස්වයංක්‍රීයව ලැබේ.",
+      "manageCategories": "සාරි වර්ග"
     },
     "costs": {
       "legend": "එක් කැබැල්ලක පිරිවැය (staff පමණි)",
@@ -988,6 +1005,31 @@
         "out": "අවසන්",
         "manage": "තොග කළමනාකරණය"
       }
+    },
+    "categories": {
+      "backToProducts": "නිෂ්පාදන වෙත ආපසු",
+      "heading": "සාරි වර්ග",
+      "intro": "සෑම සාරියක්ම එක් වර්ගයකට අයත් වේ. වර්ගයක නිෂ්පාදන කේත එහි උපසර්ගයෙන් ආරම්භ වේ: LS, ඉන්පසු නමේ එක් එක් වචනයේ මුල් අකුර. කේත ස්වයංක්‍රීයව ලැබෙන අතර කිසි විටෙක වෙනස් නොවේ.",
+      "name": "වර්ගයේ නම",
+      "nameHint": "උදා: Handwoven sarees",
+      "summary": "උපසර්ගය {prefix} · ඊළඟ කේතය {next} · සාරි {count}",
+      "gsm": "GSM",
+      "opacityLabel": "පාරදෘශ්‍යතාව",
+      "length": "දිග (m)",
+      "save": "සුරකින්න",
+      "addHeading": "වර්ගයක් එක් කරන්න",
+      "firstCode": "පළමු කේතය: {code}",
+      "ruleNote": "උපසර්ගය LS සහ එක් එක් වචනයේ මුල් අකුර (\"sarees\" නොමැතිව). එය දැනටමත් භාවිතයේ ඇත්නම්, අවසාන වචනයේ ඊළඟ අකුර එක් කෙරේ.",
+      "add": "වර්ගය එක් කරන්න",
+      "details": "විස්තර",
+      "prefix": "උපසර්ගය",
+      "nextCode": "ඊළඟ කේතය",
+      "sarees": "සාරි",
+      "opacity": {
+        "opaque": "පාරාන්ධ",
+        "semi_sheer": "අර්ධ පාරදෘශ්‍ය",
+        "sheer": "පාරදෘශ්‍ය"
+      }
     }
   },
   "notifications": {
@@ -1063,6 +1105,10 @@
       }
     },
     "show": {
+      "heading": "පාරිභෝගික සමාලෝචන",
+      "basedOn": "සමාලෝචන {count} ක් මත",
+      "barLabel": "තරු {stars}: {count}",
+      "none": "තවම සමාලෝචන නැත. පාරිභෝගිකයන්ට සාරිය ලැබුණු පසු සමාලෝචන මෙහි දිස් වේ.",
       "ratingOf": "5 න් {rating}",
       "verified": "තහවුරු කළ මිලදී ගැනීමක්",
       "photoAlt": "{name} ගත් ඡායාරූපය, {n}",

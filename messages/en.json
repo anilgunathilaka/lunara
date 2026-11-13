@@ -8,6 +8,7 @@
   },
   "product": {
     "fabric": {
+      "category": "Saree category",
       "material": "Material",
       "materialPlain": "Plain Cotton",
       "materialSuper": "Super Cotton",
@@ -36,6 +37,12 @@
       "photoAlt": "{name}, photo {n}",
       "referenceAlt": "{name}, unretouched daylight colour reference",
       "placeholderAlt": "Photograph of {name} coming soon"
+    },
+    "categories": {
+      "cotton": "Cotton sarees",
+      "handloom": "Handloom sarees",
+      "batik": "Batik sarees",
+      "handPainting": "Hand painting sarees"
     }
   },
   "commerce": {
@@ -328,7 +335,7 @@
     "title": "Shop curated pairings",
     "resultsCount": "{count} sarees",
     "filters": {
-      "material": "Material",
+      "category": "Saree category",
       "occasion": "Occasion",
       "priceBand": "Price",
       "opacity": "Opacity",
@@ -350,6 +357,12 @@
     "noResultsAction": "Clear filters"
   },
   "pdp": {
+    "breadcrumb": "Breadcrumb",
+    "home": "Home",
+    "previous": "Prev",
+    "next": "Next",
+    "previousNamed": "Previous saree: {name}",
+    "nextNamed": "Next saree: {name}",
     "addToCart": "Add to cart",
     "customiseThis": "Customise this",
     "sendSwatches": "Send me swatches",
@@ -632,8 +645,6 @@
       "codShare": "Cash on delivery",
       "bankShare": "Bank transfer",
       "productHeading": "What customers choose",
-      "superUpgrade": "Super Cotton upgrade rate",
-      "superUpgradeNote": "Saree units in Super Cotton. Very low means the price step is too big or not well explained.",
       "jacketAttachment": "Orders with standalone jacket material",
       "jacketAttachmentNote": "{units} jacket pieces sold on their own.",
       "osariya": "Kandyan Osariya drape (Design Your Own orders)",
@@ -678,7 +689,9 @@
           "metric": "Cost per delivered and paid order",
           "why": "needs delivery, return and marketing costs recorded."
         }
-      }
+      },
+      "categoriesHeading": "Sarees sold by category",
+      "category": "Category"
     },
     "products": {
       "intro": "Add, edit and archive what you sell. Archived items disappear from the shop but keep their history; items never sold can be deleted.",
@@ -715,7 +728,7 @@
       "priceLegend": "Price",
       "sareePrice": "Saree price for this design in this cotton (LKR)",
       "sareePriceFor": "Saree price for {design} in {cotton} (LKR)",
-      "sareePriceNote": "One price per design and cotton: changing it changes it for every colour of this design in this cotton, in the shop and in Design Your Own. The jacket add-on is added on top.",
+      "sareePriceNote": "One price per design and saree category: changing it changes it for every colour of this design in this category, in the shop and in Design Your Own. The jacket add-on is added on top.",
       "currentPrices": "Current prices by design",
       "jacketLegend": "Jacket material",
       "pairedJacket": "Paired jacket material and colour",
@@ -749,7 +762,11 @@
       "composition": "Composition",
       "compositionHint": "e.g. 100% cotton",
       "pieceLength": "Piece length (metres)",
-      "jacketPriceNote": "These prices belong to {material} and apply to every colour of it."
+      "jacketPriceNote": "These prices belong to {material} and apply to every colour of it.",
+      "category": "Saree category",
+      "nextCode": "next code {code}",
+      "categoryNote": "The category sets the product code, given automatically when you save.",
+      "manageCategories": "Saree categories"
     },
     "costs": {
       "legend": "Cost per piece (staff only)",
@@ -988,6 +1005,31 @@
         "out": "Out",
         "manage": "Manage inventory"
       }
+    },
+    "categories": {
+      "backToProducts": "Back to products",
+      "heading": "Saree categories",
+      "intro": "Each saree belongs to one category. A category's product codes start with its prefix: LS, then the first letter of each word of its name. Codes are given automatically and never change.",
+      "name": "Category name",
+      "nameHint": "e.g. Handwoven sarees",
+      "summary": "Prefix {prefix} · next code {next} · {count, plural, one {# saree} other {# sarees}}",
+      "gsm": "GSM",
+      "opacityLabel": "Opacity",
+      "length": "Length (m)",
+      "save": "Save",
+      "addHeading": "Add a category",
+      "firstCode": "First code: {code}",
+      "ruleNote": "The prefix is LS plus the first letter of each word (without \"sarees\"). If it is already used, the next letter of the last word is added.",
+      "add": "Add category",
+      "details": "Details",
+      "prefix": "Prefix",
+      "nextCode": "Next code",
+      "sarees": "Sarees",
+      "opacity": {
+        "opaque": "Opaque",
+        "semi_sheer": "Semi-sheer",
+        "sheer": "Sheer"
+      }
     }
   },
   "notifications": {
@@ -1063,6 +1105,10 @@
       }
     },
     "show": {
+      "heading": "Customer reviews",
+      "basedOn": "Based on {count, plural, one {# review} other {# reviews}}",
+      "barLabel": "{stars} stars: {count}",
+      "none": "No reviews yet. Reviews appear here once customers have received their saree.",
       "ratingOf": "{rating} out of 5",
       "verified": "Verified purchase",
       "photoAlt": "Photo by {name}, {n}",

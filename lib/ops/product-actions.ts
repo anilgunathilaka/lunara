@@ -5,6 +5,7 @@ import { Prisma } from '@prisma/client';
 import { getPrisma } from '@/lib/prisma';
 import { OpsError, back, checkbox, langOf, opsLocale, run, skuCode, slugify, uniqueValue } from './flow';
 import { recordCreated } from '@/lib/stock/movements';
+import { formatProductCode } from '@/lib/catalogue/product-code';
 import { requireStaffAction } from './staff';
 
 /**
@@ -12,8 +13,9 @@ import { requireStaffAction } from './staff';
  * restore and — only for things never sold — delete shop products and
  * jacket colours. Every write is staff-only, validated, transactional and
  * audited. Price stays single-sourced: a saree's price lives on its
- * design × cotton in PRICE_MATRIX, shared by every colour of that design
- * in that cotton (CLAUDE.md).
+ * design × saree category in PRICE_MATRIX, shared by every colour of that
+ * design in that category (CLAUDE.md; PRD v4.0). Each new product gets its
+ * unique code (LSC001 …) from its category, in the same transaction.
  */
 
 const NEW = '__new';
@@ -47,12 +49,27 @@ async function setMatrixPrice(tx: Tx, actor: string, designId: string, materialI
 
 // ── Sarees (shop products) ────────────────────────────────────────────────
 
+/**
+ * The next unique product code in a category: its prefix and running number,
+ * three digits at least (LSC001 … LSC999, then LSC1000). The number is taken
+ * by an atomic increment; a code already in use (entered by hand, say) is
+ * skipped. Codes are never reused or changed (PRD v4.0).
+ */
+async function nextProductCode(tx: Tx, categoryId: string): Promise<string> {
+  for (;;) {
+    const category = await tx.cottonMaterial.update({ where: { id: categoryId }, data: { nextNumber: { increment: 1 } } });
+    const code = formatProductCode(category.codePrefix!, category.nextNumber - 1);
+    if (!(await tx.curatedListing.findUnique({ where: { productCode: code } }))) return code;
+  }
+}
+
 const createSchema = z.object({
   locale: opsLocale,
   name: text(2, 80),
   designId: z.string().min(1).max(100),
   newDesignName: z.string().trim().max(60).optional(),
-  materialId: z.enum(['plain', 'super']),
+  /** The saree category (PRD v4.0); the column keeps its old name. */
+  materialId: z.string().min(1).max(100),
   colourName: text(1, 40),
   colourHex: hex,
   price: money,
@@ -90,6 +107,11 @@ export async function createProductAction(form: FormData): Promise<void> {
       }
       const jacket = await tx.jacketColourway.findUnique({ where: { id: input.jacketColourwayId } });
       if (!jacket || !jacket.active) throw new OpsError('invalid');
+      // The category: on sale, with a code prefix. Taking its next number here,
+      // inside the transaction, means two products added at once never share a code.
+      const category = await tx.cottonMaterial.findUnique({ where: { id: input.materialId } });
+      if (!category || !category.active || !category.codePrefix) throw new OpsError('invalid');
+      const productCode = await nextProductCode(tx, category.id);
 
       const duplicate = await tx.sareeColourway.findUnique({
         where: { designId_materialId_colourName: { designId, materialId: input.materialId, colourName: input.colourName } },
@@ -100,7 +122,7 @@ export async function createProductAction(form: FormData): Promise<void> {
 
       const colourwayId = await uniqueValue(slugify(`${designId}-${input.materialId}-${input.colourName}`, 80), async (v) => !!(await tx.sareeColourway.findUnique({ where: { id: v } })));
       const sku = await uniqueValue(
-        `SAR-${skuCode(designName)}-${input.materialId === 'plain' ? 'PLN' : 'SUP'}-${skuCode(input.colourName)}`,
+        `SAR-${skuCode(designName)}-${category.codePrefix}-${skuCode(input.colourName)}`,
         async (v) => !!(await tx.stockItem.findUnique({ where: { sku: v } })),
       );
       await tx.stockItem.create({ data: { sku, quantity: input.quantity, threshold: input.threshold } });
@@ -115,6 +137,7 @@ export async function createProductAction(form: FormData): Promise<void> {
         data: {
           id: listingId,
           name: input.name,
+          productCode,
           sareeColourwayId: colourwayId,
           jacketColourwayId: jacket.id,
           isFeatured: input.featured,
@@ -123,6 +146,7 @@ export async function createProductAction(form: FormData): Promise<void> {
       });
       await audit(tx, staff.email, 'product.create', 'curated_listing', listingId, {
         name: input.name,
+        productCode,
         designId,
         materialId: input.materialId,
         colourName: input.colourName,

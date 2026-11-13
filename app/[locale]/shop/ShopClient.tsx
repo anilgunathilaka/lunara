@@ -4,18 +4,18 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/primitives/Button';
 import { ProductCard } from '@/components/product/ProductCard';
-import type { CatalogueProduct, Occasion } from '@/lib/catalogue/types';
+import type { CatalogueProduct, Occasion, SareeCategory } from '@/lib/catalogue/types';
 
 type PriceBand = 'all' | 'under8000' | '8000to9000' | 'over9000';
-type MaterialFilter = 'all' | 'plain' | 'super';
 type OccasionFilter = 'all' | Occasion;
 
 export interface ShopClientProps {
   products: CatalogueProduct[];
-  /** From /shop?material=…; the customer can still change it. */
-  initialMaterial?: MaterialFilter;
-  materialLabels: { plain: string; super: string };
-  filterLabels: { material: string; occasion: string; priceBand: string; all: string; clear: string };
+  /** Saree categories on sale, in the admin's order (PRD v4.0). */
+  categories: SareeCategory[];
+  /** From /shop?category=…; the customer can still change it. */
+  initialCategory?: string;
+  filterLabels: { category: string; occasion: string; priceBand: string; all: string; clear: string };
   occasionLabels: Record<Occasion, string>;
   priceBandLabels: Record<Exclude<PriceBand, 'all'>, string>;
   noResultsLabel: string;
@@ -33,8 +33,8 @@ function matchesPriceBand(price: number, band: PriceBand): boolean {
 
 export function ShopClient({
   products,
-  initialMaterial = 'all',
-  materialLabels,
+  categories,
+  initialCategory = 'all',
   filterLabels,
   occasionLabels,
   priceBandLabels,
@@ -46,7 +46,7 @@ export function ShopClient({
   const t = useTranslations('shop');
   const tStock = useTranslations('product.stock');
   const formatLeft = (count: number) => tStock('left', { count });
-  const [material, setMaterial] = useState<MaterialFilter>(initialMaterial);
+  const [category, setCategory] = useState<string>(initialCategory);
   const [occasion, setOccasion] = useState<OccasionFilter>('all');
   const [priceBand, setPriceBand] = useState<PriceBand>('all');
 
@@ -54,17 +54,17 @@ export function ShopClient({
     () =>
       products.filter(
         (p) =>
-          (material === 'all' || p.material === material) &&
+          (category === 'all' || p.categoryId === category) &&
           (occasion === 'all' || p.occasions.includes(occasion)) &&
           matchesPriceBand(p.price, priceBand),
       ),
-    [products, material, occasion, priceBand],
+    [products, category, occasion, priceBand],
   );
 
-  const hasActiveFilters = material !== 'all' || occasion !== 'all' || priceBand !== 'all';
+  const hasActiveFilters = category !== 'all' || occasion !== 'all' || priceBand !== 'all';
 
   function clearFilters() {
-    setMaterial('all');
+    setCategory('all');
     setOccasion('all');
     setPriceBand('all');
   }
@@ -73,16 +73,16 @@ export function ShopClient({
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end gap-4">
         <div className="field">
-          <span className="field-label">{filterLabels.material}</span>
+          <span className="field-label">{filterLabels.category}</span>
           <div className="flex flex-wrap gap-2">
-            {(['all', 'plain', 'super'] as const).map((value) => (
+            {[{ id: 'all', name: filterLabels.all }, ...categories].map((value) => (
               <button
-                key={value}
+                key={value.id}
                 type="button"
-                onClick={() => setMaterial(value)}
-                className={`material-option ${material === value ? 'material-option-active' : ''}`}
+                onClick={() => setCategory(value.id)}
+                className={`material-option ${category === value.id ? 'material-option-active' : ''}`}
               >
-                {value === 'all' ? filterLabels.all : materialLabels[value]}
+                {value.name}
               </button>
             ))}
           </div>
@@ -148,7 +148,8 @@ export function ShopClient({
               href={`/shop/${product.id}`}
               image={{ src: product.imageUrl, alt: product.name }}
               name={product.name}
-              materialLabel={materialLabels[product.material]}
+              code={product.productCode}
+              materialLabel={product.categoryName}
               price={product.price}
               jacketMaterialName={product.jacketMaterialName}
               jacketSwatchHex={product.jacketSwatchHex}

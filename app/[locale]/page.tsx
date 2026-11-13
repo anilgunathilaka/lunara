@@ -4,9 +4,10 @@ import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
-import { getCuratedListings } from '@/lib/catalogue/queries';
+import { getCuratedListings, getSareeCategories } from '@/lib/catalogue/queries';
+import { categoryNamer } from '@/lib/catalogue/category-label';
 import { latestReviews, type PublicReview } from '@/lib/reviews/reviews';
-import type { CatalogueProduct } from '@/lib/catalogue/types';
+import type { CatalogueProduct, SareeCategory } from '@/lib/catalogue/types';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
@@ -43,19 +44,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale);
   // Started together, awaited only where each is shown.
   const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
+  const categoriesP = getSareeCategories();
+  const categoryName = await categoryNamer();
   const reviewsP = latestReviews(3);
   const t = await getTranslations('home');
-  const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');
   const tJacket = await getTranslations('product.jacket');
   const tSupport = await getTranslations('support');
   const tNav = await getTranslations('layout.nav');
   const tLayout = await getTranslations('layout');
-  const tFooter = await getTranslations('layout.footer');
 
   const formatLeft = (count: number) => tStock('left', { count });
-  const materialLabel = { plain: tFabric('materialPlain'), super: tFabric('materialSuper') };
 
   // Featured sarees for the hero card; until there are any, the hero photograph.
   // Founder banners first, then featured sarees, four slides at most (founder decision 2026-11-10).
@@ -78,26 +78,26 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       href: `/shop/${item.id}`,
       image: { src: item.imageUrl, alt: item.name },
       title: item.name,
-      caption: materialLabel[item.material],
+      caption: categoryName(item.categoryId, item.categoryName),
     }));
     return { slides, slideOf: slideLabels(firstSlides.length + slides.length) };
   });
 
-  // Ways in: a real saree photograph of each cotton where one exists.
-  const tilesWith = (arrivals: CatalogueProduct[]) => {
-    const photoOf = (material: 'plain' | 'super') =>
-      arrivals.find((item) => item.material === material)?.imageUrl ?? '/placeholder/product.jpg';
-    return [
-      { href: '/shop?material=plain', label: materialLabel.plain, image: photoOf('plain') },
-      { href: '/shop?material=super', label: materialLabel.super, image: photoOf('super') },
-      { href: '/jacket-material', label: tNav('jacketMaterial'), image: '/placeholder/product.jpg' },
-      { href: '/support/care-guide', label: tFooter('careGuide'), image: '/placeholder/product.jpg' },
-    ];
-  };
+  // Ways in: the saree categories, four at most, each with a real saree
+  // photograph from it where one exists (PRD v4.0, founder decision 2026-11-14).
+  const TILE_COUNT = 4;
+  const tilesWith = (arrivals: CatalogueProduct[], categories: SareeCategory[]) =>
+    categories.slice(0, TILE_COUNT).map((category) => ({
+      href: `/shop?category=${category.id}`,
+      label: categoryName(category.id, category.name),
+      image: arrivals.find((item) => item.categoryId === category.id)?.imageUrl ?? '/placeholder/product.jpg',
+    }));
+  // While the categories load: four tiles the same size, so nothing shifts.
+  const tilePlaceholders = Array.from({ length: TILE_COUNT }, () => ({ href: '/shop', label: '', image: '/placeholder/product.jpg' }));
   const tileList = (tiles: ReturnType<typeof tilesWith>) => (
     <ul className="home-tiles">
-      {tiles.map((tile) => (
-        <li key={tile.href}>
+      {tiles.map((tile, i) => (
+        <li key={i}>
           <Link href={tile.href} className="home-tile focus-ring">
             <span className="home-tile-image">
               <Image src={tile.image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" />
@@ -125,7 +125,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             href={`/shop/${item.id}`}
             image={{ src: item.imageUrl, alt: item.name }}
             name={item.name}
-            materialLabel={materialLabel[item.material]}
+            code={item.productCode}
+            materialLabel={categoryName(item.categoryId, item.categoryName)}
             price={item.price}
             jacketMaterialName={item.jacketMaterialName}
             jacketSwatchHex={item.jacketSwatchHex}
@@ -204,8 +205,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <Reveal>
             <h2 className="section-title">{t('tiles.heading')}</h2>
           </Reveal>
-          <Suspense fallback={tileList(tilesWith([]))}>
-            <Await promise={arrivalsP}>{(arrivals) => tileList(tilesWith(arrivals))}</Await>
+          <Suspense fallback={tileList(tilePlaceholders)}>
+            <Await promise={Promise.all([arrivalsP, categoriesP])}>
+              {([arrivals, categories]) => tileList(tilesWith(arrivals, categories))}
+            </Await>
           </Suspense>
         </div>
       </section>

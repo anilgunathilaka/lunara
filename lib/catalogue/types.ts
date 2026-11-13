@@ -7,13 +7,23 @@ import type { StockStateValue } from '@/lib/stock/state';
 
 export type Occasion = 'office' | 'everyday' | 'festive' | 'temple';
 export type Opacity = 'opaque' | 'semi-sheer' | 'sheer';
+/** The configurator's two-material axis (switched off; reworked to categories when it returns, PRD v4.0). */
 export type MaterialId = 'plain' | 'super';
+
+/** A saree category (PRD v4.0): Cotton, Handloom, Batik, Hand painting, and any the admin adds. */
+export interface SareeCategory {
+  id: string;
+  name: string;
+}
 
 /** A curated listing (purchase path A). */
 export interface CatalogueProduct {
   id: string;
   name: string;
-  material: MaterialId;
+  /** Unique product code (LSC001 …), generated when the product was added. */
+  productCode: string | null;
+  categoryId: string;
+  categoryName: string;
   price: number;
   colourName: string;
   colourHex: string;

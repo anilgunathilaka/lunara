@@ -16,6 +16,7 @@ import {
   type JacketProductDetail,
   type MaterialId,
   type Opacity,
+  type SareeCategory,
 } from './types';
 
 /**
@@ -54,7 +55,9 @@ function toProduct(row: ListingRow): CatalogueProduct {
   return {
     id: row.id,
     name: row.name,
-    material: toMaterialId(saree.materialId),
+    productCode: row.productCode,
+    categoryId: saree.materialId,
+    categoryName: saree.material.name,
     price: resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
     colourName: saree.colourName,
     colourHex: saree.colourHex,
@@ -96,6 +99,16 @@ export async function getCuratedListing(id: string): Promise<CatalogueProduct | 
     include: listingInclude,
   });
   return row ? toProduct(row) : null;
+}
+
+/** Saree categories on sale, in the admin's order (PRD v4.0). The table keeps its old name, cotton_material. */
+export async function getSareeCategories(): Promise<SareeCategory[]> {
+  await connection();
+  return getPrisma().cottonMaterial.findMany({
+    where: { active: true },
+    orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+    select: { id: true, name: true },
+  });
 }
 
 export const jacketInclude = {

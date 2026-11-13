@@ -70,6 +70,17 @@ Version 2.0 corrected that, but modelled the configurator as a two-axis chooser 
 | Price was a property of the material colourway. | Price is computed from design AND material together, and updates live as either changes. |
 | Saree colour and design were the same choice. | Design is recolourable. The same design renders in any available saree colour — confirmed as approach (a) by the founder. |
 
+0.2.3 v3.0 → v4.0 (founder decision 2026-11-14)
+
+| v3.0 | v4.0 |
+| --- | --- |
+| Two cotton materials only: Plain Cotton and Super Cotton. | Plain Cotton and Super Cotton are withdrawn. Sarees are grouped into saree categories: Cotton sarees, Handloom sarees, Batik sarees, Hand painting sarees. The admin can add further categories. Each category is its own kind of saree, with its own GSM, opacity and length. |
+| Price is computed from design AND material. | Price is computed from design AND category (PRICE_MATRIX: design × category), still one source of truth. |
+| The configurator's second axis is material (Plain or Super). | The second axis is the saree category. (The configurator is switched off; it follows when it returns.) |
+| Products had no reference code. | Every product carries a unique code, generated when it is added and never changed: LS (Lunara Sarees), then the first letter of each word of the category name (without "sarees"), then a running number from 001. Cotton sarees LSC001, Handloom LSH001, Batik LSB001, Hand painting LSHP001. If a new category's letters are already taken, the next letter of its last word is added (Handwoven → LSHA). The code shows on product cards and the product page. |
+
+Where a later section of this document still speaks of Plain Cotton and Super Cotton, read "saree category"; those sections are kept for the record of the reasoning, which v4.0 supersedes.
+
 Sourcing note: the Lunara Facebook page could not be machine-read during preparation, as Facebook disallows automated access. Brand positioning below is taken from the founder's written brief and confirmed through direct clarification. Any live page content that contradicts this document should be reconciled before approval.
 
 1. Product Overview

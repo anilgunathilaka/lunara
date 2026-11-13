@@ -33,6 +33,7 @@ export async function productAdminList() {
       return {
         id: row.id,
         name: row.name,
+        code: row.productCode,
         active: row.active && saree.active,
         featured: row.isFeatured,
         detail: `${saree.design.name} · ${saree.material.name} · ${saree.colourName}`,
@@ -65,7 +66,12 @@ export async function productFormOptions() {
   const prisma = getPrisma();
   const [designs, materials, jackets, jacketMaterials, prices] = await Promise.all([
     prisma.sareeDesign.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }], select: { id: true, name: true, active: true } }),
-    prisma.cottonMaterial.findMany({ orderBy: { id: 'asc' }, select: { id: true, name: true } }),
+    // Saree categories on sale (PRD v4.0), in the admin's order.
+    prisma.cottonMaterial.findMany({
+      where: { active: true, codePrefix: { not: null } },
+      orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+      select: { id: true, name: true, codePrefix: true, nextNumber: true },
+    }),
     prisma.jacketColourway.findMany({
       where: { active: true },
       orderBy: [{ material: { sortOrder: 'asc' } }, { id: 'asc' }],

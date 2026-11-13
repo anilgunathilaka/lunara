@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
-import { getCuratedListings } from '@/lib/catalogue/queries';
+import { getCuratedListings, getSareeCategories } from '@/lib/catalogue/queries';
+import { categoryNamer } from '@/lib/catalogue/category-label';
 import { ShopClient } from './ShopClient';
 
 export default async function ShopPage({
@@ -8,17 +9,19 @@ export default async function ShopPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ material?: string }>;
+  searchParams: Promise<{ category?: string }>;
 }) {
   const { locale } = await params;
-  // /shop?material=plain|super opens with that cotton chosen (the home page tiles link here).
-  const { material } = await searchParams;
-  const initialMaterial = material === 'plain' || material === 'super' ? material : 'all';
+  // /shop?category=… opens with that saree category chosen (the home page tiles link here).
+  const { category } = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations('shop');
-  const tFabric = await getTranslations('product.fabric');
   const tStock = await getTranslations('product.stock');
-  const products = await getCuratedListings();
+  const [listed, sareeCategories, categoryName] = await Promise.all([getCuratedListings(), getSareeCategories(), categoryNamer()]);
+  // Category names in the page's language.
+  const categories = sareeCategories.map((c) => ({ ...c, name: categoryName(c.id, c.name) }));
+  const products = listed.map((p) => ({ ...p, categoryName: categoryName(p.categoryId, p.categoryName) }));
+  const initialCategory = categories.some((c) => c.id === category) ? category! : 'all';
 
   return (
     <div className="home-section">
@@ -32,10 +35,10 @@ export default async function ShopPage({
 
         <ShopClient
           products={products}
-          initialMaterial={initialMaterial}
-          materialLabels={{ plain: tFabric('materialPlain'), super: tFabric('materialSuper') }}
+          categories={categories}
+          initialCategory={initialCategory}
           filterLabels={{
-            material: t('filters.material'),
+            category: t('filters.category'),
             occasion: t('filters.occasion'),
             priceBand: t('filters.priceBand'),
             all: t('filters.all'),

@@ -140,13 +140,13 @@
   --motion-reveal-delay: 400ms;
   --motion-stagger: 80ms;
   /* Hero slider (founder decision 2026-11-10, after secchiariboots.com):
-     a slide every 4s, the row sliding across in 1s, the current dash
-     growing in 0.8s. */
+     a slide every 4s, the row sliding across in 1s. */
   --motion-hero-interval: 4000ms;
   --motion-hero-slide: 1000ms ease;
-  --motion-hero-dash: 800ms ease-in-out;
   /* The facts beneath the banner drift one loop in this time. */
   --motion-marquee: 120000ms;
+  /* Product page bar with Add to cart sliding up from the bottom (founder decision 2026-11-13, after eshandlooms.com). */
+  --motion-sticky-bar: 500ms ease;
   /* Header (docs/2-ui.md §7.2): menu panels fade, the strip slides. */
   --motion-menu-ease: cubic-bezier(0.33, 0, 0, 1);
   --motion-menu-duration: 300ms;
@@ -241,6 +241,6 @@
     --motion-announcement-fade: 0ms;
     --motion-pane: 0ms;
     --motion-hero-slide: 0ms;
-    --motion-hero-dash: 0ms;
+    --motion-sticky-bar: 0ms;
   }
 }

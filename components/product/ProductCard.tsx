@@ -7,7 +7,9 @@ export interface ProductCardProps {
   href: string;
   image: { src: string; alt: string };
   name: string;
-  /** e.g. "Plain Cotton" — shown beneath the name. */
+  /** Unique product code, e.g. "LSC001" (PRD v4.0) — shown above the name. */
+  code?: string | null;
+  /** The saree category, e.g. "Cotton sarees" — shown beneath the name. */
   materialLabel: string;
   /** All-in price for saree plus jacket material. */
   price: number;
@@ -24,6 +26,7 @@ export function ProductCard({
   href,
   image,
   name,
+  code,
   materialLabel,
   price,
   jacketMaterialName,
@@ -47,6 +50,7 @@ export function ProductCard({
         lowStockLabel={lowStockLabel}
         formatLeft={formatLeft}
       />
+      {code && <p className="product-card-code">{code}</p>}
       <p className="product-card-name">{name}</p>
       <p className="product-card-material">{materialLabel}</p>
       <PriceDisplay amount={price} />

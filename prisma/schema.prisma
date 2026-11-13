@@ -121,8 +121,12 @@ model SareeDesign {
   @@map("saree_design")
 }
 
-/// Exactly two rows: 'plain' and 'super'. A table, not an enum, so GSM,
-/// opacity and length stay data (§3.1).
+/// A saree category (PRD v4.0, founder decision 2026-11-14): Cotton,
+/// Handloom, Batik, Hand painting, and any the admin adds. The table and
+/// model keep their old names (cotton_material, CottonMaterial, materialId);
+/// Plain and Super stay as inactive rows because past orders point at them.
+/// codePrefix is the product-code prefix (LSC, LSH, LSB, LSHP …) and
+/// nextNumber the next running number it hands out (docs/4-architecture.md §3.1).
 model CottonMaterial {
   id                String   @id
   name              String
@@ -130,6 +134,9 @@ model CottonMaterial {
   opacity           Opacity
   lengthMetres      Decimal  @db.Decimal(4, 2)
   textureOverlayUrl String?
+  codePrefix        String?  @unique
+  nextNumber        Int      @default(1)
+  sortOrder         Int      @default(0)
   active            Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -420,6 +427,8 @@ model OfficePayment {
 model CuratedListing {
   id                String   @id
   name              String
+  /// Unique product code (LSC001 …), generated when the listing is added; never changed.
+  productCode       String?  @unique
   sareeColourwayId  String
   jacketColourwayId String
   isFeatured        Boolean  @default(false)
