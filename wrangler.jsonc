@@ -48,7 +48,11 @@
   "vars": {
     "BETTER_AUTH_URL": "https://lunarasarees.com",
     "EMAIL_FROM": "Lunara Sarees <hello@lunarasarees.com>",
-    "R2_PUBLIC_BASE_URL": "https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev"
+    "R2_PUBLIC_BASE_URL": "https://pub-e7079fa5cefa4352ab1d1bdb90ef39d3.r2.dev",
+    // Temporary landing page on every public address while the shop is
+    // being finished (middleware.ts; founder decision 2026-11-14). Remove,
+    // or set to "0", to open the shop.
+    "COMING_SOON": "1"
   },
 
   // Notifications: send due and retrying messages (docs/4-architecture.md §6.1).
