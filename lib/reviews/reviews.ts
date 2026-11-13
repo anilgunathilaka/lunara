@@ -107,6 +107,8 @@ export interface ReviewSummary {
   count: number;
   /** One decimal place; null when there are no reviews. */
   average: number | null;
+  /** How many reviews gave each rating, index 0 for one star to 4 for five (product pages only). */
+  distribution?: [number, number, number, number, number];
 }
 
 /** Published reviews of one curated listing, newest first, with the summary over all of them. */
@@ -115,14 +117,19 @@ export async function listingReviews(listingId: string, take = 20): Promise<{ re
   await connection();
   const prisma = getPrisma();
   const where = { listingId, status: 'published' as const };
-  const [rows, agg] = await Promise.all([
+  const [rows, agg, byRating] = await Promise.all([
     prisma.review.findMany({ where, orderBy: { createdAt: 'desc' }, take, select: publicSelect }),
     prisma.review.aggregate({ where, _count: { _all: true }, _avg: { rating: true } }),
+    prisma.review.groupBy({ by: ['rating'], where, _count: { _all: true } }),
   ]);
   const average = agg._avg.rating;
+  const distribution: [number, number, number, number, number] = [0, 0, 0, 0, 0];
+  for (const group of byRating) {
+    if (group.rating >= 1 && group.rating <= 5) distribution[group.rating - 1] = group._count._all;
+  }
   return {
     reviews: rows.map(toPublic),
-    summary: { count: agg._count._all, average: average === null ? null : Math.round(average * 10) / 10 },
+    summary: { count: agg._count._all, average: average === null ? null : Math.round(average * 10) / 10, distribution },
   };
 }
 

@@ -49,20 +49,20 @@ const SWIPE_SHARE = 0.12;
  * Home hero banner (docs/2-ui.md §7.2; founder decision 2026-11-10, after
  * secchiariboots.com): photographs only, no words on them. The slides sit
  * side by side and the row slides across (--motion-hero-slide); each
- * photograph is inset from the page edges. Dashes at the bottom left show
- * where you are (the current one twice as long) and take you to a slide;
- * thin arrows sit at the bottom right. No parallax and no dimming of the
- * neighbouring slides: a photograph is never tinted or drifted (§7.1).
+ * photograph is inset from the page edges. Thin arrows sit at the bottom
+ * right (no dashes: founder decision 2026-11-13); phones swipe. No parallax
+ * and no dimming of the neighbouring slides: a photograph is never tinted
+ * or drifted (§7.1).
  *
  * It advances on its own every --motion-hero-interval (the timer is a CSS
  * animation on an invisible element) and waits while the pointer is over it
- * or anything in it has focus. Using an arrow or a dash hands control to the
+ * or anything in it has focus. Using an arrow or a swipe hands control to the
  * customer: it stops advancing on its own (WCAG 2.2.2). Under
  * prefers-reduced-motion nothing advances on its own and slides change at once.
  */
 export function HeroShowcase({ slides: firstSlides, more, labels }: HeroShowcaseProps) {
   const [active, setActive] = useState(0);
-  // Once the customer uses an arrow or a dash, the slides stop moving on their own.
+  // Once the customer uses an arrow or swipes, the slides stop moving on their own.
   const [userStopped, setUserStopped] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const swipeFrom = useRef<number | null>(null);
@@ -164,18 +164,6 @@ export function HeroShowcase({ slides: firstSlides, more, labels }: HeroShowcase
 
         {count > 1 && (
           <>
-            <div className="hero-dashes">
-              {slides.map((slide, i) => (
-                <button
-                  key={slide.href + i}
-                  type="button"
-                  className="hero-dash focus-ring"
-                  aria-label={slideOf[i]}
-                  aria-current={i === active ? 'true' : undefined}
-                  onClick={() => choose(i)}
-                />
-              ))}
-            </div>
             <div className="hero-card-arrows">
               <button type="button" className="hero-card-arrow focus-ring" onClick={() => choose(active - 1)} aria-label={labels.previous}>
                 <Icon icon={ArrowLeft} size="inline" />

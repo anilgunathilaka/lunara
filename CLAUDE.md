@@ -5,8 +5,10 @@ Cotton sarees sold with UNSTITCHED jacket material.
 We do NOT stitch. We do NOT take measurements.
 We do NOT sell ready-to-wear outfits.
 
-TWO cotton materials only: Plain Cotton, Super Cotton.
-NOT a wide fabric range. Variety comes from DESIGN, not fabric.
+SAREE CATEGORIES (PRD v4.0, founder decision 2026-11-14): Cotton,
+Handloom, Batik, Hand painting; the admin can add more. Plain Cotton
+and Super Cotton are withdrawn. Every product has a unique code
+(LSC001, LSH001, LSB001, LSHP001 …), generated, never changed.
 
 Two purchase paths:
   A. Curated listings — design + material + colour + jacket
@@ -14,12 +16,12 @@ Two purchase paths:
   B. Design Your Own — FOUR independent axes plus a drape
      toggle. Customer selects:
        1. saree DESIGN   (pre-defined set, recolourable)
-       2. MATERIAL       (Plain | Super)
+       2. CATEGORY       (Cotton | Handloom | Batik | Hand painting …)
        3. saree COLOUR   (any design renders in any colour)
        4. JACKET         (material + colour)
        + DRAPE           (Saree | Kandyan Osariya)
      Model re-renders on ALL of these.
-     PRICE re-computes on design + material.
+     PRICE re-computes on design + category.
 Plus: jacket material sold standalone.
 
 ## Non-negotiables
@@ -29,7 +31,7 @@ Plus: jacket material sold standalone.
 - No filter, overlay, gradient or tint on product photography.
 - Stock: one source of truth. Catalogue and configurator read
   the same record. Never two stores kept in sync.
-- Price: one source of truth — PRICE_MATRIX (design × material).
+- Price: one source of truth — PRICE_MATRIX (design × category).
   Never compute price in the client. Catalogue and configurator
   MUST NOT be able to quote different prices for the same combo.
 - Every price change is ATTRIBUTED at the moment it happens,

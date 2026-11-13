@@ -21,7 +21,8 @@ export interface Insights {
   deliveredRevenue: number;
   /** North star (PRD §8.1): null when no customer is old enough to measure. */
   repeat: { months: 6 | 12; eligible: number; repeated: number }[];
-  superUpgrade: { superUnits: number; sareeUnits: number };
+  /** Saree units by saree category (PRD v4.0), named as they were when sold. */
+  categories: { name: string; units: number }[];
   designs: { name: string; units: number }[];
   jacketAttachment: { ordersWithJacket: number; orders: number; jacketUnits: number };
   osariya: { osariyaUnits: number; configuredUnits: number };
@@ -40,7 +41,7 @@ export async function getInsights(days: number | null): Promise<Insights> {
   const delivered = Prisma.join(DELIVERED.map((s) => Prisma.sql`${s}::"OrderStatus"`));
   const returned = Prisma.join(RETURNED.map((s) => Prisma.sql`${s}::"OrderStatus"`));
 
-  const [orders, repeat, lines, designs, dispatch, returns, cod, reviews] = await Promise.all([
+  const [orders, repeat, lines, designs, categories, dispatch, returns, cod, reviews] = await Promise.all([
     prisma.$queryRaw<Record<string, unknown>[]>`
       select count(*)::int as placed,
              count(*) filter (where o.status = 'cancelled')::int as cancelled,
@@ -70,8 +71,7 @@ export async function getInsights(days: number | null): Promise<Insights> {
       group by m.months order by m.months`,
 
     prisma.$queryRaw<Record<string, unknown>[]>`
-      select coalesce(sum(l.quantity) filter (where l.kind in ('listing', 'configured') and l."materialId" = 'super'), 0)::int as super_units,
-             coalesce(sum(l.quantity) filter (where l.kind in ('listing', 'configured')), 0)::int as saree_units,
+      select coalesce(sum(l.quantity) filter (where l.kind in ('listing', 'configured')), 0)::int as saree_units,
              coalesce(sum(l.quantity) filter (where l.kind = 'jacket'), 0)::int as jacket_units,
              count(distinct o.id) filter (where l.kind = 'jacket')::int as orders_with_jacket,
              count(distinct o.id)::int as orders,
@@ -86,6 +86,12 @@ export async function getInsights(days: number | null): Promise<Insights> {
       left join saree_design d on d.id = l."designId"
       where ${LIVE} and ${inWindow} and l."designId" is not null
       group by 1 order by units desc, name limit 20`,
+
+    prisma.$queryRaw<Record<string, unknown>[]>`
+      select coalesce(l."materialName", l."materialId") as name, sum(l.quantity)::int as units
+      from "order" o join order_line l on l."orderId" = o.id
+      where ${LIVE} and ${inWindow} and l.kind in ('listing', 'configured') and l."materialId" is not null
+      group by 1 order by units desc, name`,
 
     // On time: dispatched on the day it became ready, or the next day,
     // Colombo time (PRD: same-day or next-day dispatch). Ready = confirmed.
@@ -138,7 +144,7 @@ export async function getInsights(days: number | null): Promise<Insights> {
       const row = repeat.find((r) => n(r.months) === months);
       return { months, eligible: n(row?.eligible), repeated: n(row?.repeated) };
     }),
-    superUpgrade: { superUnits: n(l.super_units), sareeUnits: n(l.saree_units) },
+    categories: categories.map((row) => ({ name: String(row.name), units: n(row.units) })),
     designs: designs.map((row) => ({ name: String(row.name), units: n(row.units) })),
     jacketAttachment: { ordersWithJacket: n(l.orders_with_jacket), orders: n(l.orders), jacketUnits: n(l.jacket_units) },
     osariya: { osariyaUnits: n(l.osariya_units), configuredUnits: n(l.configured_units) },

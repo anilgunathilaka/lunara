@@ -5,6 +5,7 @@ import { createProductAction } from '@/lib/ops/product-actions';
 import { productFormOptions } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
+import { formatProductCode } from '@/lib/catalogue/product-code';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
 
 /** Add a saree product (docs/4-architecture.md §3.10). A plain form: works without JavaScript. */
@@ -19,7 +20,7 @@ export default async function OpsNewProductPage({
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/products/new`);
   const [options, query, t] = await Promise.all([productFormOptions(), searchParams, getTranslations('ops.products')]);
-  const priced = options.designs.filter((d) => options.prices[`${d.id}|plain`] || options.prices[`${d.id}|super`]);
+  const priced = options.designs.filter((d) => options.materials.some((m) => options.prices[`${d.id}|${m.id}`]));
 
   return (
     <div className="flex flex-col gap-4">
@@ -65,17 +66,28 @@ export default async function OpsNewProductPage({
             </div>
           </div>
 
-          <fieldset>
-            <legend>{t('cotton')}</legend>
-            <div className="ops-inline-form">
-              {options.materials.map((m, i) => (
-                <label key={m.id} className="ops-inline-form">
-                  <input type="radio" name="materialId" value={m.id} defaultChecked={i === 0} required />
-                  {m.name}
-                </label>
+          {/* Saree category (PRD v4.0): sets the product code, e.g. LSC009. */}
+          <div className="flex flex-col gap-1">
+            <label className="field-label" htmlFor="materialId">
+              {t('category')}
+            </label>
+            <select id="materialId" name="materialId" className="input" required defaultValue="">
+              <option value="" disabled>
+                {t('choose')}
+              </option>
+              {options.materials.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name} — {t('nextCode', { code: formatProductCode(m.codePrefix!, m.nextNumber) })}
+                </option>
               ))}
-            </div>
-          </fieldset>
+            </select>
+            <p className="field-message">
+              {t('categoryNote')}{' '}
+              <Link href="/ops/products/categories" className="focus-ring">
+                {t('manageCategories')}
+              </Link>
+            </p>
+          </div>
 
           <div className="ops-form-row">
             <div className="flex flex-col gap-1">

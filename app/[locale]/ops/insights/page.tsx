@@ -93,7 +93,6 @@ export default async function OpsInsightsPage({
           {t('productHeading')}
         </h2>
         <dl className="spec-list">
-          <Row term={t('superUpgrade')} value={share(data.superUpgrade.superUnits, data.superUpgrade.sareeUnits)} note={t('superUpgradeNote')} />
           <Row
             term={t('jacketAttachment')}
             value={share(data.jacketAttachment.ordersWithJacket, data.jacketAttachment.orders)}
@@ -101,6 +100,27 @@ export default async function OpsInsightsPage({
           />
           <Row term={t('osariya')} value={share(data.osariya.osariyaUnits, data.osariya.configuredUnits)} note={t('osariyaNote')} />
         </dl>
+        <h3 className="field-label">{t('categoriesHeading')}</h3>
+        {data.categories.length === 0 ? (
+          <p className="field-message">{t('noData')}</p>
+        ) : (
+          <table className="ops-table">
+            <thead>
+              <tr>
+                <th scope="col">{t('category')}</th>
+                <th scope="col">{t('units')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.categories.map((row) => (
+                <tr key={row.name}>
+                  <td>{row.name}</td>
+                  <td>{row.units}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <h3 className="field-label">{t('designsHeading')}</h3>
         {data.designs.length === 0 ? (
           <p className="field-message">{t('noData')}</p>

@@ -49,7 +49,6 @@ export default async function LocaleLayout({
   const tOsariya = await getTranslations('home.osariya');
 
   const tHome = await getTranslations('home');
-  const tFabric = await getTranslations('product.fabric');
   const tJacketPage = await getTranslations('jacketPage');
   const tSupport = await getTranslations('support');
   const tAccordion = await getTranslations('layout.accordion');
@@ -72,10 +71,6 @@ export default async function LocaleLayout({
           href: '/shop',
           tag: tNav('shop'),
           description: tHome('hero.subhead'),
-          links: [
-            { href: '/shop?material=plain', label: tFabric('materialPlain') },
-            { href: '/shop?material=super', label: tFabric('materialSuper') },
-          ],
         },
         {
           label: tOsariya('heading'),

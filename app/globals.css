@@ -3179,41 +3179,7 @@ body {
   border-color: var(--lun-danger);
 }
 
-/* Dashes at the bottom left of the photograph: one per slide, the current
-   one twice as long and darker; each takes you to its slide. The button is
-   a 44px target, the dash a 3px line inside it. */
-.hero-dashes {
-  position: absolute;
-  z-index: 3;
-  inset-inline-start: var(--hero-gutter);
-  bottom: max(var(--space-2), 2.5vw);
-  display: flex;
-}
-.hero-dash {
-  display: inline-flex;
-  align-items: center;
-  height: 44px;
-  padding-inline: var(--space-2);
-  cursor: pointer;
-}
-.hero-dash::before {
-  content: '';
-  display: block;
-  width: var(--space-6);
-  height: 3px;
-  border-radius: var(--radius-full);
-  background: color-mix(in srgb, var(--lun-plum-deep) 35%, transparent);
-  transition:
-    width var(--motion-hero-dash),
-    background-color var(--motion-hero-dash);
-}
-.hero-dash[aria-current='true']::before {
-  width: var(--space-8);
-  background: var(--lun-plum-deep);
-}
-
-/* Thin arrows at the bottom right of the photograph. Phones swipe or use
-   the dashes instead: there is no room for both beside five dashes. */
+/* Thin arrows at the bottom right of the photograph. Phones swipe. */
 .hero-card-arrows {
   position: absolute;
   z-index: 3;
@@ -4162,4 +4128,715 @@ body {
   margin-block-start: var(--space-1);
   font: var(--type-label) var(--font-body);
   order: 5;
+}
+
+/*
+ * Product page (docs/2-ui.md §7.5; founder decision 2026-11-13, after
+ * eshandlooms.com), content and gallery unchanged: breadcrumb and
+ * previous / next above; the gallery beside the details; a band of tabs
+ * across the page; related sarees under a centred heading; a bar with Add to
+ * cart that slides up once the page's own button has scrolled away.
+ */
+.pdp {
+  padding-block-start: var(--space-5);
+}
+.pdp-inner,
+.pdp-related > * {
+  width: min(var(--container-max), 100% - 2 * var(--space-4));
+  margin-inline: auto;
+}
+.pdp-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding-block-end: var(--space-4);
+}
+.pdp-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-breadcrumb li + li::before {
+  content: '/';
+  margin-inline: var(--space-2);
+}
+.pdp-breadcrumb a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--motion-standard);
+}
+.pdp-breadcrumb a:hover {
+  color: var(--lun-plum);
+}
+.pdp-breadcrumb [aria-current='page'] {
+  color: var(--lun-ink);
+}
+.pdp-prevnext {
+  display: flex;
+  gap: var(--space-4);
+}
+.pdp-prevnext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink-muted);
+  text-decoration: none;
+  transition: color var(--motion-standard);
+}
+.pdp-prevnext-link:lang(en) {
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+}
+.pdp-prevnext-link:hover {
+  color: var(--lun-plum);
+}
+
+.pdp-main {
+  display: grid;
+  gap: var(--space-6);
+}
+@media (min-width: 1024px) {
+  .pdp-main {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: start;
+  }
+}
+.pdp-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.pdp-rating {
+  margin: 0;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-title {
+  margin: 0;
+  font: var(--type-display-m) var(--font-body);
+  font-weight: var(--weight-light);
+  color: var(--lun-ink);
+}
+.pdp-summary .pdp-price {
+  font: var(--type-display-m) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-plum);
+}
+.pdp-material {
+  margin: 0;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-summary .jacket-block {
+  align-self: stretch;
+  padding-block: var(--space-3);
+}
+.pdp-summary .jacket-block .spec-row {
+  justify-content: flex-start;
+}
+.pdp-buy {
+  align-self: stretch;
+  margin-block-start: var(--space-2);
+}
+/* Square, solid, small spaced capitals: Add to cart and the door beside it. */
+.pdp-buy .btn,
+.pdp-secondary {
+  border-radius: var(--radius-none);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.pdp-buy .btn:lang(en),
+.pdp-secondary:lang(en) {
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+}
+.pdp-buy .btn {
+  background: var(--lun-plum-deep);
+}
+.pdp-buy .btn:hover:not(:disabled) {
+  background: var(--lun-plum);
+}
+@media (min-width: 768px) {
+  .pdp-buy .btn {
+    width: auto;
+    min-width: calc(var(--space-9) * 2);
+    padding-inline: var(--space-7);
+  }
+}
+.pdp-swatches {
+  padding-inline: 0;
+}
+
+/* Related sarees: the home page rail (founder decision 2026-11-13). */
+.pdp-related {
+  padding-block: var(--space-8);
+}
+
+/* The bar with Add to cart, sliding up from the bottom of the screen. */
+.pdp-sticky {
+  position: fixed;
+  inset-inline: 0;
+  bottom: var(--bottom-bar-h);
+  z-index: 35;
+  background: var(--lun-surface);
+  border-top: 1px solid var(--lun-line);
+  box-shadow: var(--elev-1);
+  transform: translateY(calc(100% + var(--bottom-bar-h)));
+  transition: transform var(--motion-sticky-bar);
+}
+.pdp-sticky.is-shown {
+  transform: none;
+}
+.pdp-sticky-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: min(var(--container-max), 100% - 2 * var(--space-4));
+  margin-inline: auto;
+  padding-block: var(--space-2);
+}
+.pdp-sticky-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.pdp-sticky-thumb {
+  position: relative;
+  flex: none;
+  width: var(--space-7);
+  height: var(--space-7);
+  overflow: hidden;
+  background: var(--lun-gold-pale);
+}
+.pdp-sticky-thumb img {
+  object-fit: cover;
+}
+.pdp-sticky-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pdp-sticky-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.pdp-sticky-text .price-display {
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.pdp-sticky-add {
+  flex: none;
+  min-height: 44px;
+  padding-inline: var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--motion-standard);
+}
+.pdp-sticky-add:lang(en) {
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+}
+.pdp-sticky-add:hover:not(:disabled) {
+  background: var(--lun-plum-deep);
+}
+.pdp-sticky-add:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+/* While the bar is up, the WhatsApp button rises above it. */
+.whatsapp-action-floating {
+  transition: translate var(--motion-sticky-bar);
+}
+body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
+  translate: 0 calc((var(--space-7) + var(--space-4)) * -1);
+}
+
+/*
+ * Product page gallery (founder decision 2026-11-13, after
+ * perniaspopupshop.com): from 768px the thumbnails stand in a column on the
+ * left, the photograph beside them; both tall (2:3) with square corners.
+ * The column is as tall as the photograph and scrolls if there are more
+ * thumbnails than fit. Phones keep the photograph and the dots.
+ */
+.pdp-gallery .gallery-main {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-none);
+}
+@media (min-width: 768px) {
+  .pdp-gallery-slider > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 5fr);
+    gap: var(--space-3);
+  }
+  .pdp-gallery .gallery-thumbs {
+    order: -1;
+    flex-direction: column;
+    gap: var(--space-3);
+    /* As tall as the photograph, never taller: the row's height comes from it. */
+    height: 0;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .pdp-gallery .gallery-thumbs::-webkit-scrollbar {
+    display: none;
+  }
+  .pdp-gallery .gallery-thumb {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: var(--radius-none);
+    border: 1px solid var(--lun-line);
+    transition: border-color var(--motion-standard);
+  }
+  .pdp-gallery .gallery-thumb:hover {
+    border-color: var(--lun-plum-light);
+  }
+  .pdp-gallery .gallery-thumb-active {
+    border-color: var(--lun-plum);
+  }
+}
+@media (min-width: 1024px) {
+  .pdp-main {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+
+/*
+ * Material, delivery, colour promise and care, folded under Send me
+ * swatches (founder decision 2026-11-13): hairlines between them, names in
+ * small spaced capitals; the material opens as a ruled table.
+ */
+.pdp-details {
+  align-self: stretch;
+  margin-block-start: var(--space-3);
+}
+.pdp-details .accordion-trigger {
+  min-height: 44px;
+}
+.pdp-details .accordion-title {
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.pdp-details .accordion-title:lang(en) {
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+}
+.pdp-details .spec-list {
+  gap: 0;
+  border: 1px solid var(--lun-line);
+}
+.pdp-details .spec-row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+}
+.pdp-details .spec-row + .spec-row {
+  border-top: 1px solid var(--lun-line);
+}
+.pdp-details .spec-row > * {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+}
+.pdp-details .spec-row-term {
+  border-inline-end: 1px solid var(--lun-line);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+
+/*
+ * Smaller gallery (founder decision 2026-11-13: "too much bigger"): the
+ * gallery, thumbnails included, runs at most 40rem wide, about the size of
+ * the reference's; from 1024px the gallery and the details sit side by side,
+ * the gallery on the page container's left edge, the details on its right.
+ */
+.pdp-gallery {
+  width: 100%;
+  max-width: 40rem;
+}
+@media (min-width: 1024px) {
+  .pdp-main {
+    grid-template-columns: minmax(0, 40rem) minmax(0, 32rem);
+    /* Gallery on the container's left edge, details on its right edge. */
+    justify-content: space-between;
+    gap: var(--space-8);
+  }
+}
+
+/*
+ * Product photographs on wide screens (founder decision 2026-11-13, after
+ * secchiariboots.com): from 1024px every photograph shows at once, two to a
+ * row, each whole inside a square --lun-line tile; the gallery takes about
+ * 70% of the page container and the details the rest. Choosing a photograph
+ * opens it larger, full height, in the middle of the screen; the page behind
+ * is dimmed (the photograph never is, §7.1). Below 1024px: the slider.
+ */
+.pdp-gallery-grid {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .pdp-gallery-slider {
+    display: none;
+  }
+  .pdp-gallery-grid {
+    display: block;
+  }
+  .pdp-gallery {
+    max-width: none;
+  }
+  .pdp-main {
+    grid-template-columns: minmax(0, 7fr) minmax(20rem, 3fr);
+    justify-content: normal;
+    gap: var(--space-7);
+  }
+}
+.pdp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pdp-grid-tile {
+  position: relative;
+  /* Tall, like the photographs: each fills its tile with no band round it. */
+  aspect-ratio: 2 / 3;
+  background: var(--lun-line);
+}
+.pdp-grid-button {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.pdp-grid-button img,
+.pdp-grid-button video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.pdp-grid-label {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+}
+
+/* The larger view: a full-height panel in the middle of the screen. */
+.pdp-viewer {
+  width: min(100vw, 100dvh * 2 / 3);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+.pdp-viewer::backdrop {
+  background: color-mix(in srgb, var(--lun-ink) 20%, transparent);
+}
+.pdp-viewer-panel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--lun-line);
+}
+.pdp-viewer-panel img,
+.pdp-viewer-panel video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.pdp-viewer-close {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--lun-ink);
+  cursor: pointer;
+}
+
+/*
+ * The details stay in view while the photographs scroll past (founder
+ * decision 2026-11-13), just under the header as it is once the page moves.
+ */
+@media (min-width: 1024px) {
+  .pdp-summary {
+    position: sticky;
+    top: calc(var(--space-3) * 2 + max(var(--logo-h), 44px) + 1px + var(--space-5));
+  }
+}
+
+/*
+ * Customer reviews on the product page (founder decision 2026-11-13, after
+ * killstar.com): a centred heading; the average beside a bar for each
+ * rating; then each review in three columns, who / what / when, hairlines
+ * between them. Stars and bars in --lun-plum; words in ink and muted ink.
+ */
+.pdp-reviews {
+  width: min(var(--container-max), 100% - 2 * var(--space-4));
+  margin: var(--space-8) auto 0;
+  padding-block: var(--space-7);
+}
+.pdp-reviews-heading {
+  margin: 0;
+  font: var(--type-heading) var(--font-body);
+  color: var(--lun-ink-muted);
+  text-align: center;
+}
+.pdp-reviews-heading:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.pdp-reviews-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5) var(--space-7);
+  margin-block: var(--space-6);
+}
+.pdp-reviews-score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.pdp-reviews-average {
+  font: var(--type-display-xl) var(--font-body);
+  color: var(--lun-ink);
+  font-variant-numeric: lining-nums;
+}
+.pdp-reviews-score-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.pdp-reviews-score .star-rating {
+  font-size: var(--space-5);
+  line-height: 1;
+}
+.pdp-reviews-based {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-reviews-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (min-width: 768px) {
+  .pdp-reviews-bars {
+    padding-inline-start: var(--space-7);
+    border-inline-start: 1px solid var(--lun-line);
+  }
+}
+.pdp-reviews-bar {
+  display: grid;
+  grid-template-columns: var(--space-6) calc(var(--space-9) + var(--space-5)) var(--space-6);
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+.pdp-reviews-bar-track {
+  display: block;
+  height: var(--space-1);
+  border-radius: var(--radius-full);
+  background: var(--lun-line);
+  overflow: hidden;
+}
+.pdp-reviews-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+}
+.pdp-reviews-bar-count {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+.pdp-reviews-none {
+  margin: var(--space-5) auto 0;
+  max-width: 48ch;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+  text-align: center;
+}
+.pdp-reviews-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--lun-line);
+}
+.pdp-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3) var(--space-5);
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--lun-line);
+}
+.pdp-review-what {
+  grid-column: 1 / -1;
+}
+@media (min-width: 768px) {
+  .pdp-review {
+    grid-template-columns: minmax(12rem, 1fr) minmax(0, 3fr) auto;
+  }
+  .pdp-review-what {
+    grid-column: auto;
+  }
+}
+.pdp-review-who {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+.pdp-review-avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-7);
+  height: var(--space-7);
+  border-radius: var(--radius-full);
+  background: var(--lun-gold-pale);
+  color: var(--lun-plum-deep);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+}
+.pdp-review-who-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.pdp-review-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.pdp-review-name:lang(en) {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.pdp-review-district {
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink-muted);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.pdp-review-verified {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-review-what {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pdp-review-body {
+  margin: 0;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.pdp-review-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pdp-review-photo {
+  position: relative;
+  width: calc(var(--space-9) - var(--space-2));
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+.pdp-review-photo img {
+  object-fit: cover;
+}
+.pdp-review-response {
+  margin-block-start: var(--space-2);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 2px solid var(--lun-gold);
+}
+.pdp-review-response-from {
+  margin: 0 0 var(--space-1);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.pdp-review-date {
+  grid-row: 1;
+  grid-column: -2;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Rail cards (home New arrivals, product page "You might also like") show
+ * only the name, the cotton and the price (founder decision 2026-11-13,
+ * after perniaspopupshop.com): no stock note, no jacket line. The shop
+ * page cards keep both.
+ */
+.product-rail .product-card .stock-badge,
+.product-rail .product-card-jacket-row {
+  display: none;
+}
+
+/* Product code (PRD v4.0): small spaced capitals in muted ink, above the name. */
+.product-card-code,
+.pdp-code {
+  margin: 0;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--type-label-tracking);
+  color: var(--lun-ink-muted);
+  font-variant-numeric: tabular-nums;
 }

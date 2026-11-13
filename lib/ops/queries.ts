@@ -101,7 +101,8 @@ export async function priceTables() {
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
       include: { prices: true },
     }),
-    prisma.cottonMaterial.findMany({ orderBy: { id: 'asc' } }),
+    // Saree categories on sale (PRD v4.0): the price columns.
+    prisma.cottonMaterial.findMany({ where: { active: true }, orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
     prisma.jacketMaterial.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
   ]);
   return { designs, materials, jackets };
