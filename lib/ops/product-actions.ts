@@ -6,6 +6,8 @@ import { getPrisma } from '@/lib/prisma';
 import { OpsError, back, checkbox, langOf, opsLocale, run, skuCode, slugify, uniqueValue } from './flow';
 import { recordCreated } from '@/lib/stock/movements';
 import { formatProductCode } from '@/lib/catalogue/product-code';
+import { MAX_PHOTO_BYTES, photoKey, sniffPhoto } from '@/lib/media/photos';
+import { getStorage } from '@/lib/storage';
 import { requireStaffAction } from './staff';
 
 /**
@@ -269,6 +271,7 @@ const jacketCreateSchema = z.object({
   pairingAddOn: z.coerce.number().int().min(0).max(1_000_000).optional(),
   standalonePrice: money.optional(),
   colourName: text(1, 40),
+  /** Worked out in the browser from the photograph (JacketPhotoField). */
   colourHex: hex,
   quantity: count,
   threshold: count,
@@ -278,8 +281,14 @@ export async function createJacketAction(form: FormData): Promise<void> {
   const staff = await requireStaffAction();
   const lang = langOf(form);
   const path = `/${lang}/ops/products/jackets/new`;
-  const raw = Object.fromEntries([...form.entries()].filter(([, v]) => v !== ''));
+  const raw = Object.fromEntries([...form.entries()].filter(([k, v]) => v !== '' && k !== 'swatch'));
   const parsed = jacketCreateSchema.safeParse(raw);
+  // The jacket's photograph (founder decision 2026-11-14): required, a real image, within the size limit.
+  const file = form.get('swatch');
+  if (!(file instanceof File) || file.size === 0 || file.size > MAX_PHOTO_BYTES) back(path, { error: 'invalid' });
+  const photo = new Uint8Array(await file.arrayBuffer());
+  const format = sniffPhoto(photo);
+  if (!format) back(path, { error: 'invalid' });
   if (!parsed.success) back(path, { error: 'invalid' });
   const input = parsed.data;
   const isNew = input.materialId === NEW;
@@ -325,6 +334,21 @@ export async function createJacketAction(form: FormData): Promise<void> {
       await audit(tx, staff.email, 'jacket.create', 'jacket_colourway', colourwayId, { materialId, colourName: input.colourName, sku, quantity: input.quantity });
       return colourwayId;
     });
+    // The photograph, stored byte-for-byte (§4) once the jacket exists. If
+    // storing fails, the jacket is kept and the photo can be added on the Photos page.
+    const storage = getStorage();
+    const key = photoKey('swatch', id, format.ext);
+    try {
+      await storage.put({ key, body: photo, contentType: format.contentType });
+      await getPrisma().$transaction(async (tx) => {
+        await tx.jacketColourway.update({ where: { id }, data: { swatchUrl: key } });
+        await audit(tx, staff.email, 'photo.swatch', 'jacket_colourway', id, { key, bytes: photo.length, contentType: format.contentType });
+      });
+    } catch {
+      await storage.delete(key).catch(() => undefined);
+      // Saved without its photo: the Photos page is where it can be added.
+      return `/${lang}/ops/photos`;
+    }
     return `/${lang}/ops/products/jackets/${id}`;
   });
 }

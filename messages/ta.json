@@ -766,7 +766,12 @@
       "category": "சேலை வகை",
       "nextCode": "அடுத்த குறியீடு {code}",
       "categoryNote": "வகையின்படி தயாரிப்புக் குறியீடு சேமிக்கும்போது தானாக வழங்கப்படும்.",
-      "manageCategories": "சேலை வகைகள்"
+      "manageCategories": "சேலை வகைகள்",
+      "jacketDesign": "ஜாக்கெட் வடிவமைப்பு",
+      "jacketDesignName": "ஜாக்கெட் பெயர்",
+      "jacketDesignNameHint": "எ.கா. Floral block print",
+      "jacketPhoto": "ஜாக்கெட் புகைப்படம்",
+      "jacketPhotoHint": "ஜாக்கெட் துணியின் பகல் ஒளிப் புகைப்படம்: JPEG, PNG அல்லது WebP, 12 MB வரை. திருத்தாமல் அப்படியே காட்டப்படும்."
     },
     "costs": {
       "legend": "ஒரு துண்டுக்கான செலவு (ஊழியர்கள் மட்டும்)",

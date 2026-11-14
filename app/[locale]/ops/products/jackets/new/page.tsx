@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/primitives/Button';
+import { JacketPhotoField } from './JacketPhotoField';
 import { createJacketAction } from '@/lib/ops/product-actions';
 import { productFormOptions } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
@@ -81,21 +82,15 @@ export default async function OpsNewJacketPage({
         </fieldset>
 
         <fieldset>
-          <legend>{t('colour')}</legend>
-          <div className="ops-form-row">
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="colourName">
-                {t('colourName')}
-              </label>
-              <input id="colourName" name="colourName" className="input" required maxLength={40} />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="colourHex">
-                {t('colour')}
-              </label>
-              <input id="colourHex" name="colourHex" type="color" className="input ops-colour-input" required />
-            </div>
+          <legend>{t('jacketDesign')}</legend>
+          <div className="flex flex-col gap-1">
+            <label className="field-label" htmlFor="colourName">
+              {t('jacketDesignName')}
+            </label>
+            <input id="colourName" name="colourName" className="input" required maxLength={40} placeholder={t('jacketDesignNameHint')} />
           </div>
+          {/* The jacket is shown by its photograph, not a colour (founder decision 2026-11-14). */}
+          <JacketPhotoField label={t('jacketPhoto')} hint={t('jacketPhotoHint')} />
         </fieldset>
 
         <fieldset>

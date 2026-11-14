@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { SectionMarker } from '@/components/brand/SectionMarker';
@@ -26,9 +27,10 @@ export default async function JacketMaterialPage({ params }: { params: Promise<{
         <div className="home-arrivals-grid">
           {jackets.map((jacket) => (
             <Link key={jacket.id} href={`/jacket-material/${jacket.id}`} className="product-card">
-              {/* True sampled fabric colour fills the card — swatch photography
-                  will replace this flat fill once shot (OPS-02). */}
-              <div className="product-card-image" style={{ backgroundColor: jacket.swatchHex }} aria-hidden="true" />
+              {/* The jacket's photograph; its colour fills the card until one is uploaded (OPS-02). */}
+              <div className="product-card-image" style={{ backgroundColor: jacket.swatchHex }} aria-hidden="true">
+                {jacket.swatchImageUrl && <Image src={jacket.swatchImageUrl} alt="" fill sizes="(min-width: 768px) 25vw, 50vw" />}
+              </div>
               <span className="sr-only">{jacket.colourName}</span>
               <StockState
                 state={jacket.stockState}

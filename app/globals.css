@@ -4936,3 +4936,28 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   background: var(--lun-plum);
   border-color: var(--lun-plum);
 }
+
+/* Jacket photographs in place of colour blocks (founder decision 2026-11-14). */
+.mini-swatch {
+  position: relative;
+  overflow: hidden;
+}
+.mini-swatch-photo,
+.jacket-block-photo img {
+  object-fit: cover;
+}
+.jacket-block-photo {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: var(--space-8);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--lun-line);
+}
+.ops-jacket-preview {
+  width: calc(var(--space-9) + var(--space-6));
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border: 1px solid var(--lun-line);
+}

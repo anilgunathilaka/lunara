@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
   // Prisma ships workerd-specific builds; keeping these external lets the
   // OpenNext build pick them for the Worker (opennext.js.org/cloudflare/howtos/db).
   serverExternalPackages: ['@prisma/client', '.prisma/client'],
+  // The add-jacket form sends its photograph with the form (founder decision
+  // 2026-11-14); photos may be up to 12 MB (lib/media/photos MAX_PHOTO_BYTES),
+  // stored byte-for-byte, never shrunk (§4).
+  experimental: {
+    serverActions: { bodySizeLimit: '13mb' },
+  },
 };
 
 // Deliberately NOT calling initOpenNextCloudflareForDev(): `next dev` needs

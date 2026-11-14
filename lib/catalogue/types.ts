@@ -34,6 +34,8 @@ export interface CatalogueProduct {
   jacketMaterialName: string;
   jacketColourName: string;
   jacketSwatchHex: string;
+  /** The jacket's photograph (founder decision 2026-11-14); the colour block stands in until one exists. */
+  jacketSwatchUrl: string | null;
   jacketPieceLengthMetres: number;
   stockState: StockStateValue;
   quantity?: number;
