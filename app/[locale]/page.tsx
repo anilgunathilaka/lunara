@@ -130,6 +130,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             price={item.price}
             jacketMaterialName={item.jacketMaterialName}
             jacketSwatchHex={item.jacketSwatchHex}
+            jacketSwatchUrl={item.jacketSwatchUrl}
             stockState={item.stockState}
             quantity={item.quantity}
             outOfStockLabel={tStock('outOfStock')}

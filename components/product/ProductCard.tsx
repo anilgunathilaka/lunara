@@ -15,6 +15,8 @@ export interface ProductCardProps {
   price: number;
   jacketMaterialName: string;
   jacketSwatchHex: string;
+  /** The jacket's photograph, shown in place of the colour block when there is one. */
+  jacketSwatchUrl?: string | null;
   stockState: StockLevel;
   quantity?: number;
   outOfStockLabel: string;
@@ -31,6 +33,7 @@ export function ProductCard({
   price,
   jacketMaterialName,
   jacketSwatchHex,
+  jacketSwatchUrl,
   stockState,
   quantity,
   outOfStockLabel,
@@ -55,11 +58,9 @@ export function ProductCard({
       <p className="product-card-material">{materialLabel}</p>
       <PriceDisplay amount={price} />
       <div className="product-card-jacket-row">
-        <span
-          className="mini-swatch"
-          style={{ backgroundColor: jacketSwatchHex }}
-          aria-hidden="true"
-        />
+        <span className="mini-swatch" style={{ backgroundColor: jacketSwatchHex }} aria-hidden="true">
+          {jacketSwatchUrl && <Image src={jacketSwatchUrl} alt="" fill sizes="24px" className="mini-swatch-photo" />}
+        </span>
         <span>{jacketMaterialName}</span>
       </div>
     </Link>

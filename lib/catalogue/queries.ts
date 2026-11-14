@@ -68,6 +68,7 @@ function toProduct(row: ListingRow): CatalogueProduct {
     jacketMaterialName: jacket.material.name,
     jacketColourName: jacket.colourName,
     jacketSwatchHex: jacket.colourHex,
+    jacketSwatchUrl: jacket.swatchUrl ? mediaUrl(jacket.swatchUrl) : null,
     jacketPieceLengthMetres: jacket.material.pieceLengthMetres.toNumber(),
     stockState: availability.state,
     quantity: availability.quantity,

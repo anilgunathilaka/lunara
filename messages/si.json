@@ -766,7 +766,12 @@
       "category": "සාරි වර්ගය",
       "nextCode": "ඊළඟ කේතය {code}",
       "categoryNote": "වර්ගය අනුව නිෂ්පාදන කේතය සුරකින විට ස්වයංක්‍රීයව ලැබේ.",
-      "manageCategories": "සාරි වර්ග"
+      "manageCategories": "සාරි වර්ග",
+      "jacketDesign": "ජැකට් නිර්මාණය",
+      "jacketDesignName": "ජැකට් නම",
+      "jacketDesignNameHint": "උදා: Floral block print",
+      "jacketPhoto": "ජැකට් ඡායාරූපය",
+      "jacketPhotoHint": "ජැකට් රෙද්දේ දිවා ආලෝකයේ ගත් ඡායාරූපයක්: JPEG, PNG හෝ WebP, 12 MB දක්වා. එය සංස්කරණය නොකර පෙන්වයි."
     },
     "costs": {
       "legend": "එක් කැබැල්ලක පිරිවැය (staff පමණි)",

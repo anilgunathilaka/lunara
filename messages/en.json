@@ -766,7 +766,12 @@
       "category": "Saree category",
       "nextCode": "next code {code}",
       "categoryNote": "The category sets the product code, given automatically when you save.",
-      "manageCategories": "Saree categories"
+      "manageCategories": "Saree categories",
+      "jacketDesign": "Jacket design",
+      "jacketDesignName": "Jacket name",
+      "jacketDesignNameHint": "e.g. Floral block print",
+      "jacketPhoto": "Jacket photo",
+      "jacketPhotoHint": "A daylight photo of the jacket material: JPEG, PNG or WebP, up to 12 MB. It is shown as it is, never edited."
     },
     "costs": {
       "legend": "Cost per piece (staff only)",

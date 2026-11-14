@@ -153,6 +153,7 @@ export function ShopClient({
               price={product.price}
               jacketMaterialName={product.jacketMaterialName}
               jacketSwatchHex={product.jacketSwatchHex}
+              jacketSwatchUrl={product.jacketSwatchUrl}
               stockState={product.stockState}
               quantity={product.quantity}
               outOfStockLabel={outOfStockLabel}

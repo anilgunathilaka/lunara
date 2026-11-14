@@ -167,6 +167,7 @@ export default async function ProductDetailPage({
             <JacketBlock
               materialName={product.jacketMaterialName}
               swatchHex={product.jacketSwatchHex}
+              swatchUrl={product.jacketSwatchUrl}
               pieceLengthLabel={tJacket('pieceLength', { metres: product.jacketPieceLengthMetres })}
               shipsUnstitchedLabel={tJacket('shipsUnstitched')}
             />
@@ -281,6 +282,7 @@ export default async function ProductDetailPage({
                 price={item.price}
                 jacketMaterialName={item.jacketMaterialName}
                 jacketSwatchHex={item.jacketSwatchHex}
+                jacketSwatchUrl={item.jacketSwatchUrl}
                 stockState={item.stockState}
                 quantity={item.quantity}
                 outOfStockLabel={tStock('outOfStock')}
