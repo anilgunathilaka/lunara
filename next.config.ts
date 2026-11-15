@@ -27,8 +27,23 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   // Preview deployments on *.workers.dev must never be indexed: they would
   // compete with the real domain in search results.
+  // Security headers on every response (docs/4-architecture.md §2.4,
+  // security audit 2026-11-15).
   async headers() {
     return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
+          // No page may be framed by another site (clickjacking), the ops panel above all.
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Order and review links carry tokens in the query: never send them to other sites.
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
       {
         source: '/:path*',
         has: [{ type: 'host', value: '(?<subdomain>.+)\\.workers\\.dev' }],
