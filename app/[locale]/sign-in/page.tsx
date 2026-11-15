@@ -9,9 +9,18 @@ export const metadata: Metadata = { robots: { index: false, follow: false } };
 function safeNext(value: string | string[] | undefined, locale: string): string {
   // Plain sign-in: staff → operations, customers → their orders (account/start).
   const fallback = `/${locale}/account/start`;
-  if (typeof value !== 'string') return fallback;
-  if (!value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return fallback;
-  return value;
+  if (typeof value !== 'string' || !value.startsWith('/')) return fallback;
+  // Parse it the way the browser will: browsers drop tabs and newlines and
+  // read "\" as "/", so "/\t/evil.example" would otherwise leave the site.
+  // Resolved against a placeholder origin, anything off-site changes the origin.
+  const base = 'https://lunara.invalid';
+  try {
+    const url = new URL(value, base);
+    if (url.origin !== base) return fallback;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return fallback;
+  }
 }
 
 export default async function SignInPage({
