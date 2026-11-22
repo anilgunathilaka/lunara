@@ -81,6 +81,23 @@ Version 2.0 corrected that, but modelled the configurator as a two-axis chooser 
 
 Where a later section of this document still speaks of Plain Cotton and Super Cotton, read "saree category"; those sections are kept for the record of the reasoning, which v4.0 supersedes.
 
+0.2.4 v4.0 → v4.1 (founder decision 2026-11-22)
+
+| v4.0 | v4.1 |
+| --- | --- |
+| Jacket material is sold on its own, and the customer sees and can change the jacket paired with each saree. | Lunara sells the full saree only: saree plus its unstitched jacket material. Jacket material is not sold on its own, and the website no longer names, shows or links to jacket materials; the customer sees "Unstitched jacket material included" and "Ships unstitched". |
+| The admin picks a jacket for every saree. | The admin form keeps the jacket choice, already set to the default jacket: the first jacket added (the oldest active one). The default cannot be changed. |
+| — | Jacket materials stay in the admin and in the inventory, with their prices and stock. A saree's price is its design × category price plus its jacket's add-on, shown to the customer as one total. A saree is only as available as the scarcer of the saree and its jacket: if either runs out, the full saree is out of stock. |
+
+Where a later section speaks of standalone jacket sales (FR-29 to FR-32) or of the customer choosing a jacket, read v4.1; those sections are kept for the record.
+
+0.2.5 v4.1 → v4.2 (founder decision 2026-11-22)
+
+| v4.1 | v4.2 |
+| --- | --- |
+| A saree's price is its design × category price (PRICE_MATRIX), shared by every saree with that design and category: changing one changes them all. | Every saree on sale has its own price, set on that saree and changed on that saree alone. What the customer pays is that saree's price plus its jacket's price, shown as one total. The saree's price lives in one place (the saree's own record), so the shop, cart, checkout, office sales and costs can never quote different prices for the same saree. |
+| — | The design × category price stays in the background: every saree colour still needs one (database link), it seeds the price of a new saree with that design and category, and Design Your Own (switched off) will price from it. Changing a saree's price never changes it. |
+
 Sourcing note: the Lunara Facebook page could not be machine-read during preparation, as Facebook disallows automated access. Brand positioning below is taken from the founder's written brief and confirmed through direct clarification. Any live page content that contradicts this document should be reconciled before approval.
 
 1. Product Overview

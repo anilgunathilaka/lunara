@@ -9,8 +9,20 @@
  * opens in English and the choice of language is hidden everywhere; the
  * Sinhala and Tamil pages still work at /si and /ta, and every message stays
  * translated, so switching this back on restores all three at once.
+ *
+ * jacketMaterialPage: off (PRD v4.1, founder decision 2026-11-22). Lunara
+ * sells the full saree only; jacket material is not sold on its own, so the
+ * Jacket Material pages and every link to them are hidden. Jacket materials
+ * stay in the admin and the inventory.
+ *
+ * shopFilters: off while the collection is small (founder decision
+ * 2026-11-22). The shop shows every saree with Sort by only: no filter
+ * column, no Filter button, and filters in the address are ignored.
+ * Switching it on restores the filters as built (docs/2-ui.md §7.6).
  */
 export const FEATURES = {
   designYourOwn: false,
   languageSelector: false,
+  shopFilters: false,
+  jacketMaterialPage: false,
 } as const;

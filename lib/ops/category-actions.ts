@@ -48,7 +48,7 @@ export async function createCategoryAction(form: FormData): Promise<void> {
         data: { actor: staff.email, action: 'category.create', entityType: 'cotton_material', entityId: id, after: { ...input, locale: undefined, codePrefix: prefix } },
       });
     });
-  });
+  }, 'categoryAdded');
 }
 
 const updateSchema = z.object({ ...fields, id: z.string().min(1).max(100) });
@@ -84,5 +84,5 @@ export async function updateCategoryAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'categoryUpdated');
 }

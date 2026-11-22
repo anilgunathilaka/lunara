@@ -108,10 +108,12 @@ async function main(): Promise<void> {
     }
 
     for (const [index, l] of seedListings.entries()) {
+      // Each saree's own price (PRD v4.2) starts from its design × category price.
+      const colourway = await tx.sareeColourway.findUniqueOrThrow({ where: { id: l.sareeColourwayId }, include: { price: true } });
       await tx.curatedListing.upsert({
         where: { id: l.id },
         update: {},
-        create: { ...l, sortOrder: index },
+        create: { ...l, price: colourway.price.price, sortOrder: index },
       });
     }
   }, { timeout: 60_000 });

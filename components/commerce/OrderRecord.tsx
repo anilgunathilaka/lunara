@@ -17,7 +17,7 @@ import { isReviewable } from '@/lib/reviews/reviews';
  */
 export async function OrderRecord({ order }: { order: GuestOrder }) {
   const locale = await getLocale();
-  const [t, tCheckout, tSummary, tStatus, tPayment, tDistricts, tDelivery, tTracking] = await Promise.all([
+  const [t, tCheckout, tSummary, tStatus, tPayment, tDistricts, tDelivery, tTracking, tJacket] = await Promise.all([
     getTranslations('commerce.confirmed'),
     getTranslations('commerce.checkout'),
     getTranslations('commerce.summary'),
@@ -26,6 +26,7 @@ export async function OrderRecord({ order }: { order: GuestOrder }) {
     getTranslations('districts'),
     getTranslations('commerce.delivery'),
     getTranslations('commerce.tracking'),
+    getTranslations('product.jacket'),
   ]);
 
   const total = formatPriceLKR(order.total);
@@ -148,8 +149,8 @@ export async function OrderRecord({ order }: { order: GuestOrder }) {
               <span className="spec-row-term">
                 {line.title}
                 {line.materialName ? ` · ${line.materialName}` : ''}
-                {line.sareeColourName ? ` · ${line.sareeColourName}` : ''} — {line.jacketMaterialName} ·{' '}
-                {line.jacketColourName} · {t('quantity', { count: line.quantity })}
+                {line.sareeColourName ? ` · ${line.sareeColourName}` : ''} — {tJacket('included')} ·{' '}
+                {t('quantity', { count: line.quantity })}
               </span>
               <span>{formatPriceLKR(line.unitPrice * line.quantity)}</span>
             </li>

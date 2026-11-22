@@ -102,7 +102,8 @@ export function composeNotifications(
     tracking: order.trackingNumber ?? '',
     careLink: `${site}/${locale}/support/care-guide`,
     returnsLink: `${site}/${locale}/support/returns`,
-    jacketLink: `${site}/${locale}/jacket-material`,
+    // Jacket material is not sold on its own (PRD v4.1): the 45-day note points to the shop.
+    shopLink: `${site}/${locale}/shop`,
     reviewLink: reviewLink(order.number, locale),
   };
 

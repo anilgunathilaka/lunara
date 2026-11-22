@@ -1,13 +1,12 @@
 import Image from 'next/image';
 import { Suspense, type ReactNode } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
-import { getCuratedListings, getSareeCategories } from '@/lib/catalogue/queries';
+import { getCuratedListings } from '@/lib/catalogue/queries';
 import { categoryNamer } from '@/lib/catalogue/category-label';
 import { latestReviews, type PublicReview } from '@/lib/reviews/reviews';
-import type { CatalogueProduct, SareeCategory } from '@/lib/catalogue/types';
+import type { CatalogueProduct } from '@/lib/catalogue/types';
 import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
@@ -36,15 +35,14 @@ function CardSkeleton() {
 // (docs/4-architecture.md §3.3). Streamed (founder report 2026-11-10: a
 // refresh felt slow): nothing waits for the database before the first
 // paint. The header, the banner, the sliding facts, the headline and every
-// section of words go out at once; the featured sarees, the rail, the
-// tiles' photographs and the reviews follow as the reads answer, each in
+// section of words go out at once; the featured sarees, the rail and the
+// reviews follow as the reads answer, each in
 // a space the same size, so nothing shifts.
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   // Started together, awaited only where each is shown.
   const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
-  const categoriesP = getSareeCategories();
   const categoryName = await categoryNamer();
   const reviewsP = latestReviews(3);
   const t = await getTranslations('home');
@@ -83,35 +81,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     return { slides, slideOf: slideLabels(firstSlides.length + slides.length) };
   });
 
-  // Ways in: the saree categories, four at most, each with a real saree
-  // photograph from it where one exists (PRD v4.0, founder decision 2026-11-14).
-  const TILE_COUNT = 4;
-  const tilesWith = (arrivals: CatalogueProduct[], categories: SareeCategory[]) =>
-    categories.slice(0, TILE_COUNT).map((category) => ({
-      href: `/shop?category=${category.id}`,
-      label: categoryName(category.id, category.name),
-      image: arrivals.find((item) => item.categoryId === category.id)?.imageUrl ?? '/placeholder/product.jpg',
-    }));
-  // While the categories load: four tiles the same size, so nothing shifts.
-  const tilePlaceholders = Array.from({ length: TILE_COUNT }, () => ({ href: '/shop', label: '', image: '/placeholder/product.jpg' }));
-  const tileList = (tiles: ReturnType<typeof tilesWith>) => (
-    <ul className="home-tiles">
-      {tiles.map((tile, i) => (
-        <li key={i}>
-          <Link href={tile.href} className="home-tile focus-ring">
-            <span className="home-tile-image">
-              <Image src={tile.image} alt="" fill sizes="(min-width: 1024px) 25vw, 50vw" />
-            </span>
-            <span className="home-tile-label">
-              {tile.label}
-              <ArrowRight className="icon icon-inline" aria-hidden="true" />
-            </span>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-
   const railProps = {
     heading: t('newArrivals.heading'),
     viewAll: { href: '/shop', label: t('newArrivals.viewAll') },
@@ -128,9 +97,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             code={item.productCode}
             materialLabel={categoryName(item.categoryId, item.categoryName)}
             price={item.price}
-            jacketMaterialName={item.jacketMaterialName}
-            jacketSwatchHex={item.jacketSwatchHex}
-            jacketSwatchUrl={item.jacketSwatchUrl}
             stockState={item.stockState}
             quantity={item.quantity}
             outOfStockLabel={tStock('outOfStock')}
@@ -180,7 +146,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       </section>
 
       {/* Sections after the hero follow the reference layout (docs/2-ui.md §7.4):
-          a product rail, ways in, a two-drape split, a statement, a panel
+          a product rail, a two-drape split, a statement, a panel
           beside a photograph, reviews, then a word from us. */}
 
       {/* New arrivals — a rail of cards that scrolls sideways. */}
@@ -200,19 +166,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* Ways in — each tile a photograph over a solid label bar with an arrow. */}
-      <section className="home-band home-band-tight">
-        <div className="home-band-inner">
-          <Reveal>
-            <h2 className="section-title">{t('tiles.heading')}</h2>
-          </Reveal>
-          <Suspense fallback={tileList(tilePlaceholders)}>
-            <Await promise={Promise.all([arrivalsP, categoriesP])}>
-              {([arrivals, categories]) => tileList(tilesWith(arrivals, categories))}
-            </Await>
-          </Suspense>
-        </div>
-      </section>
+      {/* "Find your saree" category tiles removed (founder decision 2026-11-23). */}
 
       {/* One saree, two drapes — two photographs edge to edge, each with its
           name and a door. Both frames use the same placeholder photograph
@@ -267,8 +221,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="eyebrow">{tJacket('shipsUnstitched')}</p>
           <h2 className="home-feature-title">{tSupport('jacketStitchingHeading')}</h2>
           <p className="home-feature-body">{tSupport('jacketStitchingBody')}</p>
-          <Link href="/jacket-material" className="solid-pill solid-pill-plum focus-ring">
-            {tNav('jacketMaterial')}
+          {/* Jacket material is not sold on its own (PRD v4.1): the panel leads to the stitching guide. */}
+          <Link href="/support" className="solid-pill solid-pill-plum focus-ring">
+            {tNav('support')}
           </Link>
         </Reveal>
         <div className="home-feature-image">

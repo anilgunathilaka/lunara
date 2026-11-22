@@ -62,5 +62,5 @@ export async function saveCostAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'costSaved');
 }

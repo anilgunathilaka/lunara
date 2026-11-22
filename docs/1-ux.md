@@ -157,7 +157,7 @@ Entry: Home · Shop · social link · search
 
 Filters: design · colour · material · occasion · price · opacity
 
-Each card: drape photo, name, price, jacket material named
+Each card: drape photo, name, price (PRD v4.1: the jacket is included, not named; the product page states it)
 
 │
 
@@ -192,7 +192,7 @@ Price · delivery estimate · returns promise · reviews
 | Step | Must be true | Failure handling |
 | --- | --- | --- |
 | 1 | Filters apply without a page reload and are reflected in the URL so results can be shared and restored. Result count always visible. | No results: offer to relax the narrowest filter by name, e.g. 'No voile in emerald — show all voile?' Never a dead end. |
-| 2 | Jacket material named and 'ships unstitched' stated above the fold on mobile. Price is total for saree plus jacket material. | Out of stock: show the item, disable the buy action, offer a back-in-stock alert and surface three genuinely similar alternatives. |
+| 2 | 'Unstitched jacket material included' (PRD v4.1; was: jacket material named) and 'ships unstitched' stated above the fold on mobile. Price is total for saree plus jacket material. | Out of stock: show the item, disable the buy action, offer a back-in-stock alert and surface three genuinely similar alternatives. |
 | 3 | Adding to cart never navigates away from the product. A slide-over confirms and offers 'View cart' or 'Keep shopping'. | Stock lost between view and add: state it plainly at the moment of failure, do not silently fail. |
 
 3.2 Flow B — Design Your Own Saree

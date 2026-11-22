@@ -122,7 +122,7 @@ export async function officeItemOptions() {
     sarees: listings.map((l) => ({
       value: `listing:${l.id}`,
       name: l.name,
-      price: resolvePairedPrice({ matrixPrice: l.sareeColourway.price.price, jacketPairingAddOn: l.jacketColourway.material.pairingAddOn }),
+      price: resolvePairedPrice({ sareePrice: l.price, jacketPairingAddOn: l.jacketColourway.material.pairingAddOn }),
       available: Math.min(l.sareeColourway.stock.quantity, l.jacketColourway.stock.quantity),
     })),
     jackets: jackets.map((j) => ({

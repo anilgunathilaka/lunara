@@ -1,7 +1,7 @@
 import 'server-only';
 import { mediaUrl } from '@/lib/media/photos';
 import { getPrisma } from '@/lib/prisma';
-import { resolvePairedPrice, resolveStandaloneJacketPrice } from '@/lib/pricing/resolve';
+import { resolvePairedPrice } from '@/lib/pricing/resolve';
 import { availabilityOf } from '@/lib/stock/state';
 
 /**
@@ -39,7 +39,9 @@ export async function productAdminList() {
         detail: `${saree.design.name} · ${saree.material.name} · ${saree.colourName}`,
         colourHex: saree.colourHex,
         jacket: `${row.jacketColourway.material.name} · ${row.jacketColourway.colourName}`,
-        price: resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: row.jacketColourway.material.pairingAddOn }),
+        price: resolvePairedPrice({ sareePrice: row.price, jacketPairingAddOn: row.jacketColourway.material.pairingAddOn }),
+        sareePrice: row.price,
+        jacketPrice: row.jacketColourway.material.pairingAddOn,
         sku: saree.sku,
         quantity: saree.stock.quantity,
         state: availabilityOf(saree.stock).state,
@@ -51,8 +53,8 @@ export async function productAdminList() {
       name: `${row.material.name} · ${row.colourName}`,
       active: row.active,
       colourHex: row.colourHex,
-      price: resolveStandaloneJacketPrice({ standalonePrice: row.material.standalonePrice }),
       pairingAddOn: row.material.pairingAddOn,
+      photo: row.swatchUrl ? mediaUrl(row.swatchUrl) : null,
       sku: row.sku,
       quantity: row.stock.quantity,
       state: availabilityOf(row.stock).state,
@@ -75,15 +77,23 @@ export async function productFormOptions() {
     prisma.jacketColourway.findMany({
       where: { active: true },
       orderBy: [{ material: { sortOrder: 'asc' } }, { id: 'asc' }],
-      include: { material: { select: { name: true } } },
+      include: { material: { select: { name: true, pairingAddOn: true } } },
     }),
     prisma.jacketMaterial.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
     prisma.priceMatrix.findMany({ select: { designId: true, materialId: true, price: true } }),
   ]);
+  // The default jacket (PRD v4.1): the first jacket added, i.e. the oldest one on
+  // sale. Fixed: there is no setting to change it; if it is archived, the next
+  // oldest takes its place.
+  const defaultJacket = jackets.reduce<(typeof jackets)[number] | null>(
+    (oldest, j) => (!oldest || j.createdAt < oldest.createdAt ? j : oldest),
+    null,
+  );
   return {
     designs,
     materials,
-    jackets: jackets.map((j) => ({ id: j.id, name: `${j.material.name} · ${j.colourName}` })),
+    jackets: jackets.map((j) => ({ id: j.id, name: `${j.material.name} · ${j.colourName}`, addOn: j.material.pairingAddOn })),
+    defaultJacketId: defaultJacket?.id ?? null,
     jacketMaterials: jacketMaterials.map((m) => ({
       id: m.id,
       name: m.name,
@@ -92,7 +102,7 @@ export async function productFormOptions() {
       pairingAddOn: m.pairingAddOn,
       standalonePrice: m.standalonePrice,
     })),
-    /** "design|material" → saree price, shown so staff see what a design already costs. */
+    /** "design|category" → starting price, filled in when a new saree is added (PRD v4.2). */
     prices: Object.fromEntries(prices.map((p) => [`${p.designId}|${p.materialId}`, p.price])),
   };
 }
@@ -105,6 +115,7 @@ export async function productForEdit(id: string) {
     where: { id },
     include: {
       sareeColourway: { include: { design: true, material: true, price: true, stock: { include: { cost: true } } } },
+      jacketColourway: { include: { material: { select: { pairingAddOn: true } } } },
     },
   });
   if (!row) return null;

@@ -164,10 +164,9 @@ export default async function ProductDetailPage({
               formatLeft={(count) => tStock('left', { count })}
             />
 
+            {/* The jacket is included, never named or shown to the customer (PRD v4.1). */}
             <JacketBlock
-              materialName={product.jacketMaterialName}
-              swatchHex={product.jacketSwatchHex}
-              swatchUrl={product.jacketSwatchUrl}
+              materialName={tJacket('included')}
               pieceLengthLabel={tJacket('pieceLength', { metres: product.jacketPieceLengthMetres })}
               shipsUnstitchedLabel={tJacket('shipsUnstitched')}
             />
@@ -180,8 +179,7 @@ export default async function ProductDetailPage({
                   designName: product.name,
                   materialLabel,
                   sareeColourName: product.colourName,
-                  jacketMaterialName: product.jacketMaterialName,
-                  jacketColourName: product.jacketColourName,
+                  jacketMaterialName: tJacket('included'),
                   drapeLabel: 'Saree',
                   unitPrice: product.price,
                   quantity: 1,
@@ -280,9 +278,6 @@ export default async function ProductDetailPage({
                 code={item.productCode}
                 materialLabel={categoryName(item.categoryId, item.categoryName)}
                 price={item.price}
-                jacketMaterialName={item.jacketMaterialName}
-                jacketSwatchHex={item.jacketSwatchHex}
-                jacketSwatchUrl={item.jacketSwatchUrl}
                 stockState={item.stockState}
                 quantity={item.quantity}
                 outOfStockLabel={tStock('outOfStock')}

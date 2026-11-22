@@ -1,4 +1,7 @@
 import { getTranslations } from 'next-intl/server';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { isOpsDoneCode } from '@/lib/ops/done';
+import { FlashReveal } from './FlashReveal';
 
 /** Server-side helpers shared by the ops pages. */
 
@@ -22,22 +25,34 @@ const ERROR_CODES = [
   'planMismatch',
 ] as const;
 
-/** Outcome of the last action, from ?saved=1 / ?error=<code> (lib/ops/actions.ts). */
+/**
+ * Outcome of the last action, from ?saved=<code> / ?error=<code>
+ * (lib/ops/flow.ts, lib/ops/done.ts): a clear box at the top of the page
+ * saying what just happened — "Saree added", "Stock updated" — or what
+ * went wrong.
+ */
 export async function OpsFlash({ searchParams }: { searchParams: Awaited<OpsSearchParams> }) {
   const t = await getTranslations('ops');
   const error = typeof searchParams.error === 'string' ? searchParams.error : undefined;
   if (error && (ERROR_CODES as readonly string[]).includes(error)) {
     return (
-      <p className="field-message-error" role="alert">
-        {t(`error.${error as (typeof ERROR_CODES)[number]}`)}
-      </p>
+      <FlashReveal>
+        <p className="ops-flash ops-flash-error" role="alert">
+          <AlertCircle aria-hidden="true" className="ops-flash-icon" />
+          {t(`error.${error as (typeof ERROR_CODES)[number]}`)}
+        </p>
+      </FlashReveal>
     );
   }
-  if (searchParams.saved === '1') {
+  const saved = searchParams.saved;
+  if (saved === '1' || isOpsDoneCode(saved)) {
     return (
-      <p className="field-message" role="status">
-        {t('saved')}
-      </p>
+      <FlashReveal>
+        <p className="ops-flash ops-flash-success" role="status">
+          <CheckCircle2 aria-hidden="true" className="ops-flash-icon" />
+          {saved === '1' ? t('saved') : t(`done.${saved}`)}
+        </p>
+      </FlashReveal>
     );
   }
   return null;

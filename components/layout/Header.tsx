@@ -25,7 +25,8 @@ export interface HeaderProps {
   shop: HeaderNavItem;
   /** Visually distinguished — the differentiator, must not read as one item among five. */
   designYourOwn?: HeaderNavItem;
-  jacketMaterial: HeaderNavItem;
+  /** Omitted while the Jacket Material pages are switched off (lib/features.ts). */
+  jacketMaterial?: HeaderNavItem;
   support: HeaderNavItem;
   /** Sign in / My orders; staff land in the operations panel (app/[locale]/account/start). */
   account?: HeaderNavItem;
@@ -74,7 +75,7 @@ export function Header({
               {designYourOwn.label}
             </Link>
           )}
-          <NavItem href={jacketMaterial.href} label={jacketMaterial.label} menu={jacketMaterial.menu} />
+          {jacketMaterial && <NavItem href={jacketMaterial.href} label={jacketMaterial.label} menu={jacketMaterial.menu} />}
           <NavItem href={support.href} label={support.label} menu={support.menu} />
         </nav>
 

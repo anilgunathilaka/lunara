@@ -1,8 +1,12 @@
 import Image from 'next/image';
 export interface JacketBlockProps {
+  /**
+   * What the customer reads about the jacket. Since PRD v4.1 the shop says
+   * "Unstitched jacket material included" rather than naming the jacket.
+   */
   materialName: string;
-  /** True sampled fabric colour — catalogue data, never a design token. */
-  swatchHex: string;
+  /** True sampled fabric colour — catalogue data, never a design token. Omit to show no swatch (PRD v4.1). */
+  swatchHex?: string;
   /** The jacket's photograph (founder decision 2026-11-14), shown in place of the colour block. */
   swatchUrl?: string | null;
   /** Already formatted, e.g. "2.2 m jacket material". */
@@ -22,12 +26,15 @@ export function JacketBlock({
   pieceLengthLabel,
   shipsUnstitchedLabel,
 }: JacketBlockProps) {
+  const showSwatch = Boolean(swatchHex || swatchUrl);
   return (
     <div className="jacket-block">
       <div className="spec-row">
-        <span className={swatchUrl ? 'jacket-block-photo' : 'mini-swatch'} style={{ backgroundColor: swatchHex }} aria-hidden="true">
-          {swatchUrl && <Image src={swatchUrl} alt="" fill sizes="64px" />}
-        </span>
+        {showSwatch && (
+          <span className={swatchUrl ? 'jacket-block-photo' : 'mini-swatch'} style={{ backgroundColor: swatchHex }} aria-hidden="true">
+            {swatchUrl && <Image src={swatchUrl} alt="" fill sizes="64px" />}
+          </span>
+        )}
         <span>{materialName}</span>
       </div>
       <p className="spec-row-term">{pieceLengthLabel}</p>

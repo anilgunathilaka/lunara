@@ -8,6 +8,7 @@ import { SiteChrome } from '@/components/layout/SiteChrome';
 import '../globals.css';
 import { whatsappLink } from '@/lib/commerce/business';
 import { HERO_BANNERS } from '@/lib/home/hero';
+import { FEATURES } from '@/lib/features';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -78,13 +79,18 @@ export default async function LocaleLayout({
           tag: tNav('shop'),
           description: tOsariya('body'),
         },
-        {
-          label: tNav('jacketMaterial'),
-          href: '/jacket-material',
-          tag: tJacket('shipsUnstitched'),
-          description: tJacketPage('standaloneNote'),
-          links: [{ href: '/support', label: tSupport('jacketStitchingHeading') }],
-        },
+        // Jacket material is not sold on its own (PRD v4.1): no menu entry while its pages are off.
+        ...(FEATURES.jacketMaterialPage
+          ? [
+              {
+                label: tNav('jacketMaterial'),
+                href: '/jacket-material',
+                tag: tJacket('shipsUnstitched'),
+                description: tJacketPage('standaloneNote'),
+                links: [{ href: '/support', label: tSupport('jacketStitchingHeading') }],
+              },
+            ]
+          : []),
       ],
     },
     support: {

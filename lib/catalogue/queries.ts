@@ -58,7 +58,7 @@ function toProduct(row: ListingRow): CatalogueProduct {
     productCode: row.productCode,
     categoryId: saree.materialId,
     categoryName: saree.material.name,
-    price: resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
+    price: resolvePairedPrice({ sareePrice: row.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
     colourName: saree.colourName,
     colourHex: saree.colourHex,
     occasions: saree.design.occasionTags,
@@ -215,8 +215,8 @@ export async function getConfiguratorCatalogue(): Promise<ConfiguratorCatalogue>
 
     for (const jacket of jacketRows) {
       const addOn = jacket.material.pairingAddOn;
-      const plainPrice = resolvePairedPrice({ matrixPrice: plain.price, jacketPairingAddOn: addOn });
-      const superPrice = resolvePairedPrice({ matrixPrice: superCotton.price, jacketPairingAddOn: addOn });
+      const plainPrice = resolvePairedPrice({ sareePrice: plain.price, jacketPairingAddOn: addOn });
+      const superPrice = resolvePairedPrice({ sareePrice: superCotton.price, jacketPairingAddOn: addOn });
       quotes[quoteKey(design.id, 'plain', jacket.id)] = plainPrice;
       quotes[quoteKey(design.id, 'super', jacket.id)] = superPrice;
       materialDeltas[deltaKey(design.id, jacket.id)] = superPrice - plainPrice;

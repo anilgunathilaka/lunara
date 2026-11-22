@@ -37,7 +37,7 @@ export async function costOverview() {
   const sarees = listings.map((row) => {
     const saree = row.sareeColourway;
     const jacket = row.jacketColourway;
-    const price = resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn });
+    const price = resolvePairedPrice({ sareePrice: row.price, jacketPairingAddOn: jacket.material.pairingAddOn });
     const sareeCost = unit(saree.stock.cost);
     const jacketCost = unit(jacket.stock.cost);
     const cost = sareeCost !== null && jacketCost !== null ? sareeCost + jacketCost : null;

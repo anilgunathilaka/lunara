@@ -1609,11 +1609,21 @@ body {
 }
 
 /*
- * Footer — docs/3-components.md §6.2; layout per docs/2-ui.md §7.4 (founder
- * decision 2026-11-09, after theirnibs.com): a band of the four facts with
- * their icons, then link columns and the business details on a
- * --lun-gold-pale ground. Text on gold-pale is --lun-ink, never muted grey.
+ * Footer — docs/3-components.md §6.2; layout per docs/2-ui.md §7.4, after
+ * almadalabel.com (founder decision 2026-11-23) on the site's maroon,
+ * --lun-plum-deep (founder decision 2026-11-23): white text, gold accents; the logo,
+ * the business details and an underlined WhatsApp row on the left, Support,
+ * Policies and the language selector on the right; LUNARA in plum across the full
+ * width; a small closing line. Labels are the surface colour at 75%.
+ * The content is the founder's, unchanged: above it, the band of the four
+ * facts with their icons (founder decision 2026-11-10).
  */
+.site-footer-wrap {
+  --footer-muted: color-mix(in srgb, var(--lun-surface) 75%, transparent);
+  --footer-rule: color-mix(in srgb, var(--lun-surface) 20%, transparent);
+  background: var(--lun-plum-deep);
+  color: var(--lun-surface);
+}
 .site-trust {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1621,9 +1631,8 @@ body {
   margin: 0;
   padding: var(--space-6) var(--space-4);
   list-style: none;
-  /* White, like the whole site (founder decision 2026-11-10); hairlines mark the band. */
-  background: var(--lun-surface);
-  border-block: 1px solid var(--lun-line);
+  /* On the footer's maroon; a hairline beneath marks the band. */
+  border-bottom: 1px solid var(--footer-rule);
 }
 @media (min-width: 768px) {
   .site-trust {
@@ -1637,7 +1646,7 @@ body {
   align-items: center;
   gap: var(--space-2);
   min-height: 44px;
-  color: var(--lun-plum-deep);
+  color: var(--lun-surface);
   text-align: center;
   text-decoration: none;
 }
@@ -1650,24 +1659,105 @@ body {
   text-underline-offset: var(--space-1);
 }
 .site-footer {
-  padding: var(--space-7) var(--space-4) var(--space-5);
-  /* White, like the whole site (founder decision 2026-11-10); a hairline above. */
-  background: var(--lun-surface);
-  border-top: 1px solid var(--lun-line);
-  color: var(--lun-ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-4) var(--space-5);
+  color: var(--lun-surface);
+  font: var(--type-body-s) var(--font-body);
 }
 @media (min-width: 768px) {
   .site-footer {
-    padding-inline: max(var(--space-6), calc((100% - var(--container-max)) / 2));
+    padding: var(--space-9) var(--space-6) var(--space-6);
   }
 }
-.site-footer-grid {
-  display: grid;
-  gap: var(--space-6);
+@media (min-width: 1024px) {
+  .site-footer {
+    gap: var(--space-9);
+  }
 }
-@media (min-width: 768px) {
-  .site-footer-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr);
+.site-footer-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+@media (min-width: 1024px) {
+  .site-footer-top {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-5);
+  }
+}
+
+/* The opening block: logo, business details, WhatsApp. */
+.site-footer-talk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  width: 100%;
+}
+.site-footer-talk .wordmark-logo {
+  height: var(--space-7);
+  width: auto;
+}
+.site-footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.site-footer-legal p {
+  margin: 0;
+}
+@media (min-width: 1024px) {
+  .site-footer-talk {
+    flex: 0 1 40%;
+    max-width: 27rem;
+    min-width: 0;
+  }
+}
+/* Looks like the reference's e-mail field: a row with a hairline beneath and an arrow. */
+.site-footer-talk-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  align-self: stretch;
+  min-height: 44px;
+  border-bottom: 1px solid var(--footer-muted);
+  color: var(--footer-muted);
+  text-decoration: none;
+  transition:
+    color var(--motion-quick),
+    border-bottom-color var(--motion-quick);
+}
+.site-footer-talk-row:hover,
+.site-footer-talk-row:focus-visible {
+  color: var(--lun-surface);
+  border-bottom-color: var(--lun-gold);
+}
+.site-footer-talk-arrow {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+  color: var(--lun-surface);
+  transition: transform var(--motion-quick);
+}
+.site-footer-talk-row:hover .site-footer-talk-arrow {
+  transform: translateX(var(--space-1));
+}
+
+/* Details and links: three equal columns on desktop, two then one on phones. */
+.site-footer-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-5);
+  width: 100%;
+}
+@media (min-width: 1024px) {
+  .site-footer-columns {
+    flex: 1 1 60%;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 .site-footer-column {
@@ -1676,43 +1766,51 @@ body {
   align-items: flex-start;
   gap: var(--space-2);
 }
+/* Headings as the reference's quiet labels: muted, not capitals. */
 .site-footer-heading {
-  margin: 0 0 var(--space-2);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
+  margin: 0 0 var(--space-1);
+  color: var(--footer-muted);
 }
 .site-footer-link {
-  font: var(--type-body-s) var(--font-body);
-  color: var(--lun-ink);
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: var(--lun-surface);
   text-decoration: none;
+  text-underline-offset: var(--space-1);
+  text-decoration-thickness: 1px;
+  text-decoration-skip-ink: none;
 }
 .site-footer-link:hover,
 .site-footer-link:focus-visible {
-  text-decoration: underline;
-  text-underline-offset: var(--space-1);
+  text-decoration-line: underline;
 }
-.site-footer-brand .wordmark-logo {
-  height: var(--space-7);
-  width: auto;
-}
-.site-footer-legal {
+
+/* LUNARA across the full width. */
+.site-footer-bottom {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
-  font: var(--type-body-s) var(--font-body);
+  gap: var(--space-5);
 }
-.site-footer-base {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  margin-top: var(--space-7);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--lun-gold-deep);
+.site-footer-mark {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.site-footer-mark text {
+  font-family: var(--font-display);
+  font-size: 182px;
+  font-weight: 400;
+  /* Gold on maroon: a decorative mark (aria-hidden), never text on white. */
+  fill: var(--lun-gold);
+}
+.site-footer-copyright {
+  margin: 0;
   font: var(--type-label) var(--font-body);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--footer-muted);
 }
 
 /*
@@ -2850,6 +2948,8 @@ body {
   color: var(--lun-surface);
 }
 .ops-table-wrap {
+  /* Contains absolutely placed children (.sr-only) so they never widen the page. */
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--lun-line);
   border-radius: var(--radius-s);
@@ -4960,4 +5060,412 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border: 1px solid var(--lun-line);
+}
+
+/*
+ * Shop page (docs/2-ui.md §7.6; founder decision 2026-11-22, after
+ * perniaspopupshop.com), Lunara's content and colours: filters in a column
+ * beside the grid from 1024px (a Filter button and the slide-over below
+ * it), a heading row with the count and Sort by over a 1px ink rule, and
+ * cards as on the home rail with the stock note on the photograph's corner.
+ * Pointing at a card cross-fades to its second photograph (§7.1): never
+ * scaled, not on touch screens, not under reduced motion.
+ */
+.shop .pdp-breadcrumb {
+  margin-block-end: var(--space-5);
+}
+.shop-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .shop-layout {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: var(--space-7);
+  }
+}
+.shop-layout-plain {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1024px) {
+  .shop-layout.shop-layout-plain {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Filters switched off (lib/features.ts): Sort by alone, on the right. */
+.shop-layout-plain .shop-toolbar {
+  justify-content: flex-end;
+}
+.shop-sidebar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .shop-sidebar {
+    display: block;
+  }
+}
+.shop-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Heading row: title and count on the left, Sort by on the right, ink rule under. */
+.shop-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block-end: var(--space-3);
+  border-block-end: 1px solid var(--lun-ink);
+}
+.shop-title {
+  margin: 0;
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.shop-title:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.shop-count {
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+}
+.shop-head-sort {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .shop-head-sort {
+    display: block;
+  }
+}
+.shop-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.shop-sort-select {
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-none);
+  background: var(--lun-surface);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+  cursor: pointer;
+}
+.shop-sort-select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Below 1024px: Filter and Sort by above the grid. */
+.shop-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+@media (min-width: 1024px) {
+  .shop-toolbar {
+    display: none;
+  }
+}
+
+/* Filters. */
+.shop-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.shop-filters-clear {
+  align-self: flex-start;
+  min-height: var(--control-height-md);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+  cursor: pointer;
+}
+.shop-filters-clear:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.shop-filter-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.shop-filter-heading {
+  padding: 0;
+  margin-block-end: var(--space-2);
+  font: var(--type-body-l) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.shop-filter-heading:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+/* Long lists scroll inside their group, as in the reference. */
+.shop-filter-list {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(var(--control-height-md) * 7);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.shop-filters .option-label {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+.shop-filter-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.shop-filter-count {
+  color: var(--lun-ink-muted);
+}
+.shop-filter-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 1px solid var(--lun-line);
+}
+.shop-drawer-actions {
+  position: sticky;
+  bottom: calc(var(--space-4) * -1);
+  margin-block-start: var(--space-5);
+  padding-block: var(--space-3);
+  background: var(--lun-surface);
+}
+
+/* Grid: four across from 1024px, three from 768px, two on phones. */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-4);
+  row-gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .shop-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+}
+@media (min-width: 1024px) {
+  .shop-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--space-6);
+    row-gap: var(--space-7);
+  }
+}
+.shop-sentinel {
+  height: 1px;
+}
+
+/* Cards, as on the home rail (§7.4). */
+.shop-grid .product-card {
+  gap: var(--space-1);
+}
+.shop-grid .product-card-image {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-none);
+  margin-block-end: var(--space-2);
+}
+.shop-grid .product-card-image-badge {
+  position: absolute;
+  inset-inline-start: var(--space-2);
+  inset-block-end: var(--space-2);
+  z-index: 1;
+}
+.shop-grid .product-card-image-badge:empty {
+  display: none;
+}
+.shop-grid .product-card-image-badge .stock-badge {
+  background: var(--lun-surface);
+}
+.shop-grid .product-card-code {
+  display: none;
+}
+.shop-grid .product-card-name,
+.shop-grid .product-card-name:lang(en) {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.shop-grid .product-card-name:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.shop-grid .product-card-material {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+}
+.shop-grid .product-card .price-display {
+  margin-block-start: var(--space-2);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.shop-grid .product-card-jacket-row {
+  margin-block-start: var(--space-1);
+  font: var(--type-label) var(--font-body);
+}
+
+/* The second photograph: hidden until the card is pointed at. */
+.product-card-image-alt {
+  opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .shop-grid .product-card-image-alt {
+    transition: opacity var(--motion-standard);
+  }
+  .shop-grid .product-card:hover .product-card-image-alt {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shop-grid .product-card-image-alt {
+    display: none;
+  }
+}
+
+/*
+ * Admin clarity (docs/2-ui.md §7.7, founder request 2026-11-22): a short
+ * lead under a page title, what the customer pays worked out beside the
+ * price fields, small notes under table cells, figures right-aligned, and
+ * fields that appear only when their choice is made.
+ */
+.ops-lead {
+  max-width: 48rem;
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.ops-price-sum {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: 3px solid var(--lun-gold);
+  background: var(--lun-ground);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.ops-warning-text {
+  color: var(--lun-warning);
+  font-weight: var(--weight-semibold);
+}
+.ops-cell-note {
+  display: block;
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-body-weight);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+}
+.ops-inline-form .ops-cell-note {
+  display: inline;
+}
+.ops-table .ops-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ops-table .ops-strong {
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.ops-thumb-inline {
+  display: inline-block;
+  vertical-align: middle;
+  margin-inline-end: var(--space-2);
+}
+.ops-show-when {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.ops-show-when[hidden] {
+  display: none;
+}
+
+.ops-direction-select {
+  width: auto;
+}
+.ops-other-actions {
+  border-block-start: 1px solid var(--lun-line);
+  padding-block-start: var(--space-3);
+}
+.ops-other-actions > summary {
+  min-height: var(--control-height-md);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink-muted);
+}
+.ops-other-actions[open] > summary {
+  margin-block-end: var(--space-3);
+}
+
+/* A long table cell (product detail, jacket name) wraps instead of widening the table. */
+.ops-table td.ops-cell-wrap {
+  white-space: normal;
+  min-inline-size: 14em;
+  max-inline-size: 28em;
+}
+
+/*
+ * What just happened after an add, edit or delete (OpsFlash,
+ * app/[locale]/ops/shared.tsx): a clear box at the top of the page, in
+ * the page itself (not a toast), with an icon so it never relies on colour.
+ */
+.ops-flash {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-m);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.ops-flash-success {
+  color: var(--lun-success);
+  background: color-mix(in srgb, var(--lun-success) 8%, var(--lun-surface));
+}
+.ops-flash-error {
+  color: var(--lun-danger);
+  background: color-mix(in srgb, var(--lun-danger) 8%, var(--lun-surface));
+}
+.ops-flash-icon {
+  flex: none;
+  width: 1.25em;
+  height: 1.25em;
 }

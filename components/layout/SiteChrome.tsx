@@ -84,7 +84,7 @@ function SiteChromeInner({
       <Header
         shop={{ href: '/shop', label: navLabels.shop, menu: menus?.shop }}
         designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
-        jacketMaterial={{ href: '/jacket-material', label: navLabels.jacketMaterial }}
+        jacketMaterial={FEATURES.jacketMaterialPage ? { href: '/jacket-material', label: navLabels.jacketMaterial } : undefined}
         support={{ href: '/support', label: navLabels.support, menu: menus?.support }}
         account={{ href: '/account/start', label: navLabels.account, text: navLabels.accountShort }}
         cartHref="/cart"
@@ -136,9 +136,11 @@ function SiteChromeInner({
           <Link href="/shop" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.shop}
           </Link>
-          <Link href="/jacket-material" className="site-header-link" onClick={() => setMenuOpen(false)}>
-            {navLabels.jacketMaterial}
-          </Link>
+          {FEATURES.jacketMaterialPage && (
+            <Link href="/jacket-material" className="site-header-link" onClick={() => setMenuOpen(false)}>
+              {navLabels.jacketMaterial}
+            </Link>
+          )}
           <Link href="/support" className="site-header-link" onClick={() => setMenuOpen(false)}>
             {navLabels.support}
           </Link>

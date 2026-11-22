@@ -335,6 +335,8 @@ onSelect
 | ColourPicker | Wraps SwatchGrid. Colours unavailable for the current design are disabled with the reason stated, not hidden — hiding them makes the range look smaller than it is. | UX-C5 |
 | All three | Independently selectable in any order. Changing one never resets another. | UX-C1a |
 
+Money format (founder decision 2026-11-22): every amount of money, everywhere (shop, cart, checkout, messages, admin), is written with grouped thousands and two decimal places: LKR 5,200.00, +900.00. One formatter does it (lib/pricing/format.ts); amounts are still whole rupees underneath. Examples elsewhere in these documents without decimals predate this rule.
+
 4.2b PriceAttribution
 
 Small component carrying a trust obligation. Price moves live across four axes; this makes each movement legible.
@@ -458,7 +460,7 @@ Three placements are required by Document 1: the listing, checkout, and the prin
 | WhatsAppAction | Floating on mobile, header and footer on desktop. Reachable from every page without scrolling. |
 | SlideOver | Used for add-to-cart confirmation. Confirms without navigating away from the product, per Flow A step 3. |
 | Accordion | Product detail secondary blocks on mobile. First panel open by default. |
-| Footer | Facts band with icons, then --lun-gold-pale ground (docs/2-ui.md §7.4). Support links, policies, registration number, address, contact number, language selector. |
+| Footer | Facts band with icons, then (layout after almadalabel.com, docs/2-ui.md §7.4) logo, registration number, address, contact number and WhatsApp; Support links; policies; language selector; LUNARA across the full width; copyright. |
 
 7. Quality Standards
 

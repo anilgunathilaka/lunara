@@ -1,3 +1,5 @@
+import { FEATURES } from '@/lib/features';
+import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -7,6 +9,8 @@ import { StockState } from '@/components/product/StockState';
 import { getStandaloneJackets } from '@/lib/catalogue/queries';
 
 export default async function JacketMaterialPage({ params }: { params: Promise<{ locale: string }> }) {
+  // Jacket material is not sold on its own (PRD v4.1): the page is off.
+  if (!FEATURES.jacketMaterialPage) notFound();
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations('jacketPage');
