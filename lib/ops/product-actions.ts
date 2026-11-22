@@ -37,16 +37,16 @@ async function audit(tx: Tx, actor: string, action: string, entityType: string, 
   await tx.auditLog.create({ data: { actor, action, entityType, entityId, before, after } });
 }
 
-/** Sets a design × cotton price, audited when it changes. It applies to every colour of that design in that cotton. */
-async function setMatrixPrice(tx: Tx, actor: string, designId: string, materialId: string, price: number) {
+/**
+ * Makes sure a design × category price exists (every saree colour needs one,
+ * and Design Your Own prices from it). PRD v4.2: a saree's own price lives on
+ * the saree, so an existing matrix price is never overwritten from here.
+ */
+async function ensureMatrixPrice(tx: Tx, actor: string, designId: string, materialId: string, price: number) {
   const current = await tx.priceMatrix.findUnique({ where: { designId_materialId: { designId, materialId } } });
-  if (current?.price === price) return;
-  await tx.priceMatrix.upsert({
-    where: { designId_materialId: { designId, materialId } },
-    create: { designId, materialId, price },
-    update: { price },
-  });
-  await audit(tx, actor, 'price.matrix', 'price_matrix', `${designId}|${materialId}`, { price }, current ? { price: current.price } : undefined);
+  if (current) return;
+  await tx.priceMatrix.create({ data: { designId, materialId, price } });
+  await audit(tx, actor, 'price.matrix', 'price_matrix', `${designId}|${materialId}`, { price });
 }
 
 // ── Sarees (shop products) ────────────────────────────────────────────────
@@ -120,7 +120,7 @@ export async function createProductAction(form: FormData): Promise<void> {
       });
       if (duplicate) throw new OpsError('exists');
 
-      await setMatrixPrice(tx, staff.email, designId, input.materialId, input.price);
+      await ensureMatrixPrice(tx, staff.email, designId, input.materialId, input.price);
 
       const colourwayId = await uniqueValue(slugify(`${designId}-${input.materialId}-${input.colourName}`, 80), async (v) => !!(await tx.sareeColourway.findUnique({ where: { id: v } })));
       const sku = await uniqueValue(
@@ -142,6 +142,8 @@ export async function createProductAction(form: FormData): Promise<void> {
           productCode,
           sareeColourwayId: colourwayId,
           jacketColourwayId: jacket.id,
+          // This saree's own price (PRD v4.2).
+          price: input.price,
           isFeatured: input.featured,
           sortOrder: (last._max.sortOrder ?? 0) + 1,
         },
@@ -155,11 +157,12 @@ export async function createProductAction(form: FormData): Promise<void> {
         sku,
         quantity: input.quantity,
         jacketColourwayId: jacket.id,
+        price: input.price,
       });
       return listingId;
     });
     return `/${lang}/ops/products/${id}`;
-  });
+  }, 'sareeAdded');
 }
 
 const updateSchema = z.object({
@@ -199,10 +202,13 @@ export async function updateProductAction(form: FormData): Promise<void> {
       }
       await tx.sareeColourway.update({ where: { id: saree.id }, data: { colourName: input.colourName, colourHex: input.colourHex } });
       await tx.stockItem.update({ where: { sku: saree.sku }, data: { threshold: input.threshold } });
-      await setMatrixPrice(tx, staff.email, saree.designId, saree.materialId, input.price);
+      // PRD v4.2: this saree's price alone; other sarees keep theirs.
+      if (listing.price !== input.price) {
+        await audit(tx, staff.email, 'price.saree', 'curated_listing', listing.id, { price: input.price }, { price: listing.price });
+      }
       await tx.curatedListing.update({
         where: { id: listing.id },
-        data: { name: input.name, isFeatured: input.featured, jacketColourwayId: jacket.id },
+        data: { name: input.name, isFeatured: input.featured, jacketColourwayId: jacket.id, price: input.price },
       });
       await audit(
         tx,
@@ -214,7 +220,7 @@ export async function updateProductAction(form: FormData): Promise<void> {
         { name: listing.name, colourName: saree.colourName, colourHex: saree.colourHex, jacketColourwayId: listing.jacketColourwayId, featured: listing.isFeatured, threshold: saree.stock.threshold },
       );
     });
-  });
+  }, 'sareeUpdated');
 }
 
 const idSchema = z.object({ locale: opsLocale, id: z.string().min(1).max(100), op: z.enum(['archive', 'restore', 'delete']) });
@@ -257,7 +263,7 @@ export async function productStatusAction(form: FormData): Promise<void> {
       await audit(tx, staff.email, 'product.delete', 'curated_listing', id, { deleted: true }, { name: listing.name, sareeColourwayId: listing.sareeColourwayId });
     });
     return op === 'delete' ? `/${lang}/ops/products` : undefined;
-  });
+  }, ({ archive: 'sareeArchived', restore: 'sareeRestored', delete: 'sareeDeleted' } as const)[op]);
 }
 
 // ── Jacket colours ────────────────────────────────────────────────────────
@@ -292,7 +298,7 @@ export async function createJacketAction(form: FormData): Promise<void> {
   if (!parsed.success) back(path, { error: 'invalid' });
   const input = parsed.data;
   const isNew = input.materialId === NEW;
-  if (isNew && (!input.newMaterialName || input.newMaterialName.length < 2 || !input.composition || !input.pieceLengthMetres || input.standalonePrice === undefined)) {
+  if (isNew && (!input.newMaterialName || input.newMaterialName.length < 2 || !input.composition || !input.pieceLengthMetres)) {
     back(path, { error: 'invalid' });
   }
 
@@ -311,11 +317,12 @@ export async function createJacketAction(form: FormData): Promise<void> {
             composition: input.composition!,
             pieceLengthMetres: new Prisma.Decimal(input.pieceLengthMetres!),
             pairingAddOn: input.pairingAddOn ?? 0,
-            standalonePrice: input.standalonePrice!,
+            // Not asked for while jacket material is not sold on its own (PRD v4.1).
+            standalonePrice: input.standalonePrice ?? Math.max(1, input.pairingAddOn ?? 0),
             sortOrder: (last._max.sortOrder ?? 0) + 1,
           },
         });
-        await audit(tx, staff.email, 'jacket_material.create', 'jacket_material', materialId, { name: materialName, standalonePrice: input.standalonePrice!, pairingAddOn: input.pairingAddOn ?? 0 });
+        await audit(tx, staff.email, 'jacket_material.create', 'jacket_material', materialId, { name: materialName, standalonePrice: input.standalonePrice ?? Math.max(1, input.pairingAddOn ?? 0), pairingAddOn: input.pairingAddOn ?? 0 });
       } else {
         const material = await tx.jacketMaterial.findUnique({ where: { id: materialId } });
         if (!material) throw new OpsError('invalid');
@@ -350,7 +357,7 @@ export async function createJacketAction(form: FormData): Promise<void> {
       return `/${lang}/ops/photos`;
     }
     return `/${lang}/ops/products/jackets/${id}`;
-  });
+  }, 'jacketAdded');
 }
 
 const jacketUpdateSchema = z.object({
@@ -359,7 +366,8 @@ const jacketUpdateSchema = z.object({
   colourName: text(1, 40),
   colourHex: hex,
   pairingAddOn: z.coerce.number().int().min(0).max(1_000_000),
-  standalonePrice: money,
+  /** Not asked for while jacket material is not sold on its own (PRD v4.1): follows the jacket price. */
+  standalonePrice: money.optional(),
   threshold: count,
 });
 
@@ -383,13 +391,15 @@ export async function updateJacketAction(form: FormData): Promise<void> {
       await tx.jacketColourway.update({ where: { id: jacket.id }, data: { colourName: input.colourName, colourHex: input.colourHex } });
       await tx.stockItem.update({ where: { sku: jacket.sku }, data: { threshold: input.threshold } });
       // Material prices are shared by every colour of this jacket material.
-      if (jacket.material.pairingAddOn !== input.pairingAddOn || jacket.material.standalonePrice !== input.standalonePrice) {
-        await tx.jacketMaterial.update({ where: { id: jacket.materialId }, data: { pairingAddOn: input.pairingAddOn, standalonePrice: input.standalonePrice } });
-        await audit(tx, staff.email, 'price.jacket', 'jacket_material', jacket.materialId, { pairingAddOn: input.pairingAddOn, standalonePrice: input.standalonePrice }, { pairingAddOn: jacket.material.pairingAddOn, standalonePrice: jacket.material.standalonePrice });
+      // One jacket price (docs/2-ui.md §7.7): the stored stand-alone price follows it.
+      const standalonePrice = input.standalonePrice ?? Math.max(1, input.pairingAddOn);
+      if (jacket.material.pairingAddOn !== input.pairingAddOn || jacket.material.standalonePrice !== standalonePrice) {
+        await tx.jacketMaterial.update({ where: { id: jacket.materialId }, data: { pairingAddOn: input.pairingAddOn, standalonePrice } });
+        await audit(tx, staff.email, 'price.jacket', 'jacket_material', jacket.materialId, { pairingAddOn: input.pairingAddOn, standalonePrice }, { pairingAddOn: jacket.material.pairingAddOn, standalonePrice: jacket.material.standalonePrice });
       }
       await audit(tx, staff.email, 'jacket.update', 'jacket_colourway', jacket.id, { colourName: input.colourName, colourHex: input.colourHex, threshold: input.threshold }, { colourName: jacket.colourName, colourHex: jacket.colourHex, threshold: jacket.stock.threshold });
     });
-  });
+  }, 'jacketUpdated');
 }
 
 export async function jacketStatusAction(form: FormData): Promise<void> {
@@ -421,5 +431,5 @@ export async function jacketStatusAction(form: FormData): Promise<void> {
       await audit(tx, staff.email, 'jacket.delete', 'jacket_colourway', id, { deleted: true }, { colourName: jacket.colourName, sku: jacket.sku });
     });
     return op === 'delete' ? `/${lang}/ops/products` : undefined;
-  });
+  }, ({ archive: 'jacketArchived', restore: 'jacketRestored', delete: 'jacketDeleted' } as const)[op]);
 }

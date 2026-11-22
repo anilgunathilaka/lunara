@@ -51,7 +51,7 @@ export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: {
       orderBy: { sku: 'asc' },
       include: {
         cost: true,
-        sareeColourway: { include: { design: true, material: true, price: true, listings: { select: { id: true, active: true }, orderBy: { sortOrder: 'asc' } } } },
+        sareeColourway: { include: { design: true, material: true, price: true, listings: { select: { id: true, active: true, price: true }, orderBy: { sortOrder: 'asc' } } } },
         jacketColourway: { include: { material: true } },
       },
     }),
@@ -63,9 +63,10 @@ export async function inventoryRows(): Promise<{ rows: InventoryRow[]; totals: {
     const saree = item.sareeColourway;
     const jacket = item.jacketColourway;
     const unitCost = item.cost ? totalCost(item.cost) : null;
-    // A saree's own value is its design × cotton price; a jacket's is its price on its own.
-    const unitPrice = saree ? saree.price.price : jacket ? resolveStandaloneJacketPrice({ standalonePrice: jacket.material.standalonePrice }) : 0;
+    // A saree's value is its own price (PRD v4.2; the design × category price
+    // if it has no product); a jacket's is its jacket price.
     const listing = saree?.listings[0];
+    const unitPrice = saree ? (listing?.price ?? saree.price.price) : jacket ? resolveStandaloneJacketPrice({ standalonePrice: jacket.material.standalonePrice }) : 0;
     return {
       sku: item.sku,
       kind: saree ? 'saree' : 'jacket',

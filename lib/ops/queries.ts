@@ -2,6 +2,7 @@ import 'server-only';
 import type { OrderStatus, Prisma } from '@prisma/client';
 import { mediaUrl } from '@/lib/media/photos';
 import { getPrisma } from '@/lib/prisma';
+import { resolvePairedPrice } from '@/lib/pricing/resolve';
 import { availabilityOf } from '@/lib/stock/state';
 
 /** Reads for the operations panel (docs/4-architecture.md §3.5). One query each. */
@@ -95,7 +96,7 @@ export async function stockRows(): Promise<StockRow[]> {
 
 export async function priceTables() {
   const prisma = getPrisma();
-  const [designs, materials, jackets] = await Promise.all([
+  const [designs, materials, jackets, listings] = await Promise.all([
     prisma.sareeDesign.findMany({
       relationLoadStrategy: 'join',
       orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
@@ -104,8 +105,35 @@ export async function priceTables() {
     // Saree categories on sale (PRD v4.0): the price columns.
     prisma.cottonMaterial.findMany({ where: { active: true }, orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
     prisma.jacketMaterial.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
+    // Live sarees, for "what customers pay" (PRD v4.1: saree price + jacket price, shown as one total).
+    prisma.curatedListing.findMany({
+      relationLoadStrategy: 'join',
+      where: { active: true },
+      orderBy: [{ productCode: 'asc' }, { id: 'asc' }],
+      include: {
+        jacketColourway: { select: { colourName: true, materialId: true, material: { select: { name: true, pairingAddOn: true } } } },
+      },
+    }),
   ]);
-  return { designs, materials, jackets };
+  const customerPrices = listings.map((l) => {
+    const sareePrice = l.price;
+    const jacketPrice = l.jacketColourway.material.pairingAddOn;
+    return {
+      id: l.id,
+      code: l.productCode,
+      name: l.name,
+      sareePrice,
+      jacketName: l.jacketColourway.material.name,
+      jacketPrice,
+      total: resolvePairedPrice({ sareePrice, jacketPairingAddOn: jacketPrice }),
+    };
+  });
+  // Sarees reached by each jacket material's price.
+  const sareesByJacket: Record<string, number> = {};
+  for (const l of listings) {
+    sareesByJacket[l.jacketColourway.materialId] = (sareesByJacket[l.jacketColourway.materialId] ?? 0) + 1;
+  }
+  return { designs, materials, jackets, customerPrices, sareesByJacket };
 }
 
 /** Every colourway with its photos, for the Photos page (§3.7). Keys resolved to URLs here. */

@@ -67,7 +67,7 @@ export default async function OpsProductsPage({
                       {row.cover ? <Image src={row.cover} alt="" fill sizes="64px" unoptimized /> : null}
                     </span>
                   </td>
-                  <td>
+                  <td className="ops-cell-wrap">
                     <strong>{row.name}</strong>
                     {row.code && <span className="ops-muted"> · {row.code}</span>}
                     <br />
@@ -76,8 +76,14 @@ export default async function OpsProductsPage({
                       {row.detail} · {row.sku}
                     </span>
                   </td>
-                  <td>{row.jacket}</td>
-                  <td>{formatPriceLKR(row.price)}</td>
+                  <td className="ops-cell-wrap">{row.jacket}</td>
+                  <td>
+                    {/* What the customer pays, then its two parts (PRD v4.1). */}
+                    <strong>{formatPriceLKR(row.price)}</strong>
+                    <span className="ops-cell-note">
+                      {t('priceParts', { saree: formatPriceLKR(row.sareePrice), jacket: formatPriceLKR(row.jacketPrice) })}
+                    </span>
+                  </td>
                   <td className={row.state === 'out' ? 'ops-status-out' : row.state === 'low' ? 'ops-status-low' : undefined}>
                     {row.quantity}
                     {level(row.state)}
@@ -109,8 +115,7 @@ export default async function OpsProductsPage({
             <thead>
               <tr>
                 <th scope="col">{t('product')}</th>
-                <th scope="col">{t('priceAlone')}</th>
-                <th scope="col">{t('pairingAddOn')}</th>
+                <th scope="col">{t('jacketPrice')}</th>
                 <th scope="col">{t('inStock')}</th>
                 <th scope="col">{t('status')}</th>
                 <th scope="col">
@@ -122,14 +127,20 @@ export default async function OpsProductsPage({
               {data.jackets.map((row) => (
                 <tr key={row.id}>
                   <td>
-                    <span className="ops-swatch" style={{ background: row.colourHex }} aria-hidden="true" />
+                    {/* Jackets are shown by their photograph (founder decision 2026-11-14). */}
+                    {row.photo ? (
+                      <span className="ops-thumb ops-thumb-inline">
+                        <Image src={row.photo} alt="" fill sizes="64px" unoptimized />
+                      </span>
+                    ) : (
+                      <span className="ops-swatch" style={{ background: row.colourHex }} aria-hidden="true" />
+                    )}
                     <strong>{row.name}</strong>
                     <br />
                     <span className="ops-muted">
                       {row.sku} · {t('usedIn', { count: row.listings })}
                     </span>
                   </td>
-                  <td>{formatPriceLKR(row.price)}</td>
                   <td>{formatPriceLKR(row.pairingAddOn)}</td>
                   <td className={row.state === 'out' ? 'ops-status-out' : row.state === 'low' ? 'ops-status-low' : undefined}>
                     {row.quantity}

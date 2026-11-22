@@ -6,6 +6,7 @@ import { inventoryRows } from '@/lib/ops/inventory';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../shared';
+import { StockAdjustFields } from './StockAdjustFields';
 
 /**
  * Inventory in one place (docs/4-architecture.md §3.12): STOCK_ITEM, the
@@ -107,23 +108,7 @@ export default async function OpsStockPage({
                   <form action={adjustStockAction} className="ops-inline-form">
                     <input type="hidden" name="locale" value={locale} />
                     <input type="hidden" name="sku" value={row.sku} />
-                    <input
-                      className="input ops-number-input"
-                      name="delta"
-                      type="number"
-                      step={1}
-                      required
-                      aria-label={`${tStock('adjust')} — ${row.name}`}
-                      placeholder="±"
-                    />
-                    <input
-                      className="input"
-                      name="reason"
-                      required
-                      minLength={2}
-                      aria-label={`${tStock('reason')} — ${row.name}`}
-                      placeholder={tStock('adjustHint')}
-                    />
+                    <StockAdjustFields idPrefix={`adjust-${row.sku}`} itemName={row.name} compact />
                     <Button type="submit" size="sm" variant="secondary">
                       {tStock('save')}
                     </Button>

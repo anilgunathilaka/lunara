@@ -205,7 +205,7 @@ export async function createOfficeSaleAction(form: FormData): Promise<void> {
       }
     }
     throw new OpsError('conflict');
-  });
+  }, 'saleRecorded');
 }
 
 // ── Payments ──────────────────────────────────────────────────────────────
@@ -243,7 +243,7 @@ export async function recordPaymentAction(form: FormData): Promise<void> {
       });
       await audit(tx, staff.email, 'office.payment', sale.number, { payment: payment.id, amount: input.amount, method: input.method, paidOn: input.paidOn, outstandingAfter: outstanding - input.amount });
     });
-  });
+  }, 'paymentRecorded');
 }
 
 const voidSchema = z.object({
@@ -271,7 +271,7 @@ export async function voidPaymentAction(form: FormData): Promise<void> {
       if (count !== 1) throw new OpsError('conflict');
       await audit(tx, staff.email, 'office.payment.void', sale.number, { payment: input.paymentId }, undefined, input.reason);
     });
-  });
+  }, 'paymentVoided');
 }
 
 // ── Plan ──────────────────────────────────────────────────────────────────
@@ -294,7 +294,7 @@ export async function updatePlanAction(form: FormData): Promise<void> {
       const view = (rows: { dueDate: Date; amount: number }[]) => rows.map((p) => ({ due: p.dueDate.toISOString().slice(0, 10), amount: p.amount }));
       await audit(tx, staff.email, 'office.plan.update', sale.number, view(plan), view(sale.instalments));
     });
-  });
+  }, 'planUpdated');
 }
 
 // ── Cancel ────────────────────────────────────────────────────────────────
@@ -330,7 +330,7 @@ export async function cancelOfficeSaleAction(form: FormData): Promise<void> {
       }
       await audit(tx, staff.email, 'office.sale.cancel', sale.number, { status: 'cancelled' }, { status: 'active' }, input.reason);
     });
-  });
+  }, 'saleCancelled');
 }
 
 // ── Customer details ──────────────────────────────────────────────────────
@@ -370,5 +370,5 @@ export async function updateOfficeCustomerAction(form: FormData): Promise<void> 
         },
       });
     });
-  });
+  }, 'customerUpdated');
 }

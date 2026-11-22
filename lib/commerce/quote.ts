@@ -134,7 +134,7 @@ async function resolveRefs(db: Db, inputs: QuoteLineInput[]): Promise<Map<string
         sareeColourName: saree.colourName,
         jacketMaterialName: jacket.material.name,
         jacketColourName: jacket.colourName,
-        unitPrice: resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
+        unitPrice: resolvePairedPrice({ sareePrice: row.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
         available: Math.min(saree.stock.quantity, jacket.stock.quantity),
         stockBySku: { [saree.sku]: saree.stock.quantity, [jacket.sku]: jacket.stock.quantity },
       });
@@ -170,7 +170,7 @@ async function resolveRefs(db: Db, inputs: QuoteLineInput[]): Promise<Map<string
         sareeColourName: saree.colourName,
         jacketMaterialName: jacket.material.name,
         jacketColourName: jacket.colourName,
-        unitPrice: resolvePairedPrice({ matrixPrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
+        unitPrice: resolvePairedPrice({ sareePrice: saree.price.price, jacketPairingAddOn: jacket.material.pairingAddOn }),
         available: Math.min(saree.stock.quantity, jacket.stock.quantity),
         stockBySku: { [saree.sku]: saree.stock.quantity, [jacket.sku]: jacket.stock.quantity },
       });

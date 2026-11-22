@@ -47,6 +47,30 @@ export default async function OpsOrderPage({
     return tStep(to);
   }
 
+  // The order's usual way forward; everything else (cancel, returns) is secondary.
+  const mainStep = nextSteps.find((to) => to !== 'cancelled' && to !== 'return_requested');
+  const otherSteps = nextSteps.filter((to) => to !== mainStep);
+
+  function stepForm(to: (typeof nextSteps)[number], variant: 'primary' | 'secondary', key: string) {
+    return (
+      <form key={to} action={transitionOrderAction} className="flex flex-col gap-3">
+        <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="number" value={order!.number} />
+        <input type="hidden" name="to" value={to} />
+        {to === 'dispatched' && (
+          <>
+            <Input label={t('courier')} name="courier" required />
+            <Input label={t('tracking')} name="trackingNumber" required />
+          </>
+        )}
+        <Input label={t('note')} name="note" id={`note-${key}-${to}`} />
+        <Button type="submit" variant={variant}>
+          {stepLabel(to)}
+        </Button>
+      </form>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6" style={{ maxWidth: '720px' }}>
       <Link href="/ops/orders" className="btn focus-ring btn-tertiary btn-sm" style={{ alignSelf: 'flex-start' }}>
@@ -156,23 +180,17 @@ export default async function OpsOrderPage({
         {nextSteps.length === 0 ? (
           <p className="field-message">{t('noNextStep')}</p>
         ) : (
-          nextSteps.map((to) => (
-            <form key={to} action={transitionOrderAction} className="flex flex-col gap-3">
-              <input type="hidden" name="locale" value={locale} />
-              <input type="hidden" name="number" value={order.number} />
-              <input type="hidden" name="to" value={to} />
-              {to === 'dispatched' && (
-                <>
-                  <Input label={t('courier')} name="courier" required />
-                  <Input label={t('tracking')} name="trackingNumber" required />
-                </>
-              )}
-              <Input label={t('note')} name="note" />
-              <Button type="submit" variant={to === 'cancelled' ? 'secondary' : 'primary'}>
-                {stepLabel(to)}
-              </Button>
-            </form>
-          ))
+          <>
+            {/* The usual next step stands out; cancelling and the rest wait under
+                "Other actions", so they are never pressed by mistake (docs/2-ui.md §7.7). */}
+            {mainStep && stepForm(mainStep, 'primary', 'main')}
+            {otherSteps.length > 0 && (
+              <details className="ops-other-actions">
+                <summary className="focus-ring">{t('otherActions')}</summary>
+                <div className="flex flex-col gap-4">{otherSteps.map((to) => stepForm(to, 'secondary', 'other'))}</div>
+              </details>
+            )}
+          </>
         )}
       </section>
 

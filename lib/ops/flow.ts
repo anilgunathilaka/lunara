@@ -3,6 +3,7 @@ import type { Route } from 'next';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import type { OpsDoneCode } from './done';
 
 /**
  * Shared shape of ops form actions (docs/4-architecture.md §3.5): validate,
@@ -38,22 +39,26 @@ export function langOf(form: FormData): 'en' | 'si' | 'ta' {
 }
 
 /** Back to a page built from validated parts, with the outcome in the query string. */
-export function back(path: string, outcome: { error?: OpsErrorCode } = {}): never {
+export function back(path: string, outcome: { error?: OpsErrorCode; done?: OpsDoneCode } = {}): never {
   revalidatePath(path);
   const join = path.includes('?') ? '&' : '?';
-  redirect((outcome.error ? `${path}${join}error=${outcome.error}` : `${path}${join}saved=1`) as Route);
+  redirect((outcome.error ? `${path}${join}error=${outcome.error}` : `${path}${join}saved=${outcome.done ?? '1'}`) as Route);
 }
 
-/** Runs the work; an OpsError returns to `path` with its code, success goes to `done` (default `path`). */
-export async function run(path: string, work: () => Promise<string | void>): Promise<never> {
-  let done: string | void;
+/**
+ * Runs the work; an OpsError returns to `path` with its code. Success goes to
+ * the path the work returns (default `path`), with `done` saying what
+ * succeeded (lib/ops/done.ts).
+ */
+export async function run(path: string, work: () => Promise<string | void>, done?: OpsDoneCode): Promise<never> {
+  let to: string | void;
   try {
-    done = await work();
+    to = await work();
   } catch (error) {
     if (error instanceof OpsError) back(path, { error: error.code });
     throw error;
   }
-  back(done ?? path);
+  back(to ?? path, { done });
 }
 
 /** "Rose Dust Border" → "rose-dust-border". Non-Latin names fall back to a short random id. */

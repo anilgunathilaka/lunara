@@ -8,6 +8,7 @@ import { requireStaffPage } from '@/lib/ops/staff';
 import { formatDateTime } from '@/lib/format/date';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
+import { StockAdjustFields } from '../StockAdjustFields';
 
 /** One item's stock and every movement behind it (docs/4-architecture.md §3.12). */
 export default async function OpsStockHistoryPage({
@@ -80,20 +81,7 @@ export default async function OpsStockHistoryPage({
         <input type="hidden" name="from" value="history" />
         <fieldset>
           <legend>{tStock('adjust')}</legend>
-          <div className="ops-form-row">
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="delta">
-                {tStock('adjust')}
-              </label>
-              <input id="delta" className="input ops-number-input" name="delta" type="number" step={1} required placeholder="±" />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="reason">
-                {tStock('reason')}
-              </label>
-              <input id="reason" className="input" name="reason" required minLength={2} maxLength={300} placeholder={tStock('adjustHint')} />
-            </div>
-          </div>
+          <StockAdjustFields idPrefix="adjust" itemName={row.name} />
         </fieldset>
         <div>
           <Button type="submit">{tStock('save')}</Button>

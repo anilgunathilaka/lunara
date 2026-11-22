@@ -10,13 +10,14 @@ import { deliverSoon } from '@/lib/notifications/deliver';
 import { getPrisma } from '@/lib/prisma';
 import { moveStock } from '@/lib/stock/movements';
 import { getStorage } from '@/lib/storage';
+import type { OpsDoneCode } from './done';
 import { requireStaffAction } from './staff';
 import { ORDER_STATUSES, RESTOCK_ON_CANCEL_FROM, canTransition } from './transitions';
 
 /**
  * Operations actions (docs/4-architecture.md §3.5). Each one: re-checks
  * staff access, validates its form, writes atomically, records who did it,
- * then returns to the page with ?saved=1 or ?error=<code>.
+ * then returns to the page with ?saved=<what was done> or ?error=<code>.
  */
 
 type ErrorCode = 'invalid' | 'conflict' | 'negative' | 'tracking';
@@ -29,20 +30,21 @@ class OpsError extends Error {
 
 const locale = z.enum(['en', 'si', 'ta']);
 
-function back(path: string, outcome: { error?: ErrorCode }): never {
+function back(path: string, outcome: { error?: ErrorCode; done?: OpsDoneCode }): never {
   revalidatePath(path);
   // Paths are built from validated parts (locale enum, order-number regex).
-  redirect((outcome.error ? `${path}?error=${outcome.error}` : `${path}?saved=1`) as Route);
+  redirect((outcome.error ? `${path}?error=${outcome.error}` : `${path}?saved=${outcome.done ?? '1'}`) as Route);
 }
 
-async function run(path: string, work: () => Promise<void>): Promise<never> {
+/** Runs the work; an OpsError returns with its code, success with `done` (lib/ops/done.ts). */
+async function run(path: string, work: () => Promise<void>, done?: OpsDoneCode): Promise<never> {
   try {
     await work();
   } catch (error) {
     if (error instanceof OpsError) back(path, { error: error.code });
     throw error;
   }
-  back(path, {});
+  back(path, { done });
 }
 
 // ── Orders ───────────────────────────────────────────────────────────────
@@ -110,7 +112,7 @@ export async function transitionOrderAction(form: FormData): Promise<void> {
       }
     });
     deliverSoon();
-  });
+  }, 'orderUpdated');
 }
 
 // ── Notifications sent by hand (no WhatsApp/SMS provider yet, §6.1) ──────
@@ -130,17 +132,24 @@ export async function markNotificationSentAction(form: FormData): Promise<void> 
       data: { status: 'sent', sentAt: new Date(), sentBy: staff.email },
     });
     if (count !== 1) throw new OpsError('conflict');
-  });
+  }, 'notificationSent');
 }
 
 // ── Stock ────────────────────────────────────────────────────────────────
 
-const adjustSchema = z.object({
-  locale,
-  sku: z.string().min(1).max(100),
-  delta: z.coerce.number().int().min(-10_000).max(10_000).refine((n) => n !== 0),
-  reason: z.string().trim().min(2).max(300),
-});
+const adjustSchema = z
+  .object({
+    locale,
+    sku: z.string().min(1).max(100),
+    /** Add or remove a quantity, in words (docs/2-ui.md §7.7)… */
+    direction: z.enum(['add', 'remove']).optional(),
+    amount: z.coerce.number().int().min(1).max(10_000).optional(),
+    /** …or a signed change, as before. */
+    delta: z.coerce.number().int().min(-10_000).max(10_000).refine((n) => n !== 0).optional(),
+    reason: z.string().trim().min(2).max(300),
+  })
+  .transform((v) => ({ ...v, delta: v.delta ?? (v.direction && v.amount ? (v.direction === 'remove' ? -v.amount : v.amount) : undefined) }))
+  .refine((v) => v.delta !== undefined);
 
 export async function adjustStockAction(form: FormData): Promise<void> {
   const staff = await requireStaffAction();
@@ -150,7 +159,8 @@ export async function adjustStockAction(form: FormData): Promise<void> {
   const fromHistory = form.get('from') === 'history';
   const path = fromHistory ? `/${lang}/ops/stock/${encodeURIComponent(String(form.get('sku') ?? ''))}` : `/${lang}/ops/stock`;
   if (!parsed.success) back(path, { error: 'invalid' });
-  const { sku, delta, reason } = parsed.data;
+  const { sku, reason } = parsed.data;
+  const delta = parsed.data.delta!;
 
   await run(path, async () => {
     await getPrisma().$transaction(async (tx) => {
@@ -171,7 +181,7 @@ export async function adjustStockAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'stockUpdated');
 }
 
 const thresholdSchema = z.object({
@@ -204,7 +214,7 @@ export async function setThresholdAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'thresholdSaved');
 }
 
 // ── Prices ───────────────────────────────────────────────────────────────
@@ -244,14 +254,50 @@ export async function updateMatrixPriceAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'startingPriceSaved');
+}
+
+const sareePriceSchema = z.object({
+  locale,
+  id: z.string().min(1).max(100),
+  price,
+});
+
+/** One saree's own price (PRD v4.2): changes that saree alone. */
+export async function updateSareePriceAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const parsed = sareePriceSchema.safeParse(Object.fromEntries(form));
+  const lang = locale.safeParse(form.get('locale')).data ?? 'en';
+  const path = `/${lang}/ops/prices`;
+  if (!parsed.success) back(path, { error: 'invalid' });
+  const { id, price: next } = parsed.data;
+
+  await run(path, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      const before = await tx.curatedListing.findUnique({ where: { id }, select: { price: true } });
+      if (!before) throw new OpsError('invalid');
+      if (before.price === next) return;
+      await tx.curatedListing.update({ where: { id }, data: { price: next } });
+      await tx.auditLog.create({
+        data: {
+          actor: staff.email,
+          action: 'price.saree',
+          entityType: 'curated_listing',
+          entityId: id,
+          before: { price: before.price },
+          after: { price: next },
+        },
+      });
+    });
+  }, 'sareePriceSaved');
 }
 
 const jacketPriceSchema = z.object({
   locale,
   id: z.string().min(1).max(100),
   pairingAddOn: z.coerce.number().int().min(0).max(1_000_000),
-  standalonePrice: price,
+  /** Not asked for while jacket material is not sold on its own (PRD v4.1): follows the jacket price. */
+  standalonePrice: price.optional(),
 });
 
 export async function updateJacketPricesAction(form: FormData): Promise<void> {
@@ -260,12 +306,14 @@ export async function updateJacketPricesAction(form: FormData): Promise<void> {
   const lang = locale.safeParse(form.get('locale')).data ?? 'en';
   const path = `/${lang}/ops/prices`;
   if (!parsed.success) back(path, { error: 'invalid' });
-  const { id, pairingAddOn, standalonePrice } = parsed.data;
+  const { id, pairingAddOn } = parsed.data;
 
   await run(path, async () => {
     await getPrisma().$transaction(async (tx) => {
       const before = await tx.jacketMaterial.findUnique({ where: { id } });
       if (!before) throw new OpsError('invalid');
+      // One jacket price (docs/2-ui.md §7.7): the stored stand-alone price follows it.
+      const standalonePrice = parsed.data.standalonePrice ?? Math.max(1, pairingAddOn);
       if (before.pairingAddOn === pairingAddOn && before.standalonePrice === standalonePrice) return;
       await tx.jacketMaterial.update({ where: { id }, data: { pairingAddOn, standalonePrice } });
       await tx.auditLog.create({
@@ -279,7 +327,7 @@ export async function updateJacketPricesAction(form: FormData): Promise<void> {
         },
       });
     });
-  });
+  }, 'jacketPriceSaved');
 }
 
 // ── Photos (§3.7) ─────────────────────────────────────────────────────────
@@ -329,7 +377,7 @@ export async function galleryPhotoAction(form: FormData): Promise<void> {
     });
     // After commit: the database no longer points at it. Best effort; an orphan costs only storage.
     if (removed.key) await getStorage().delete(removed.key).catch(() => undefined);
-  });
+  }, op === 'remove' ? 'photoRemoved' : 'coverSet');
 }
 
 // ── Reviews (§3.8, PRD FR-46) ─────────────────────────────────────────────
@@ -364,7 +412,7 @@ export async function respondReviewAction(form: FormData): Promise<void> {
         data: { actor: staff.email, action: 'review.respond', entityType: 'review', entityId: id, before: { response: before.response }, after: { response: response || null } },
       });
     });
-  });
+  }, 'replySaved');
 }
 
 const visibilitySchema = z.object({
@@ -394,5 +442,5 @@ export async function reviewVisibilityAction(form: FormData): Promise<void> {
         data: { actor: staff.email, action: `review.${op}`, entityType: 'review', entityId: id, after: { reason: reason ?? null } },
       });
     });
-  });
+  }, op === 'hide' ? 'reviewHidden' : 'reviewShown');
 }

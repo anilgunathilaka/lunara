@@ -431,6 +431,10 @@ model CuratedListing {
   productCode       String?  @unique
   sareeColourwayId  String
   jacketColourwayId String
+  /// This saree's own price, whole LKR, without the jacket (PRD v4.2): the
+  /// customer pays it plus the jacket's pairing add-on. Changed on this
+  /// saree alone; PRICE_MATRIX only seeds it when the saree is added.
+  price             Int
   isFeatured        Boolean  @default(false)
   active            Boolean  @default(true)
   sortOrder         Int      @default(0)

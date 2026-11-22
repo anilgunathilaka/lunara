@@ -4,9 +4,10 @@ import { Button } from '@/components/primitives/Button';
 import { createProductAction } from '@/lib/ops/product-actions';
 import { productFormOptions } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
-import { formatPriceLKR } from '@/lib/pricing/format';
 import { formatProductCode } from '@/lib/catalogue/product-code';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
+import { ShowWhen } from '../../ShowWhen';
+import { ProductPriceFields } from '../ProductPriceFields';
 
 /** Add a saree product (docs/4-architecture.md §3.10). A plain form: works without JavaScript. */
 export default async function OpsNewProductPage({
@@ -20,7 +21,7 @@ export default async function OpsNewProductPage({
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/products/new`);
   const [options, query, t] = await Promise.all([productFormOptions(), searchParams, getTranslations('ops.products')]);
-  const priced = options.designs.filter((d) => options.materials.some((m) => options.prices[`${d.id}|${m.id}`]));
+  const jacketAddOns = Object.fromEntries(options.jackets.map((j) => [j.id, j.addOn]));
 
   return (
     <div className="flex flex-col gap-4">
@@ -58,12 +59,14 @@ export default async function OpsNewProductPage({
                 <option value="__new">{t('newDesign')}</option>
               </select>
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="newDesignName">
-                {t('newDesignName')}
-              </label>
-              <input id="newDesignName" name="newDesignName" className="input" maxLength={60} placeholder={t('newDesignHint')} />
-            </div>
+            <ShowWhen field="designId" value="__new">
+              <div className="flex flex-col gap-1">
+                <label className="field-label" htmlFor="newDesignName">
+                  {t('newDesignName')}
+                </label>
+                <input id="newDesignName" name="newDesignName" className="input" maxLength={60} placeholder={t('newDesignHint')} />
+              </div>
+            </ShowWhen>
           </div>
 
           {/* Saree category (PRD v4.0): sets the product code, e.g. LSC009. */}
@@ -106,30 +109,6 @@ export default async function OpsNewProductPage({
         </fieldset>
 
         <fieldset>
-          <legend>{t('priceLegend')}</legend>
-          <label className="field-label" htmlFor="price">
-            {t('sareePrice')}
-          </label>
-          <input id="price" name="price" type="number" min={1} step={1} className="input ops-number-input" required />
-          <p className="field-message">{t('sareePriceNote')}</p>
-          {priced.length > 0 && (
-            <details>
-              <summary className="field-message">{t('currentPrices')}</summary>
-              <ul className="field-message">
-                {priced.map((d) => (
-                  <li key={d.id}>
-                    {d.name}: {options.materials.map((m) => {
-                      const p = options.prices[`${d.id}|${m.id}`];
-                      return `${m.name} ${p ? formatPriceLKR(p) : '—'}`;
-                    }).join(' · ')}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          )}
-        </fieldset>
-
-        <fieldset>
           <legend>{t('jacketLegend')}</legend>
           <label className="field-label" htmlFor="jacketColourwayId">
             {t('pairedJacket')}
@@ -157,6 +136,13 @@ export default async function OpsNewProductPage({
               {t('addJacket')}
             </Link>
           </p>
+        </fieldset>
+
+        <fieldset>
+          <legend>{t('priceLegend')}</legend>
+          {/* Saree price + jacket price = what the customer pays (docs/2-ui.md §7.7). */}
+          <ProductPriceFields startingPrices={options.prices} jacketAddOns={jacketAddOns} />
+          <p className="field-message">{t('sareePriceNote')}</p>
         </fieldset>
 
         <fieldset>

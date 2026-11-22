@@ -7,6 +7,7 @@ import { productFormOptions, productForEdit } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
 import { CostForm } from '../CostForm';
+import { ProductPriceFields } from '../ProductPriceFields';
 
 /** Edit, archive, restore or delete one saree product (docs/4-architecture.md §3.10). */
 export default async function OpsEditProductPage({
@@ -31,7 +32,11 @@ export default async function OpsEditProductPage({
   const live = row.active && saree.active;
   const jacketChoices = options.jackets.some((j) => j.id === row.jacketColourwayId)
     ? options.jackets
-    : [{ id: row.jacketColourwayId, name: `${row.jacketColourwayId} (${t('archived')})` }, ...options.jackets];
+    : [
+        { id: row.jacketColourwayId, name: `${row.jacketColourwayId} (${t('archived')})`, addOn: row.jacketColourway.material.pairingAddOn },
+        ...options.jackets,
+      ];
+  const jacketAddOns = Object.fromEntries(jacketChoices.map((j) => [j.id, j.addOn]));
 
   return (
     <div className="flex flex-col gap-4">
@@ -72,15 +77,6 @@ export default async function OpsEditProductPage({
         </fieldset>
 
         <fieldset>
-          <legend>{t('priceLegend')}</legend>
-          <label className="field-label" htmlFor="price">
-            {t('sareePriceFor', { design: saree.design.name, cotton: saree.material.name })}
-          </label>
-          <input id="price" name="price" type="number" min={1} step={1} className="input ops-number-input" required defaultValue={saree.price.price} />
-          <p className="field-message">{t('sareePriceNote')}</p>
-        </fieldset>
-
-        <fieldset>
           <legend>{t('jacketLegend')}</legend>
           <label className="field-label" htmlFor="jacketColourwayId">
             {t('pairedJacket')}
@@ -92,6 +88,13 @@ export default async function OpsEditProductPage({
               </option>
             ))}
           </select>
+        </fieldset>
+
+        <fieldset>
+          <legend>{t('priceLegend')}</legend>
+          {/* This saree's own price (PRD v4.2) + jacket price = what the customer pays (docs/2-ui.md §7.7). */}
+          <ProductPriceFields jacketAddOns={jacketAddOns} defaultPrice={row.price} />
+          <p className="field-message">{t('sareePriceNote')}</p>
         </fieldset>
 
         <fieldset>
@@ -130,7 +133,7 @@ export default async function OpsEditProductPage({
         kind="saree"
         id={row.id}
         cost={saree.stock.cost}
-        price={saree.price.price}
+        price={row.price}
         priceLabel={t('sareePriceFor', { design: saree.design.name, cotton: saree.material.name })}
       />
 

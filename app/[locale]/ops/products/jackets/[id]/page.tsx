@@ -40,39 +40,31 @@ export default async function OpsEditJacketPage({
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="id" value={row.id} />
         <fieldset>
-          <legend>{t('colour')}</legend>
+          <legend>{t('jacketDesign')}</legend>
           <div className="ops-form-row">
             <div className="flex flex-col gap-1">
               <label className="field-label" htmlFor="colourName">
-                {t('colourName')}
+                {t('jacketDesignName')}
               </label>
               <input id="colourName" name="colourName" className="input" required maxLength={40} defaultValue={row.colourName} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="field-label" htmlFor="colourHex">
-                {t('colour')}
+                {t('standInColour')}
               </label>
               <input id="colourHex" name="colourHex" type="color" className="input ops-colour-input" required defaultValue={row.colourHex} />
             </div>
           </div>
+          <p className="field-message">{t('standInColourHint')}</p>
         </fieldset>
         <fieldset>
           <legend>{t('priceLegend')}</legend>
-          <div className="ops-form-row">
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="standalonePrice">
-                {t('priceAlone')}
-              </label>
-              <input id="standalonePrice" name="standalonePrice" type="number" min={1} step={1} className="input ops-number-input" required defaultValue={row.material.standalonePrice} />
-            </div>
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="pairingAddOn">
-                {t('pairingAddOn')}
-              </label>
-              <input id="pairingAddOn" name="pairingAddOn" type="number" min={0} step={1} className="input ops-number-input" required defaultValue={row.material.pairingAddOn} />
-            </div>
-          </div>
-          <p className="field-message">{t('jacketPriceNote', { material: row.material.name })}</p>
+          {/* One jacket price (PRD v4.1): added to the price of every saree with this jacket. */}
+          <label className="field-label" htmlFor="pairingAddOn">
+            {t('jacketPrice')}
+          </label>
+          <input id="pairingAddOn" name="pairingAddOn" type="number" min={0} step={1} className="input ops-number-input" required defaultValue={row.material.pairingAddOn} />
+          <p className="field-message">{t('jacketPriceHint', { count: row._count.listings, material: row.material.name })}</p>
         </fieldset>
         <fieldset>
           <legend>{t('stockLegend')}</legend>
@@ -95,7 +87,7 @@ export default async function OpsEditJacketPage({
         </div>
       </form>
 
-      <CostForm locale={locale} kind="jacket" id={row.id} cost={row.stock.cost} price={row.material.standalonePrice} priceLabel={t('priceAlone')} />
+      <CostForm locale={locale} kind="jacket" id={row.id} cost={row.stock.cost} price={row.material.pairingAddOn} priceLabel={t('jacketPrice')} />
 
       <fieldset className="ops-form ops-danger-zone">
         <legend>{t('statusLegend')}</legend>

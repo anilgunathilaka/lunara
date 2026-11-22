@@ -34,7 +34,11 @@ prices and stock. New sarees default to the first jacket added.
 - No filter, overlay, gradient or tint on product photography.
 - Stock: one source of truth. Catalogue and configurator read
   the same record. Never two stores kept in sync.
-- Price: one source of truth — PRICE_MATRIX (design × category).
+- Price: one source of truth per saree — the saree's own price
+  (curated_listing.price, PRD v4.2, 2026-11-22), changed on that saree
+  alone; the customer pays it plus the jacket price, as one total.
+  PRICE_MATRIX (design × category) only seeds new sarees and will price
+  Design Your Own.
   Never compute price in the client. Catalogue and configurator
   MUST NOT be able to quote different prices for the same combo.
 - Every price change is ATTRIBUTED at the moment it happens,

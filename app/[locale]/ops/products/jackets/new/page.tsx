@@ -7,6 +7,7 @@ import { productFormOptions } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../../shared';
+import { ShowWhen } from '../../../ShowWhen';
 
 /** Add a jacket colour, optionally with a new jacket material (docs/4-architecture.md §3.10). */
 export default async function OpsNewJacketPage({
@@ -39,11 +40,12 @@ export default async function OpsNewJacketPage({
             </option>
             {options.jacketMaterials.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.name} · {formatPriceLKR(m.standalonePrice)}
+                {m.name} · {formatPriceLKR(m.pairingAddOn)}
               </option>
             ))}
             <option value="__new">{t('newJacketMaterial')}</option>
           </select>
+          <ShowWhen field="materialId" value="__new">
           <p className="field-message">{t('newJacketMaterialNote')}</p>
           <div className="ops-form-row">
             <div className="flex flex-col gap-1">
@@ -66,19 +68,16 @@ export default async function OpsNewJacketPage({
               </label>
               <input id="pieceLengthMetres" name="pieceLengthMetres" type="number" min={0.3} max={5} step={0.05} className="input ops-number-input" />
             </div>
-            <div className="flex flex-col gap-1">
-              <label className="field-label" htmlFor="standalonePrice">
-                {t('priceAlone')}
-              </label>
-              <input id="standalonePrice" name="standalonePrice" type="number" min={1} step={1} className="input ops-number-input" />
-            </div>
+            {/* One jacket price (PRD v4.1): added to the price of every saree with this jacket. */}
             <div className="flex flex-col gap-1">
               <label className="field-label" htmlFor="pairingAddOn">
-                {t('pairingAddOn')}
+                {t('jacketPrice')}
               </label>
               <input id="pairingAddOn" name="pairingAddOn" type="number" min={0} step={1} defaultValue={0} className="input ops-number-input" />
             </div>
           </div>
+          <p className="field-message">{t('jacketPriceNewHint')}</p>
+          </ShowWhen>
         </fieldset>
 
         <fieldset>

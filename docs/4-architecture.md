@@ -327,7 +327,7 @@ ORDER_EVENT: one row per status change, with the actor — the order's history a
 | Rule | Detail |
 | --- | --- |
 | What staff manage | Saree products (a curated listing: design, cotton, colour, paired jacket, stock, price) and jacket colours (with a new or existing jacket material). New designs and jacket materials can be created from the same forms. |
-| Price stays single-sourced | The saree price is the PRICE_MATRIX cell for its design × cotton, shared by every colour of that design in that cotton; the form says so. Jacket prices belong to the jacket material. Every price change is audited. |
+| Price stays single-sourced | PRD v4.2: the saree price is the saree's own CURATED_LISTING.price, changed on that saree alone; a new saree starts from its design × category price, and creates that matrix row if it is missing. (Before v4.2 it was the shared PRICE_MATRIX cell.) Jacket prices belong to the jacket material. Every price change is audited. |
 | Archive, never lose history | Removing a product archives it (founder decision 2026-11-09): `active = false` on the listing and its saree colourway, which hides it from the shop, Design Your Own and checkout (the quote refuses archived colourways). It can be restored. A jacket colour paired in a live product cannot be archived. |
 | Delete only the never-sold | Permanent delete is offered only when no order line refers to the item, and needs an explicit "can't be undone" confirmation, checked on the server. |
 | Identifiers | Ids and SKUs are generated from names (`SAR-DESIGN-PLN-COLOUR`, `JKT-MATERIAL-COLOUR`), made unique, and never change afterwards; renaming a colour keeps its SKU. |
@@ -576,7 +576,7 @@ Implementation (`lib/notifications/`):
 
 | Rule | Implementation |
 | --- | --- |
-| Price resolution | Price for any combination resolves from PRICE_MATRIX on design plus material, with any jacket material difference added. Catalogue and configurator resolve from the same matrix, so the two paths can never disagree. |
+| Price resolution | PRD v4.2 (2026-11-22): a curated saree's price is its own CURATED_LISTING.price plus its jacket's pairing add-on; every reader (shop, cart, checkout, office, costs, inventory) resolves it through lib/pricing/resolve from that one column. Before v4.2: price for any combination resolves from PRICE_MATRIX on design plus material, with any jacket material difference added. Catalogue and configurator resolve from the same matrix, so the two paths can never disagree. |
 | All-in display | Displayed price is always saree plus jacket material. Delivery and any COD fee are shown before checkout, never revealed at the final step. |
 | Configured pricing | Resolves from the same matrix as the catalogue. The API MUST return not only the new price but the CAUSE of the change — design, material or jacket — so the client can attribute it (UX-C10a). Attribution computed client-side from a diff is fragile and will drift. |
 | Material delta | The API MUST expose the Plain-to-Super price difference for a given design, so the material selector can show it before selection (UX-C10b). |

@@ -91,6 +91,13 @@ Where a later section of this document still speaks of Plain Cotton and Super Co
 
 Where a later section speaks of standalone jacket sales (FR-29 to FR-32) or of the customer choosing a jacket, read v4.1; those sections are kept for the record.
 
+0.2.5 v4.1 → v4.2 (founder decision 2026-11-22)
+
+| v4.1 | v4.2 |
+| --- | --- |
+| A saree's price is its design × category price (PRICE_MATRIX), shared by every saree with that design and category: changing one changes them all. | Every saree on sale has its own price, set on that saree and changed on that saree alone. What the customer pays is that saree's price plus its jacket's price, shown as one total. The saree's price lives in one place (the saree's own record), so the shop, cart, checkout, office sales and costs can never quote different prices for the same saree. |
+| — | The design × category price stays in the background: every saree colour still needs one (database link), it seeds the price of a new saree with that design and category, and Design Your Own (switched off) will price from it. Changing a saree's price never changes it. |
+
 Sourcing note: the Lunara Facebook page could not be machine-read during preparation, as Facebook disallows automated access. Brand positioning below is taken from the founder's written brief and confirmed through direct clarification. Any live page content that contradicts this document should be reconciled before approval.
 
 1. Product Overview
