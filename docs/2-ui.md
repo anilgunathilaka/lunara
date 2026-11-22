@@ -375,7 +375,7 @@ The preview cross-fade is the only orchestrated moment in the product. When a ma
 
 Rotation follows the pointer or finger one-to-one. It is direct manipulation, never an animation the customer triggers and watches.
 
-Never animate a product photograph. No parallax, no scale-on-hover, no drift. The one exception is the home hero slider (founder decision 2026-11-10, §7.2): when the slide changes, whole photographs slide across, unaltered; there is still no parallax, scaling, drift or dimming of a photograph.
+Never animate a product photograph. No parallax, no scale-on-hover, no drift. The exceptions are the home hero slider (founder decision 2026-11-10, §7.2): when the slide changes, whole photographs slide across, unaltered; there is still no parallax, scaling, drift or dimming of a photograph. And on the shop grid (founder decision 2026-11-22, §7.6), pointing at a card shows that saree's second photograph in place of the first, cross-faded over --motion-standard; both photographs are shown unaltered, nothing is scaled, and on touch screens and under prefers-reduced-motion it does not happen.
 
 prefers-reduced-motion is honoured absolutely: cross-fades become instant swaps and rotation becomes stepped.
 
@@ -421,7 +421,23 @@ The founder asked for the product page to follow eshandlooms.com in layout and m
 - Reviews (founder decision 2026-11-13, after killstar.com; replaces the reviews tab): a centred heading in muted capitals; the average large (--type-display-xl) with --lun-plum stars and "Based on N reviews", beside a bar for each rating from five stars to one (--lun-plum on --lun-line) with its count, a hairline between them from 768px; then each review between hairlines in three columns from 768px: who (an initial in a --lun-gold-pale circle, the name in capitals, the district, "Verified purchase"), what (stars, the words, photos as taken, any reply from Lunara under a gold rule) and the date. With no reviews, a short line says so. Not taken from the reference: search, filters and "was this helpful?" votes.
 - Related (founder decision 2026-11-13): "You might also like" as the same rail and cards as New arrivals on the home page (§7.4): heading on the left, View all and round arrows on the right, up to eight sarees that scroll sideways.
 - Bar: once the page's own Add to cart has scrolled up out of view, a white bar slides up from the bottom (--motion-sticky-bar) with the photograph, the name, the price and a round --lun-plum Add to cart that presses the page's own button (one add-to-cart path, one confirmation); it slides away when the button comes back. On phones it sits above the bottom bar; the WhatsApp button rises above it.
+- Jacket (PRD v4.1, founder decision 2026-11-22): the block between hairlines says "Unstitched jacket material included", its length, and "Ships unstitched"; the jacket's name, colour and photograph are not shown.
 - Not taken from the reference: the quantity box beside Add to cart and Buy now (not part of Lunara's product), the instalment lines, and the related carousel (a grid instead).
+
+7.6 Shop Page (founder decision 2026-11-22, after perniaspopupshop.com)
+
+The founder asked for the shop page to follow the perniaspopupshop.com listing page in layout and motion, with Lunara's own content and colours. It replaces the row of filter buttons above the grid.
+
+- Above: the breadcrumb (Home / Shop), as on the product page. Then a heading row: the page title in capitals in the body face with the number of sarees beside it in muted ink, and Sort by on the right (Featured, the shop order; Price, low to high; Price, high to low). A 1px --lun-ink rule closes the row.
+- Filters (from 1024px): a column about 15rem wide on the left of the grid, not sticky. Groups in order: In stock only (a single checkbox at the top), Saree category, Colour, Occasion, Price. Each group: its name in capitals in the body face (--type-body-l, medium), then a checkbox per option with the number of sarees it would show in muted ink; colours also show their colour as a small square. Long lists scroll inside the group. Options may be combined: several within a group widen the result (or), groups narrow it (and). The numbers are counted with the other groups applied. Clear all appears at the top when anything is chosen.
+- Below 1024px the column is hidden; a Filter button (with the number of choices made) and Sort by sit above the grid. Filter opens the same groups in the slide-over, closed by a button that names the number of sarees it will show.
+- Every choice applies at once, without a page reload, and is written into the address (?category=…&colour=…&occasion=…&price=…&stock=1&sort=…), so a filtered page can be shared and opened again (docs/1-ux.md §3.1).
+- Grid: four across from 1024px, three from 768px, two on phones; cards as on the home rail (§7.4) — tall 2:3 photographs with square corners, the name in capitals on one line, the category in muted ink, the price — and, because the shop card must name it (docs/1-ux.md §3.1), (PRD v4.1: the jacket is no longer named on cards; the product page says it is included). The stock note sits on the photograph's bottom-left corner, as the reference's badges do. Pointing at a card shows its second photograph (§7.1); a saree with one photograph keeps it.
+- More sarees load as the customer reaches the end of the grid, 24 at a time; no page numbers.
+- No results: the empty state with Clear all; never a dead end.
+- Jacket Material is gone from the header, the phone menu and the home page, and its pages are switched off (PRD v4.1, lib/features.ts jacketMaterialPage).
+- Switched off for now (founder decision 2026-11-22, lib/features.ts shopFilters): while the collection is small the shop shows every saree with Sort by only — no filter column, no Filter button, filters in the address ignored, the grid across the full container (four across from 1024px). Switching it on restores the filters above unchanged.
+- Not taken from the reference: the sale banner above the grid (Lunara has no sales), the wishlist heart, the designer filter, sizes, discounts, and View similar / More by designer.
 
 8. Token Reference
 

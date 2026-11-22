@@ -13,6 +13,8 @@ import { FEATURES } from '@/lib/features';
 
 // Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
 export default async function JacketDetailPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
+  // Jacket material is not sold on its own (PRD v4.1): the page is off.
+  if (!FEATURES.jacketMaterialPage) notFound();
   const { locale, id } = await params;
   setRequestLocale(locale);
   const jacket = await getStandaloneJacket(id);

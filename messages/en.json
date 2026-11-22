@@ -25,7 +25,8 @@
     },
     "jacket": {
       "shipsUnstitched": "Ships unstitched",
-      "pieceLength": "{metres} m jacket material"
+      "pieceLength": "{metres} m jacket material",
+      "included": "Unstitched jacket material included"
     },
     "stock": {
       "outOfStock": "Out of stock",
@@ -333,14 +334,20 @@
   },
   "shop": {
     "title": "Shop curated pairings",
-    "resultsCount": "{count} sarees",
+    "resultsCount": "{count, plural, one {# saree} other {# sarees}}",
     "filters": {
       "category": "Saree category",
       "occasion": "Occasion",
       "priceBand": "Price",
       "opacity": "Opacity",
       "all": "All",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "colour": "Colour",
+      "inStock": "In stock only",
+      "clearAll": "Clear all",
+      "button": "Filter",
+      "heading": "Filters",
+      "show": "Show {count, plural, one {# saree} other {# sarees}}"
     },
     "occasion": {
       "office": "Office",
@@ -354,7 +361,14 @@
       "over9000": "Over LKR 9,000"
     },
     "noResults": "No sarees match these filters.",
-    "noResultsAction": "Clear filters"
+    "noResultsAction": "Clear filters",
+    "breadcrumb": "Shop",
+    "sort": {
+      "label": "Sort by",
+      "featured": "Featured",
+      "priceAsc": "Price: low to high",
+      "priceDesc": "Price: high to low"
+    }
   },
   "pdp": {
     "breadcrumb": "Breadcrumb",
@@ -770,7 +784,8 @@
       "jacketDesignName": "Jacket name",
       "jacketDesignNameHint": "e.g. Floral block print",
       "jacketPhoto": "Jacket photo",
-      "jacketPhotoHint": "A daylight photo of the jacket material: JPEG, PNG or WebP, up to 12 MB. It is shown as it is, never edited."
+      "jacketPhotoHint": "A daylight photo of the jacket material: JPEG, PNG or WebP, up to 12 MB. It is shown as it is, never edited.",
+      "defaultJacket": "default"
     },
     "costs": {
       "legend": "Cost per piece (staff only)",
@@ -1055,8 +1070,8 @@
     "deliveredDay3": "Lunara: how is your order {number}? If anything isn't right, reply here — we're happy to help.",
     "deliveredDay14Subject": "Share a photo of your Lunara saree?",
     "deliveredDay14": "Lunara: how is your saree? A photo and a few words help other customers trust the colour. Share them here: {reviewLink} — thank you!",
-    "deliveredDay45Subject": "A new jacket piece for your saree?",
-    "deliveredDay45": "Lunara: new arrivals are in, and our jacket materials can be bought on their own to refresh a saree you already love: {jacketLink}"
+    "deliveredDay45Subject": "New arrivals at Lunara",
+    "deliveredDay45": "Lunara: new arrivals are in. Come and see the latest sarees: {shopLink}"
   },
   "account": {
     "ordersHeading": "My orders",

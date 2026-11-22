@@ -81,6 +81,16 @@ Version 2.0 corrected that, but modelled the configurator as a two-axis chooser 
 
 Where a later section of this document still speaks of Plain Cotton and Super Cotton, read "saree category"; those sections are kept for the record of the reasoning, which v4.0 supersedes.
 
+0.2.4 v4.0 → v4.1 (founder decision 2026-11-22)
+
+| v4.0 | v4.1 |
+| --- | --- |
+| Jacket material is sold on its own, and the customer sees and can change the jacket paired with each saree. | Lunara sells the full saree only: saree plus its unstitched jacket material. Jacket material is not sold on its own, and the website no longer names, shows or links to jacket materials; the customer sees "Unstitched jacket material included" and "Ships unstitched". |
+| The admin picks a jacket for every saree. | The admin form keeps the jacket choice, already set to the default jacket: the first jacket added (the oldest active one). The default cannot be changed. |
+| — | Jacket materials stay in the admin and in the inventory, with their prices and stock. A saree's price is its design × category price plus its jacket's add-on, shown to the customer as one total. A saree is only as available as the scarcer of the saree and its jacket: if either runs out, the full saree is out of stock. |
+
+Where a later section speaks of standalone jacket sales (FR-29 to FR-32) or of the customer choosing a jacket, read v4.1; those sections are kept for the record.
+
 Sourcing note: the Lunara Facebook page could not be machine-read during preparation, as Facebook disallows automated access. Brand positioning below is taken from the founder's written brief and confirmed through direct clarification. Any live page content that contradicts this document should be reconciled before approval.
 
 1. Product Overview

@@ -80,10 +80,18 @@ export async function productFormOptions() {
     prisma.jacketMaterial.findMany({ orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }] }),
     prisma.priceMatrix.findMany({ select: { designId: true, materialId: true, price: true } }),
   ]);
+  // The default jacket (PRD v4.1): the first jacket added, i.e. the oldest one on
+  // sale. Fixed: there is no setting to change it; if it is archived, the next
+  // oldest takes its place.
+  const defaultJacket = jackets.reduce<(typeof jackets)[number] | null>(
+    (oldest, j) => (!oldest || j.createdAt < oldest.createdAt ? j : oldest),
+    null,
+  );
   return {
     designs,
     materials,
     jackets: jackets.map((j) => ({ id: j.id, name: `${j.material.name} · ${j.colourName}` })),
+    defaultJacketId: defaultJacket?.id ?? null,
     jacketMaterials: jacketMaterials.map((m) => ({
       id: m.id,
       name: m.name,

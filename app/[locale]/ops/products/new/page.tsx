@@ -134,13 +134,20 @@ export default async function OpsNewProductPage({
           <label className="field-label" htmlFor="jacketColourwayId">
             {t('pairedJacket')}
           </label>
-          <select id="jacketColourwayId" name="jacketColourwayId" className="input" required defaultValue="">
+          <select
+            id="jacketColourwayId"
+            name="jacketColourwayId"
+            className="input"
+            required
+            // Already set to the default jacket (PRD v4.1); staff can still choose another.
+            defaultValue={options.defaultJacketId ?? ''}
+          >
             <option value="" disabled>
               {t('choose')}
             </option>
             {options.jackets.map((j) => (
               <option key={j.id} value={j.id}>
-                {j.name}
+                {j.id === options.defaultJacketId ? `${j.name} — ${t('defaultJacket')}` : j.name}
               </option>
             ))}
           </select>

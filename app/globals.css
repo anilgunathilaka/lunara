@@ -4961,3 +4961,296 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   object-fit: cover;
   border: 1px solid var(--lun-line);
 }
+
+/*
+ * Shop page (docs/2-ui.md §7.6; founder decision 2026-11-22, after
+ * perniaspopupshop.com), Lunara's content and colours: filters in a column
+ * beside the grid from 1024px (a Filter button and the slide-over below
+ * it), a heading row with the count and Sort by over a 1px ink rule, and
+ * cards as on the home rail with the stock note on the photograph's corner.
+ * Pointing at a card cross-fades to its second photograph (§7.1): never
+ * scaled, not on touch screens, not under reduced motion.
+ */
+.shop .pdp-breadcrumb {
+  margin-block-end: var(--space-5);
+}
+.shop-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .shop-layout {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: var(--space-7);
+  }
+}
+.shop-layout-plain {
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 1024px) {
+  .shop-layout.shop-layout-plain {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Filters switched off (lib/features.ts): Sort by alone, on the right. */
+.shop-layout-plain .shop-toolbar {
+  justify-content: flex-end;
+}
+.shop-sidebar {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .shop-sidebar {
+    display: block;
+  }
+}
+.shop-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Heading row: title and count on the left, Sort by on the right, ink rule under. */
+.shop-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block-end: var(--space-3);
+  border-block-end: 1px solid var(--lun-ink);
+}
+.shop-title {
+  margin: 0;
+  font: var(--type-heading) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.shop-title:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.shop-count {
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+}
+.shop-head-sort {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .shop-head-sort {
+    display: block;
+  }
+}
+.shop-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.shop-sort-select {
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-none);
+  background: var(--lun-surface);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+  cursor: pointer;
+}
+.shop-sort-select:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Below 1024px: Filter and Sort by above the grid. */
+.shop-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+@media (min-width: 1024px) {
+  .shop-toolbar {
+    display: none;
+  }
+}
+
+/* Filters. */
+.shop-filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.shop-filters-clear {
+  align-self: flex-start;
+  min-height: var(--control-height-md);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+  cursor: pointer;
+}
+.shop-filters-clear:focus-visible {
+  outline: var(--focus-ring-width) solid var(--lun-gold);
+  outline-offset: var(--focus-ring-offset);
+}
+.shop-filter-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.shop-filter-heading {
+  padding: 0;
+  margin-block-end: var(--space-2);
+  font: var(--type-body-l) var(--font-body);
+  font-weight: var(--weight-medium);
+  color: var(--lun-ink);
+}
+.shop-filter-heading:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+/* Long lists scroll inside their group, as in the reference. */
+.shop-filter-list {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(var(--control-height-md) * 7);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.shop-filters .option-label {
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+.shop-filter-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.shop-filter-count {
+  color: var(--lun-ink-muted);
+}
+.shop-filter-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 1px solid var(--lun-line);
+}
+.shop-drawer-actions {
+  position: sticky;
+  bottom: calc(var(--space-4) * -1);
+  margin-block-start: var(--space-5);
+  padding-block: var(--space-3);
+  background: var(--lun-surface);
+}
+
+/* Grid: four across from 1024px, three from 768px, two on phones. */
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-4);
+  row-gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .shop-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+}
+@media (min-width: 1024px) {
+  .shop-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--space-6);
+    row-gap: var(--space-7);
+  }
+}
+.shop-sentinel {
+  height: 1px;
+}
+
+/* Cards, as on the home rail (§7.4). */
+.shop-grid .product-card {
+  gap: var(--space-1);
+}
+.shop-grid .product-card-image {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-none);
+  margin-block-end: var(--space-2);
+}
+.shop-grid .product-card-image-badge {
+  position: absolute;
+  inset-inline-start: var(--space-2);
+  inset-block-end: var(--space-2);
+  z-index: 1;
+}
+.shop-grid .product-card-image-badge:empty {
+  display: none;
+}
+.shop-grid .product-card-image-badge .stock-badge {
+  background: var(--lun-surface);
+}
+.shop-grid .product-card-code {
+  display: none;
+}
+.shop-grid .product-card-name,
+.shop-grid .product-card-name:lang(en) {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.shop-grid .product-card-name:lang(en) {
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.shop-grid .product-card-material {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font: var(--type-body-s) var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--lun-ink-muted);
+}
+.shop-grid .product-card .price-display {
+  margin-block-start: var(--space-2);
+  font: var(--type-body) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.shop-grid .product-card-jacket-row {
+  margin-block-start: var(--space-1);
+  font: var(--type-label) var(--font-body);
+}
+
+/* The second photograph: hidden until the card is pointed at. */
+.product-card-image-alt {
+  opacity: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .shop-grid .product-card-image-alt {
+    transition: opacity var(--motion-standard);
+  }
+  .shop-grid .product-card:hover .product-card-image-alt {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shop-grid .product-card-image-alt {
+    display: none;
+  }
+}

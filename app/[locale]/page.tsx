@@ -128,9 +128,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             code={item.productCode}
             materialLabel={categoryName(item.categoryId, item.categoryName)}
             price={item.price}
-            jacketMaterialName={item.jacketMaterialName}
-            jacketSwatchHex={item.jacketSwatchHex}
-            jacketSwatchUrl={item.jacketSwatchUrl}
             stockState={item.stockState}
             quantity={item.quantity}
             outOfStockLabel={tStock('outOfStock')}
@@ -267,8 +264,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="eyebrow">{tJacket('shipsUnstitched')}</p>
           <h2 className="home-feature-title">{tSupport('jacketStitchingHeading')}</h2>
           <p className="home-feature-body">{tSupport('jacketStitchingBody')}</p>
-          <Link href="/jacket-material" className="solid-pill solid-pill-plum focus-ring">
-            {tNav('jacketMaterial')}
+          {/* Jacket material is not sold on its own (PRD v4.1): the panel leads to the stitching guide. */}
+          <Link href="/support" className="solid-pill solid-pill-plum focus-ring">
+            {tNav('support')}
           </Link>
         </Reveal>
         <div className="home-feature-image">

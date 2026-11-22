@@ -25,7 +25,8 @@
     },
     "jacket": {
       "shipsUnstitched": "මසින් නොකළව එවනු ලැබේ",
-      "pieceLength": "ජැකට් රෙදි මීටර් {metres}"
+      "pieceLength": "ජැකට් රෙදි මීටර් {metres}",
+      "included": "මැසීමට නොමැසූ ජැකට් රෙද්ද ඇතුළත්"
     },
     "stock": {
       "outOfStock": "තොග අවසන්",
@@ -340,7 +341,13 @@
       "priceBand": "මිල",
       "opacity": "විනිවිදභාවය",
       "all": "සියල්ල",
-      "clear": "පෙරහන් ඉවත් කරන්න"
+      "clear": "පෙරහන් ඉවත් කරන්න",
+      "colour": "වර්ණය",
+      "inStock": "තොගයේ ඇති ඒවා පමණක්",
+      "clearAll": "සියල්ල ඉවත් කරන්න",
+      "button": "පෙරහන",
+      "heading": "පෙරහන්",
+      "show": "සාරි {count} පෙන්වන්න"
     },
     "occasion": {
       "office": "කාර්යාලය",
@@ -354,7 +361,14 @@
       "over9000": "රු. 9,000ට වැඩි"
     },
     "noResults": "මෙම පෙරහන් වලට ගැලපෙන සාරි නොමැත.",
-    "noResultsAction": "පෙරහන් ඉවත් කරන්න"
+    "noResultsAction": "පෙරහන් ඉවත් කරන්න",
+    "breadcrumb": "සාප්පුව",
+    "sort": {
+      "label": "පෙළගස්වන්න",
+      "featured": "විශේෂිත",
+      "priceAsc": "මිල: අඩු සිට වැඩි",
+      "priceDesc": "මිල: වැඩි සිට අඩු"
+    }
   },
   "pdp": {
     "breadcrumb": "පිටු මාර්ගය",
@@ -770,7 +784,8 @@
       "jacketDesignName": "ජැකට් නම",
       "jacketDesignNameHint": "උදා: Floral block print",
       "jacketPhoto": "ජැකට් ඡායාරූපය",
-      "jacketPhotoHint": "ජැකට් රෙද්දේ දිවා ආලෝකයේ ගත් ඡායාරූපයක්: JPEG, PNG හෝ WebP, 12 MB දක්වා. එය සංස්කරණය නොකර පෙන්වයි."
+      "jacketPhotoHint": "ජැකට් රෙද්දේ දිවා ආලෝකයේ ගත් ඡායාරූපයක්: JPEG, PNG හෝ WebP, 12 MB දක්වා. එය සංස්කරණය නොකර පෙන්වයි.",
+      "defaultJacket": "පෙරනිමි"
     },
     "costs": {
       "legend": "එක් කැබැල්ලක පිරිවැය (staff පමණි)",
@@ -1055,8 +1070,8 @@
     "deliveredDay3": "Lunara: ඔබේ ඇණවුම {number} කෙසේද? යමක් නිවැරදි නැත්නම්, මෙහි පිළිතුරු දෙන්න — උදව් කිරීමට අපි සතුටු වෙමු.",
     "deliveredDay14Subject": "ඔබේ Lunara සාරියේ ඡායාරූපයක් බෙදා ගන්නද?",
     "deliveredDay14": "Lunara: ඔබේ සාරිය කොහොමද? ඡායාරූපයක් සහ වචන කිහිපයක් අනෙක් පාරිභෝගිකයන්ට වර්ණය විශ්වාස කිරීමට උදව් වේ. මෙතැනින් බෙදා ගන්න: {reviewLink} — ස්තූතියි!",
-    "deliveredDay45Subject": "ඔබේ සාරියට නව ජැකට් රෙද්දක්?",
-    "deliveredDay45": "Lunara: නව එකතුවක් පැමිණ ඇත. ඔබ දැනටමත් කැමති සාරියක් අලුත් කිරීමට අපගේ ජැකට් රෙදි තනිවම මිලදී ගත හැක: {jacketLink}"
+    "deliveredDay45Subject": "Lunara හි නව එකතුව",
+    "deliveredDay45": "Lunara: නව එකතුවක් පැමිණ ඇත. අලුත්ම සාරි බලන්න: {shopLink}"
   },
   "account": {
     "ordersHeading": "මගේ ඇණවුම්",
