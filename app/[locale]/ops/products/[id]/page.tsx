@@ -113,6 +113,10 @@ export default async function OpsEditProductPage({
             <input type="checkbox" name="featured" defaultChecked={row.isFeatured} />
             {t('featured')}
           </label>
+          <label className="ops-inline-form">
+            <input type="checkbox" name="topSeller" defaultChecked={row.isTopSeller} />
+            {t('topSeller')}
+          </label>
         </fieldset>
 
         <div className="ops-inline-form">

@@ -165,6 +165,10 @@ export default async function OpsNewProductPage({
             <input type="checkbox" name="featured" />
             {t('featured')}
           </label>
+          <label className="ops-inline-form">
+            <input type="checkbox" name="topSeller" />
+            {t('topSeller')}
+          </label>
         </fieldset>
 
         <p className="field-message">{t('photosAfter')}</p>

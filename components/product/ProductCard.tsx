@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { PHOTO_QUALITY } from '@/lib/media/quality';
 import { Link } from '@/i18n/navigation';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState, type StockLevel } from '@/components/product/StockState';
@@ -66,8 +67,8 @@ export function ProductCard({
     <Link href={href} className="product-card">
       <div className="product-card-image">
         {/* Drape photograph — no filter, overlay, gradient or hover-zoom. */}
-        <Image src={image.src} alt={image.alt} fill sizes={sizes} />
-        {hoverImageSrc && <Image src={hoverImageSrc} alt="" fill sizes={sizes} className="product-card-image-alt" />}
+        <Image src={image.src} alt={image.alt} fill sizes={sizes} quality={PHOTO_QUALITY} />
+        {hoverImageSrc && <Image src={hoverImageSrc} alt="" fill sizes={sizes} quality={PHOTO_QUALITY} className="product-card-image-alt" />}
         {badgeOnImage && <span className="product-card-image-badge">{stock}</span>}
       </div>
       {!badgeOnImage && stock}

@@ -3,6 +3,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { productAdminList } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
+import { homeTopSellAction } from '@/lib/ops/home-actions';
+import { getHomeTopSellVisible } from '@/lib/site/settings';
+import { Button } from '@/components/primitives/Button';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../shared';
 
@@ -17,12 +20,15 @@ export default async function OpsProductsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/products`);
-  const [data, query, t, tLevel] = await Promise.all([
+  const [data, query, t, tLevel, topSellVisible] = await Promise.all([
     productAdminList(),
     searchParams,
     getTranslations('ops.products'),
     getTranslations('product.stock'),
+    // Until the site_setting table exists (migration 20261123130000), read as hidden.
+    getHomeTopSellVisible().catch(() => false),
   ]);
+  const topSellCount = data.sarees.filter((row) => row.active && row.topSeller).length;
   const level = (state: string) => (state === 'out' ? ` · ${tLevel('outOfStock')}` : state === 'low' ? ` · ${tLevel('lowStock')}` : '');
 
   return (
@@ -31,6 +37,24 @@ export default async function OpsProductsPage({
       <p className="field-message" style={{ maxWidth: '68ch' }}>
         {t('intro')}
       </p>
+
+      {/* The home page's Top sell section (founder decision 2026-11-23): which
+          sarees are ticked on each saree's page; here, the whole section on or off. */}
+      <section className="flex flex-col gap-3" aria-labelledby="top-sell">
+        <h2 id="top-sell" className="checkout-step-title">
+          {t('topSellHeading')}
+        </h2>
+        <p className="field-message" style={{ maxWidth: '68ch' }}>
+          {topSellVisible ? t('topSellShown', { count: topSellCount }) : t('topSellHidden')}
+        </p>
+        <form action={homeTopSellAction} className="ops-inline-form">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="visible" value={topSellVisible ? 'false' : 'true'} />
+          <Button type="submit" variant="secondary" size="sm">
+            {topSellVisible ? t('topSellHide') : t('topSellShow')}
+          </Button>
+        </form>
+      </section>
 
       <section className="flex flex-col gap-3" aria-labelledby="sarees">
         <div className="ops-inline-form">
@@ -88,7 +112,10 @@ export default async function OpsProductsPage({
                     {row.quantity}
                     {level(row.state)}
                   </td>
-                  <td>{row.active ? (row.featured ? t('liveFeatured') : t('live')) : t('archived')}</td>
+                  <td>
+                    {row.active ? (row.featured ? t('liveFeatured') : t('live')) : t('archived')}
+                    {row.active && row.topSeller ? ` · ${t('topSellTag')}` : ''}
+                  </td>
                   <td>
                     <Link href={`/ops/products/${row.id}`} className="btn focus-ring btn-secondary btn-sm">
                       {t('edit')}

@@ -79,6 +79,7 @@ const createSchema = z.object({
   quantity: count,
   threshold: count,
   featured: checkbox,
+  topSeller: checkbox,
 });
 
 export async function createProductAction(form: FormData): Promise<void> {
@@ -145,6 +146,7 @@ export async function createProductAction(form: FormData): Promise<void> {
           // This saree's own price (PRD v4.2).
           price: input.price,
           isFeatured: input.featured,
+          isTopSeller: input.topSeller,
           sortOrder: (last._max.sortOrder ?? 0) + 1,
         },
       });
@@ -158,6 +160,7 @@ export async function createProductAction(form: FormData): Promise<void> {
         quantity: input.quantity,
         jacketColourwayId: jacket.id,
         price: input.price,
+        topSeller: input.topSeller,
       });
       return listingId;
     });
@@ -175,6 +178,7 @@ const updateSchema = z.object({
   jacketColourwayId: z.string().min(1).max(100),
   threshold: count,
   featured: checkbox,
+  topSeller: checkbox,
 });
 
 export async function updateProductAction(form: FormData): Promise<void> {
@@ -208,7 +212,7 @@ export async function updateProductAction(form: FormData): Promise<void> {
       }
       await tx.curatedListing.update({
         where: { id: listing.id },
-        data: { name: input.name, isFeatured: input.featured, jacketColourwayId: jacket.id, price: input.price },
+        data: { name: input.name, isFeatured: input.featured, isTopSeller: input.topSeller, jacketColourwayId: jacket.id, price: input.price },
       });
       await audit(
         tx,
@@ -216,8 +220,8 @@ export async function updateProductAction(form: FormData): Promise<void> {
         'product.update',
         'curated_listing',
         listing.id,
-        { name: input.name, colourName: input.colourName, colourHex: input.colourHex, jacketColourwayId: jacket.id, featured: input.featured, threshold: input.threshold },
-        { name: listing.name, colourName: saree.colourName, colourHex: saree.colourHex, jacketColourwayId: listing.jacketColourwayId, featured: listing.isFeatured, threshold: saree.stock.threshold },
+        { name: input.name, colourName: input.colourName, colourHex: input.colourHex, jacketColourwayId: jacket.id, featured: input.featured, topSeller: input.topSeller, threshold: input.threshold },
+        { name: listing.name, colourName: saree.colourName, colourHex: saree.colourHex, jacketColourwayId: listing.jacketColourwayId, featured: listing.isFeatured, topSeller: listing.isTopSeller, threshold: saree.stock.threshold },
       );
     });
   }, 'sareeUpdated');

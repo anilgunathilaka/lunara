@@ -436,6 +436,8 @@ model CuratedListing {
   /// saree alone; PRICE_MATRIX only seeds it when the saree is added.
   price             Int
   isFeatured        Boolean  @default(false)
+  /// Shown in the home page's Top sell section (founder decision 2026-11-23).
+  isTopSeller       Boolean  @default(false)
   active            Boolean  @default(true)
   sortOrder         Int      @default(0)
   createdAt         DateTime @default(now())
@@ -581,6 +583,17 @@ model StaffMember {
   updatedAt DateTime  @updatedAt
 
   @@map("staff_member")
+}
+
+/// Site-wide switches changed in /ops (founder decision 2026-11-23), one row
+/// per key (lib/site/settings.ts). A missing row means the default.
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+
+  @@map("site_setting")
 }
 
 /// Stock and price changes made in /ops: who, what, before, after.

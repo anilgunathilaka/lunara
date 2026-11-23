@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
+import { PHOTO_QUALITY } from '@/lib/media/quality';
 import { X } from 'lucide-react';
 import { Icon } from '@/components/primitives/Icon';
 import type { GalleryAsset } from '@/components/product/ProductGallery';
@@ -46,7 +47,7 @@ export function ProductImageGrid({ assets, referenceFrameLabel, viewerLabel, clo
               {asset.type === 'video' ? (
                 <video src={asset.src} muted playsInline aria-hidden="true" />
               ) : (
-                <Image src={asset.src} alt="" fill sizes="(min-width: 1024px) 35vw, 1px" priority={index < 2} />
+                <Image src={asset.src} alt="" fill sizes="(min-width: 1024px) 35vw, 1px" priority={index < 2} quality={PHOTO_QUALITY} />
               )}
             </button>
             {asset.isReferenceFrame && <span className="gallery-reference-label pdp-grid-label">{referenceFrameLabel}</span>}
@@ -69,7 +70,7 @@ export function ProductImageGrid({ assets, referenceFrameLabel, viewerLabel, clo
             (shown.type === 'video' ? (
               <video src={shown.src} muted loop playsInline controls aria-label={shown.alt} />
             ) : (
-              <Image src={shown.src} alt={shown.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" />
+              <Image src={shown.src} alt={shown.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" quality={PHOTO_QUALITY} />
             ))}
           <button type="button" className="pdp-viewer-close focus-ring" onClick={close} aria-label={closeLabel}>
             <Icon icon={X} size="inline" />

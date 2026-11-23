@@ -317,6 +317,25 @@
       "previous": "Previous sarees",
       "next": "More sarees"
     },
+    "topSell": {
+      "heading": "Top sellers"
+    },
+    "trio": {
+      "label": "Lookbook",
+      "alt1": "Kandyan Heritage — Timeless Grace in Every Weave: a blue printed saree draped as a Kandyan Osariya",
+      "alt2": "Classic Beauty, Ethereal Charm: a peach saree draped as a Kandyan Osariya",
+      "alt3": "Kandyan Bloom, Ethereal Greenery — The Art of the Osaria: a green saree draped as a Kandyan Osariya"
+    },
+    "stage": {
+      "lineTop": "Grace in",
+      "lineBottom": "every drape",
+      "title": "Drape it your way",
+      "sub": "Wear it the classic way or as a Kandyan Osariya. One saree, made for both, with its jacket material unstitched."
+    },
+    "film": {
+      "pause": "Pause the film",
+      "play": "Play the film"
+    },
     "osariya": {
       "heading": "One saree, two drapes",
       "body": "Every saree can be draped the traditional way or as a Kandyan Osariya — same fabric, same price, same item shipped."
@@ -479,6 +498,7 @@
     "done": {
       "sareeAdded": "Saree added.",
       "sareeUpdated": "Saree changes saved.",
+      "homeSectionUpdated": "Home page section updated.",
       "sareeArchived": "Saree archived. It is no longer in the shop.",
       "sareeRestored": "Saree restored. It is back in the shop.",
       "sareeDeleted": "Saree deleted.",
@@ -808,6 +828,13 @@
       "startingQuantity": "Starting quantity",
       "lowAt": "Warn when stock is at or below",
       "featured": "Feature on the home page",
+      "topSeller": "Show in Top sellers on the home page",
+      "topSellTag": "top seller",
+      "topSellHeading": "Home page: Top sellers",
+      "topSellShown": "Shown on the home page, with {count, plural, =0 {no sarees ticked yet, so nothing appears} one {# saree} other {# sarees}}. Tick “Show in Top sellers” on a saree’s page to add it.",
+      "topSellHidden": "Hidden: the home page does not show the Top sellers section.",
+      "topSellHide": "Hide the section",
+      "topSellShow": "Show the section",
       "photosAfter": "After saving, add photos on the Photos page.",
       "create": "Save product",
       "inStockNow": "{count} in stock.",

@@ -78,13 +78,19 @@ function toProduct(row: ListingRow): CatalogueProduct {
   };
 }
 
-export async function getCuratedListings(options: { featuredOnly?: boolean; limit?: number } = {}): Promise<
+export async function getCuratedListings(
+  options: { featuredOnly?: boolean; topSellersOnly?: boolean; limit?: number } = {},
+): Promise<
   CatalogueProduct[]
 > {
   await connection();
   const rows = await getPrisma().curatedListing.findMany({
     relationLoadStrategy: 'join',
-    where: { ...activeListing, ...(options.featuredOnly ? { isFeatured: true } : {}) },
+    where: {
+      ...activeListing,
+      ...(options.featuredOnly ? { isFeatured: true } : {}),
+      ...(options.topSellersOnly ? { isTopSeller: true } : {}),
+    },
     include: listingInclude,
     orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     take: options.limit,

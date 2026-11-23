@@ -2825,55 +2825,6 @@ body {
 }
 
 /* A panel beside a photograph, white like the whole site (founder decision 2026-11-10). */
-.home-feature {
-  display: grid;
-  background: var(--lun-surface);
-}
-@media (min-width: 768px) {
-  .home-feature {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.home-feature-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-5);
-}
-@media (min-width: 1024px) {
-  .home-feature-copy {
-    padding: var(--space-8) max(var(--space-8), calc((100vw - var(--container-max)) / 2));
-    padding-inline-end: var(--space-8);
-  }
-}
-.home-feature-title {
-  margin: 0;
-  font: var(--type-display-l) var(--font-display);
-  letter-spacing: var(--type-display-l-tracking);
-  color: var(--lun-plum-deep);
-}
-.home-feature-body {
-  margin: 0;
-  max-width: 52ch;
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink);
-}
-.home-feature-image {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  background: var(--lun-surface);
-}
-.home-feature-image img {
-  object-fit: cover;
-}
-@media (min-width: 768px) {
-  .home-feature-image {
-    aspect-ratio: 1 / 1;
-  }
-}
-
 /* A word from us, centred. */
 .home-community {
   align-items: center;
@@ -5515,35 +5466,24 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
     padding: var(--space-9) var(--space-6);
   }
 }
+/* The promise, centred on the page (founder decision 2026-11-23): the
+   display-xl size from the tokens, 30% larger (1.3em on the words). */
+.home-statement-block .home-band-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 .home-statement-big {
-  position: relative;
   margin: 0;
   max-width: 24em;
   font: var(--type-display-xl) var(--font-display);
   letter-spacing: var(--type-display-m-tracking);
   color: var(--lun-plum-deep);
 }
-.home-statement-label {
-  display: block;
-  margin-bottom: var(--space-3);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  color: var(--lun-ink-muted);
-}
-@media (min-width: 1024px) {
-  /* The label sits at the start of the first line; the sentence is indented past it. */
-  .home-statement-big {
-    text-indent: 28%;
-  }
-  .home-statement-label {
-    position: absolute;
-    inset-inline-start: 0;
-    top: var(--space-4);
-    margin: 0;
-    text-indent: 0;
-  }
+.home-statement-words {
+  font-size: 1.3em;
+  line-height: 1.2;
 }
 .scroll-word {
   opacity: clamp(0.18, calc(var(--p) * (var(--n) + 3) - var(--i)), 1);
@@ -5578,6 +5518,8 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   letter-spacing: var(--type-display-hero-tracking);
   color: var(--lun-plum-deep);
   white-space: nowrap;
+  /* All capitals: GRACE IN / EVERY DRAPE. */
+  text-transform: uppercase;
 }
 .home-stage-line-top {
   transform: translateX(calc((var(--p) - 0.3) * -40vw));
@@ -5625,6 +5567,11 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   font: var(--type-display-l) var(--font-display);
   letter-spacing: var(--type-display-l-tracking);
   color: var(--lun-plum-deep);
+}
+.home-stage-sub {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
 }
 
 
@@ -5774,4 +5721,83 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
 }
 .policy-link:hover {
   color: var(--lun-plum-deep);
+}
+
+/*
+ * The home film (founder decision 2026-11-23) plays inside the two-drapes
+ * stage, in place of its photograph, and grows with it. Only its pause
+ * button sits on it: top right, clear of the white card at the bottom.
+ */
+.home-film-video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* When cropped to a wide screen, keep the face in frame. */
+  object-position: 50% 15%;
+}
+.home-film-toggle {
+  position: absolute;
+  top: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height-md);
+  min-height: var(--control-height-md);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  background: var(--lun-surface);
+  color: var(--lun-plum);
+  cursor: pointer;
+}
+.home-film-toggle:hover {
+  border-color: var(--lun-plum);
+}
+
+/*
+ * Three posters after the film (founder decision 2026-11-23). From 768px:
+ * one row, every poster the same height and shown whole: each item grows in
+ * proportion to its own width-to-height ratio (--ar). Phones: a sideways
+ * row that snaps, one poster and a glimpse of the next.
+ */
+.home-trio {
+  padding: var(--space-7) 0;
+  background: var(--lun-surface);
+}
+.home-trio-row {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-inline: var(--space-4);
+  scrollbar-width: none;
+}
+.home-trio-row::-webkit-scrollbar {
+  display: none;
+}
+.home-trio-item {
+  flex: 0 0 80%;
+  scroll-snap-align: center;
+}
+.home-trio-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media (min-width: 768px) {
+  .home-trio-row {
+    overflow: visible;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--space-5);
+    gap: var(--space-4);
+  }
+  .home-trio-item {
+    flex: var(--ar) 1 0;
+    min-width: 0;
+  }
 }
