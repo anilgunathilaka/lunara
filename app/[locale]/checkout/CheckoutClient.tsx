@@ -12,6 +12,7 @@ import { UnstitchedReminder } from '@/components/commerce/UnstitchedReminder';
 import { Input } from '@/components/primitives/Input';
 import { Select, type SelectOption } from '@/components/primitives/Select';
 import { Button } from '@/components/primitives/Button';
+import { Checkbox } from '@/components/primitives/Checkbox';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { useCart, type CartLineItem } from '@/lib/cart/CartContext';
 import { useCartQuote } from '@/lib/cart/useCartQuote';
@@ -102,6 +103,8 @@ export function CheckoutClient(props: CheckoutClientProps) {
   const [eventDate, setEventDate] = useState('');
   const [payment, setPayment] = useState<OfferedPaymentMethod>('bank_transfer');
   const [acknowledged, setAcknowledged] = useState(false);
+  // "Email me about new arrivals": unticked by default, never pre-checked.
+  const [newArrivals, setNewArrivals] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<CheckoutError>(null);
 
@@ -168,6 +171,7 @@ export function CheckoutClient(props: CheckoutClientProps) {
         details,
         paymentMethod: payment,
         unstitchedAcknowledged: acknowledged,
+        marketingConsent: newArrivals && email.trim().length > 0,
         expectedTotal: quote.total,
         locale,
       });
@@ -274,6 +278,15 @@ export function CheckoutClient(props: CheckoutClientProps) {
             type="email"
             autoComplete="email"
           />
+          {/* Marketing consent, separate from the order (privacy policy §2): asked only once
+              there is an email address to send to, and never ticked for the customer. */}
+          {email.trim() && (
+            <Checkbox
+              label={t('newArrivalsConsent')}
+              checked={newArrivals}
+              onChange={(e) => setNewArrivals(e.target.checked)}
+            />
+          )}
           <Input
             label={props.addressLabel}
             value={address}

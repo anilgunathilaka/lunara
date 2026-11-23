@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ShoppingBag, UserRound } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
@@ -50,18 +50,35 @@ export function Header({
   languageLabels,
   announcement,
 }: HeaderProps) {
-  // The strip and the header stay at the top together; once the page has
-  // moved, a hairline settles under the header.
+  // After ccopadel.com (founder decision 2026-11-23): once the page has moved
+  // the header floats as a rounded white bar; it slips away while the
+  // customer scrolls down and comes back the moment they scroll up. It never
+  // hides while a menu is open or anything in it has keyboard focus.
+  const groupRef = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 0);
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const group = groupRef.current;
+      const busy = !!group && (group.matches(':focus-within') || !!group.querySelector('.site-header-item.is-open'));
+      setScrolled(y > 0);
+      if (busy || y < (group?.offsetHeight ?? 0)) setHidden(false);
+      else if (Math.abs(y - last) > 4) setHidden(y > last);
+      last = y;
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   return (
-    <div className={cn('site-header-group', scrolled && 'is-scrolled')}>
+    <div
+      ref={groupRef}
+      className={cn('site-header-group', scrolled && 'is-scrolled', hidden && 'is-hidden')}
+      onFocus={() => setHidden(false)}
+    >
       {announcement && <AnnouncementBar {...announcement} />}
       <header className="site-header">
         <Link href="/" aria-label="Lunara Sarees" className="site-header-logo">

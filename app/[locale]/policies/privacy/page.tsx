@@ -1,11 +1,13 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
+import { PolicyText } from '@/components/content/PolicyText';
+import { PRIVACY_POLICY_EN } from '@/content/policies/privacy.en';
 
 /**
- * No approved privacy-policy legal text exists yet (content/policies/ is
- * empty — CLAUDE.md: policy text is never machine-translated or invented,
- * only approved translations are used). This page states that honestly
- * rather than fabricating legal copy.
+ * Privacy Policy — the founder's approved English text (content/policies/,
+ * 2026-11-23). Policy text is never machine-translated (CLAUDE.md): until
+ * approved Sinhala and Tamil translations exist, those pages show the
+ * English text, marked as English, with a short note saying so.
  */
 export default async function PrivacyPolicyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -14,10 +16,12 @@ export default async function PrivacyPolicyPage({ params }: { params: Promise<{ 
 
   return (
     <div className="home-section">
-      <div className="home-section-inner flex flex-col gap-4" style={{ maxWidth: '640px' }}>
+      <div className="home-section-inner policy-page">
         <SectionMarker />
-        <h1 className="home-section-title">{t('privacyTitle')}</h1>
-        <p className="field-message">{t('pending')}</p>
+        {locale !== 'en' && <p className="field-message">{t('englishOnly')}</p>}
+        <div lang="en">
+          <PolicyText source={PRIVACY_POLICY_EN} />
+        </div>
       </div>
     </div>
   );

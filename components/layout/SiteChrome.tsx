@@ -8,6 +8,7 @@ import type { AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
 import { Footer, type FooterLink, type FooterProps } from '@/components/layout/Footer';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
+import { SmoothScroll } from '@/components/motion/SmoothScroll';
 import { SlideOver } from '@/components/layout/SlideOver';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -152,6 +153,8 @@ function SiteChromeInner({
       </SlideOver>
 
       <WhatsAppAction href={whatsappHref} label={whatsappLabel} variant="floating" />
+      {/* Smooth wheel scrolling on the store pages, not in the operations panel. */}
+      <SmoothScroll />
     </div>
   );
 }

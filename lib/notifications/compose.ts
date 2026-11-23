@@ -37,6 +37,8 @@ interface Route {
   template: Template;
   channels: NotificationChannel[];
   afterDays: number;
+  /** Marketing, not about the order: sent only with the customer's consent. */
+  marketing?: boolean;
 }
 
 const ROUTES: Record<NotifiableEvent, Route[]> = {
@@ -49,7 +51,7 @@ const ROUTES: Record<NotifiableEvent, Route[]> = {
     { template: 'deliveredDay1', channels: ['whatsapp'], afterDays: 1 },
     { template: 'deliveredDay3', channels: ['whatsapp'], afterDays: 3 },
     { template: 'deliveredDay14', channels: ['whatsapp', 'email'], afterDays: 14 },
-    { template: 'deliveredDay45', channels: ['email'], afterDays: 45 },
+    { template: 'deliveredDay45', channels: ['email'], afterDays: 45, marketing: true },
   ],
 };
 
@@ -73,6 +75,8 @@ export interface OrderForMessages {
   estimateMaxDays: number;
   courier: string | null;
   trackingNumber: string | null;
+  /** Set only when the customer ticked "email me about new arrivals" at checkout. */
+  marketingConsentAt: Date | null;
 }
 
 function bankLine(): string | null {
@@ -132,6 +136,8 @@ export function composeNotifications(
 
   const rows: Prisma.NotificationCreateManyInput[] = [];
   for (const route of ROUTES[event]) {
+    // The new-arrivals email goes only to customers who asked for it at checkout.
+    if (route.marketing && !order.marketingConsentAt) continue;
     const { subject, body } = render(route.template);
     for (const channel of route.channels) {
       if (channel === 'email' && (!order.email || !emailConfigured())) continue;
