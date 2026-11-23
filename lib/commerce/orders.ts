@@ -100,6 +100,7 @@ export async function placeOrder(input: PlaceOrderInput, userId: string | null =
             district: details.district,
             eventDate: details.eventDate ? new Date(`${details.eventDate}T00:00:00Z`) : null,
             unstitchedAcknowledgedAt: new Date(),
+            marketingConsentAt: input.marketingConsent && details.email ? new Date() : null,
             subtotal: quote.subtotal,
             deliveryFee: quote.deliveryFee!,
             codFee: quote.codFee,

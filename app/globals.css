@@ -5469,3 +5469,309 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   width: 1.25em;
   height: 1.25em;
 }
+
+/*
+ * Home after the hero, after ccopadel.com (founder decision 2026-11-23),
+ * light: white ground, --lun-plum-deep headings, --lun-ink text, Lunara's
+ * own words. Scroll-linked motion reads --p (0 → 1) from ScrollProgress
+ * (components/motion/ScrollProgress.tsx); --p is 1 without JavaScript and
+ * under reduced motion, so every block shows finished.
+ */
+.scroll-progress {
+  --p: 1;
+}
+
+/* A maroon curtain lifts off the page on arrival. */
+.home-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--lun-plum-deep);
+  pointer-events: none;
+  transform: translateY(-100%);
+  animation: home-curtain-lift var(--motion-section) both;
+}
+@keyframes home-curtain-lift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-curtain {
+    display: none;
+  }
+}
+
+/* Statement: a small label, then large words that darken as they scroll in. */
+.home-statement-block {
+  padding: var(--space-8) var(--space-4);
+  background: var(--lun-surface);
+}
+@media (min-width: 768px) {
+  .home-statement-block {
+    padding: var(--space-9) var(--space-6);
+  }
+}
+.home-statement-big {
+  position: relative;
+  margin: 0;
+  max-width: 24em;
+  font: var(--type-display-xl) var(--font-display);
+  letter-spacing: var(--type-display-m-tracking);
+  color: var(--lun-plum-deep);
+}
+.home-statement-label {
+  display: block;
+  margin-bottom: var(--space-3);
+  font: var(--type-label) var(--font-body);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+@media (min-width: 1024px) {
+  /* The label sits at the start of the first line; the sentence is indented past it. */
+  .home-statement-big {
+    text-indent: 28%;
+  }
+  .home-statement-label {
+    position: absolute;
+    inset-inline-start: 0;
+    top: var(--space-4);
+    margin: 0;
+    text-indent: 0;
+  }
+}
+.scroll-word {
+  opacity: clamp(0.18, calc(var(--p) * (var(--n) + 3) - var(--i)), 1);
+  transition: opacity var(--motion-quick);
+}
+
+/* One saree, two drapes: a tall block whose inside stays pinned. The two
+   names slide apart while the photograph grows from the lower middle to
+   the whole screen; then a white card with the door to the shop. */
+.home-stage {
+  position: relative;
+  height: 240vh;
+  background: var(--lun-surface);
+}
+.home-stage-pin {
+  --g: clamp(0, calc(var(--p) / 0.6), 1);
+  --c: clamp(0, calc((var(--p) - 0.65) * 4), 1);
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.home-stage-lines {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font: var(--type-display-hero) var(--font-display);
+  letter-spacing: var(--type-display-hero-tracking);
+  color: var(--lun-plum-deep);
+  white-space: nowrap;
+}
+.home-stage-line-top {
+  transform: translateX(calc((var(--p) - 0.3) * -40vw));
+}
+.home-stage-line-bottom {
+  transform: translateX(calc((var(--p) - 0.3) * 40vw));
+}
+.home-stage-media {
+  position: absolute;
+  inset: calc((1 - var(--g)) * 42%) calc((1 - var(--g)) * 22%) calc((1 - var(--g)) * 6%);
+  z-index: 1;
+  overflow: hidden;
+  background: var(--lun-surface);
+}
+.home-stage-media img {
+  object-fit: cover;
+}
+.home-stage-card {
+  position: absolute;
+  inset-inline-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+  bottom: var(--space-6);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 26rem;
+  padding: var(--space-6);
+  background: var(--lun-surface);
+  box-shadow: var(--elev-1);
+  opacity: var(--c);
+  transform: translateY(calc((1 - var(--c)) * var(--space-6)));
+  visibility: visible;
+}
+@media (min-width: 768px) {
+  .home-stage-card {
+    inset-inline-start: var(--space-8);
+    inset-inline-end: auto;
+    bottom: var(--space-8);
+  }
+}
+.home-stage-title {
+  margin: 0;
+  font: var(--type-display-l) var(--font-display);
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-plum-deep);
+}
+
+
+/*
+ * Header and hero after ccopadel.com (founder decision 2026-11-23), light.
+ * Header: flat on the white ground at the top of the page; once the page
+ * moves it floats as a rounded white bar inset from the edges, with a soft
+ * shadow. It slips away while the customer scrolls down and returns the
+ * moment they scroll up (Header.tsx), never while a menu is open or focus
+ * is inside it. `translate`, not `transform`, so it never fights the
+ * header-in arrival animation.
+ */
+.site-header-group {
+  transition:
+    translate var(--motion-header),
+    background-color var(--motion-header);
+}
+.site-header-group.is-hidden {
+  translate: 0 calc(-100% - var(--space-2));
+}
+.site-header-group.is-scrolled {
+  background: transparent;
+}
+.site-header {
+  transition:
+    border-color var(--motion-header),
+    padding var(--motion-header),
+    margin var(--motion-header),
+    border-radius var(--motion-header),
+    box-shadow var(--motion-header);
+}
+.site-header-group.is-scrolled .site-header {
+  margin: var(--space-2) var(--space-2) 0;
+  border-bottom-color: transparent;
+  border-radius: var(--radius-m);
+  box-shadow: var(--elev-1);
+}
+@media (min-width: 1024px) {
+  .site-header-group.is-scrolled .site-header,
+  .site-header-group:has(.site-header-item.is-open) .site-header {
+    border-bottom-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header-group,
+  .site-header {
+    transition: none;
+  }
+}
+
+/*
+ * Hero: the banner slider runs edge to edge across the screen, as tall as
+ * the banner itself (1920 × 733) but never taller than the screen below the
+ * header, so the words baked into the founder's banners are never cropped.
+ * After the curtain lifts it opens from the top down (a clip, never a zoom,
+ * tint or drift on the photograph, §7.1). Phones keep their own height.
+ */
+@media (min-width: 768px) {
+  .hero-card {
+    --hero-gutter: 0;
+  }
+  .hero-card-frame {
+    height: min(calc(100vw * 733 / 1920), calc(100svh - var(--header-h)));
+  }
+  .hero-card-arrows {
+    inset-inline-end: var(--space-4);
+  }
+}
+.hero-card-frame {
+  animation: hero-open var(--motion-section) var(--motion-quick) both;
+}
+@keyframes hero-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-card-frame {
+    animation: none;
+  }
+}
+
+/* Policy pages (content/policies/, rendered by components/content/PolicyText.tsx):
+   a readable column of approved text on white. */
+.policy-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 44rem;
+}
+.policy-text {
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+}
+.policy-text h1 {
+  margin: 0 0 var(--space-5);
+  font: var(--type-display-m) var(--font-display);
+  font-weight: var(--type-display-m-weight);
+  letter-spacing: var(--type-display-m-tracking);
+  color: var(--lun-plum);
+}
+.policy-text h2 {
+  margin: var(--space-7) 0 var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--lun-line);
+  font: var(--type-heading) var(--font-display);
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--type-heading-tracking);
+  color: var(--lun-plum-deep);
+}
+.policy-text h3 {
+  margin: var(--space-5) 0 var(--space-2);
+  font: var(--type-body-l) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.policy-text p {
+  margin: 0 0 var(--space-3);
+}
+.policy-text ul {
+  margin: 0 0 var(--space-4);
+  padding-inline-start: var(--space-5);
+  list-style: disc;
+}
+.policy-text li {
+  margin-bottom: var(--space-1);
+}
+.policy-text li::marker {
+  color: var(--lun-plum-light);
+}
+.policy-text strong {
+  font-weight: var(--weight-semibold);
+}
+.policy-text hr {
+  margin: var(--space-7) 0 var(--space-5);
+  border: 0;
+  border-top: 1px solid var(--lun-line);
+}
+.policy-link {
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+.policy-link:hover {
+  color: var(--lun-plum-deep);
+}

@@ -494,6 +494,9 @@ model Order {
   eventDate                DateTime?     @db.Date
   /// NOT NULL: no order exists without the explicit acknowledgement.
   unstitchedAcknowledgedAt DateTime
+  /// When the customer ticked "email me about new arrivals" at checkout (unticked by
+  /// default). Null: no marketing email is ever sent for this order.
+  marketingConsentAt       DateTime?
   subtotal                 Int
   deliveryFee              Int
   codFee                   Int

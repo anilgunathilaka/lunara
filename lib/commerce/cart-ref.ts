@@ -75,6 +75,8 @@ export const placeOrderSchema = z.object({
   paymentMethod: paymentMethodSchema,
   /** Must be literally true: the acknowledgement cannot be skipped or defaulted (CLAUDE.md). */
   unstitchedAcknowledged: z.literal(true),
+  /** "Email me about new arrivals": optional, unticked by default; counts only with an email address. */
+  marketingConsent: z.boolean().optional(),
   /** The total the customer last saw; a mismatch stops the order (§3.4). */
   expectedTotal: z.number().int().min(0),
   locale: z.enum(['en', 'si', 'ta']),

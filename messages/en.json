@@ -112,7 +112,8 @@
       "sendOnWhatsApp": "Send on WhatsApp",
       "whatsappOrderIntro": "Hello Lunara, I'd like to place this order:",
       "invalidDetails": "Some details need another look. Check them and try again.",
-      "fixCart": "Some items need your attention before you continue."
+      "fixCart": "Some items need your attention before you continue.",
+      "newArrivalsConsent": "Email me about new arrivals. You can ask us to stop at any time."
     },
     "quote": {
       "priceChanged": "Price updated — was {old}",
@@ -417,7 +418,8 @@
   "policies": {
     "privacyTitle": "Privacy policy",
     "termsTitle": "Terms of service",
-    "pending": "This page is pending final legal review and will be published before launch. For questions in the meantime, reach us on WhatsApp."
+    "pending": "This page is pending final legal review and will be published before launch. For questions in the meantime, reach us on WhatsApp.",
+    "englishOnly": "This policy is available in English only for now."
   },
   "auth": {
     "signInEmail": {

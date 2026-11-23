@@ -5,15 +5,14 @@ import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
 import { categoryNamer } from '@/lib/catalogue/category-label';
-import { latestReviews, type PublicReview } from '@/lib/reviews/reviews';
 import type { CatalogueProduct } from '@/lib/catalogue/types';
-import { ReviewList } from '@/components/reviews/ReviewList';
 import { whatsappLink } from '@/lib/commerce/business';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
 import { HERO_BANNERS } from '@/lib/home/hero';
 import { FactMarquee } from '@/components/home/FactMarquee';
 import { ProductRail } from '@/components/home/ProductRail';
 import { Reveal } from '@/components/motion/Reveal';
+import { ScrollProgress, ScrollWords } from '@/components/motion/ScrollProgress';
 
 /** Waits for a read inside its own Suspense boundary, then renders with it. */
 async function Await<T>({ promise, children }: { promise: Promise<T>; children: (value: T) => ReactNode }) {
@@ -35,8 +34,8 @@ function CardSkeleton() {
 // (docs/4-architecture.md §3.3). Streamed (founder report 2026-11-10: a
 // refresh felt slow): nothing waits for the database before the first
 // paint. The header, the banner, the sliding facts, the headline and every
-// section of words go out at once; the featured sarees, the rail and the
-// reviews follow as the reads answer, each in
+// section of words go out at once; the featured sarees and the rail
+// follow as the reads answer, each in
 // a space the same size, so nothing shifts.
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -44,7 +43,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // Started together, awaited only where each is shown.
   const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
   const categoryName = await categoryNamer();
-  const reviewsP = latestReviews(3);
   const t = await getTranslations('home');
   const tStock = await getTranslations('product.stock');
   const tDrape = await getTranslations('configurator.drape');
@@ -87,40 +85,36 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     labels: { previous: t('newArrivals.previous'), next: t('newArrivals.next') },
   };
   const renderRail = (arrivals: CatalogueProduct[]) => (
-      <ProductRail {...railProps}>
-        {arrivals.map((item) => (
-          <ProductCard
-            key={item.id}
-            href={`/shop/${item.id}`}
-            image={{ src: item.imageUrl, alt: item.name }}
-            name={item.name}
-            code={item.productCode}
-            materialLabel={categoryName(item.categoryId, item.categoryName)}
-            price={item.price}
-            stockState={item.stockState}
-            quantity={item.quantity}
-            outOfStockLabel={tStock('outOfStock')}
-            lowStockLabel={tStock('lowStock')}
-            formatLeft={formatLeft}
-          />
-        ))}
-      </ProductRail>
+    <ProductRail {...railProps}>
+      {arrivals.map((item) => (
+        <ProductCard
+          key={item.id}
+          href={`/shop/${item.id}`}
+          image={{ src: item.imageUrl, alt: item.name }}
+          name={item.name}
+          code={item.productCode}
+          materialLabel={categoryName(item.categoryId, item.categoryName)}
+          price={item.price}
+          stockState={item.stockState}
+          quantity={item.quantity}
+          outOfStockLabel={tStock('outOfStock')}
+          lowStockLabel={tStock('lowStock')}
+          formatLeft={formatLeft}
+        />
+      ))}
+    </ProductRail>
   );
 
-  const renderReviews = (reviews: PublicReview[]) =>
-    reviews.length > 0 ? (
-      <div className="home-reviews">
-        <ReviewList reviews={reviews} showItem />
-      </div>
-    ) : (
-      <div className="home-proof-placeholder">
-        <p>{t('proof.placeholderNote')}</p>
-      </div>
-    );
   const drapeImage = '/placeholder/product.jpg';
+  // Osariya is additionally shown in Sinhala script regardless of active locale — docs/3-components.md §4.3.
+  const osariyaLabel = `${tDrape('osariya')} · ඔසරිය`;
 
   return (
     <>
+      {/* On arrival a maroon curtain lifts off the page (after ccopadel.com,
+          founder decision 2026-11-23). CSS only; skipped under reduced motion. */}
+      <div className="home-curtain" aria-hidden="true" />
+
       {/* Hero (docs/1-ux.md §4.1; layout and motion per docs/2-ui.md §7.2):
           a slider of photographs with no words on them, the four facts
           sliding beneath it. */}
@@ -145,11 +139,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* Sections after the hero follow the reference layout (docs/2-ui.md §7.4):
-          a product rail, a two-drape split, a statement, a panel
-          beside a photograph, reviews, then a word from us. */}
+      {/* Sections after the hero follow ccopadel.com (docs/2-ui.md §7.4,
+          founder decision 2026-11-23) on white, with Lunara's own words. */}
 
-      {/* New arrivals — a rail of cards that scrolls sideways. */}
+      {/* Statement: a small label, then the promise in large type whose words
+          darken one by one as it scrolls in. */}
+      <ScrollProgress as="section" className="home-statement-block" aria-label={t('osariya.heading')}>
+        <div className="home-band-inner">
+          <p className="home-statement-big">
+            <span className="home-statement-label">{t('osariya.heading')}</span>
+            <ScrollWords text={t('osariya.body')} />
+          </p>
+          <Link href="/shop" className="text-link">
+            {t('shopNow')}
+          </Link>
+        </div>
+      </ScrollProgress>
+
+      {/* New arrivals — a rail of cards that scrolls sideways (the earlier design, kept: founder decision 2026-11-23). */}
       <section className="home-band">
         <div className="home-band-inner">
           <Suspense
@@ -166,56 +173,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* "Find your saree" category tiles removed (founder decision 2026-11-23). */}
-
-      {/* One saree, two drapes — two photographs edge to edge, each with its
-          name and a door. Both frames use the same placeholder photograph
-          until the real dual-drape capture (OPS-09) exists: this shows the
-          layout, not a claim that these are two different drapes. */}
-      <section className="home-split" aria-label={t('osariya.heading')}>
-        {[
-          { label: tDrape('saree'), alt: 'Standard saree drape' },
-          // Osariya is additionally shown in Sinhala script regardless of active locale — docs/3-components.md §4.3.
-          { label: `${tDrape('osariya')} · ඔසරිය`, alt: 'Kandyan Osariya drape' },
-        ].map((panel) => (
-          <div key={panel.alt} className="home-split-panel">
-            <Image src={drapeImage} alt={panel.alt} fill sizes="(min-width: 768px) 50vw, 100vw" />
-            <Reveal className="home-split-copy">
-              <h2 className="home-split-title">{panel.label}</h2>
-              <Link href="/shop" className="solid-pill focus-ring">
-                {t('shopNow')}
-              </Link>
-            </Reveal>
+      {/* One saree, two drapes: the two names slide apart as the photograph
+          grows to fill the screen, then a card with the door to the shop. */}
+      <ScrollProgress mode="stage" as="section" className="home-stage" aria-label={t('osariya.heading')}>
+        <div className="home-stage-pin">
+          <p className="home-stage-lines" aria-hidden="true">
+            <span className="home-stage-line home-stage-line-top">{tDrape('saree')}</span>
+            <span className="home-stage-line home-stage-line-bottom">{osariyaLabel}</span>
+          </p>
+          <div className="home-stage-media">
+            <Image src={drapeImage} alt="" fill sizes="100vw" />
           </div>
-        ))}
-      </section>
-
-      {/* Statement — the promise behind the split, set large. */}
-      <section className="home-band">
-        <Reveal className="home-band-inner home-statement">
-          <p className="eyebrow">{t('osariya.heading')}</p>
-          <p className="home-statement-text">{t('osariya.body')}</p>
-          <Link href="/shop" className="text-link">
-            {t('shopNow')}
-          </Link>
-        </Reveal>
-      </section>
-
-      {/* Reviews — verified customer photo reviews (FR-46), newest first and
-          never filtered by rating. Until the first exists, this says so
-          plainly rather than inventing a name and a quote. */}
-      <section className="home-band home-band-tight">
-        <div className="home-band-inner">
-          <Reveal>
-            <h2 className="section-title">{t('proof.heading')}</h2>
-          </Reveal>
-          <Suspense fallback={<div className="home-reviews skeleton skeleton-block" aria-hidden="true" />}>
-            <Await promise={reviewsP}>{renderReviews}</Await>
-          </Suspense>
+          <div className="home-stage-card">
+            <h2 className="home-stage-title">
+              {tDrape('saree')}
+              <br />
+              {osariyaLabel}
+            </h2>
+            <Link href="/shop" className="solid-pill solid-pill-plum focus-ring">
+              {t('shopNow')}
+            </Link>
+          </div>
         </div>
-      </section>
+      </ScrollProgress>
 
-      {/* A coloured panel beside a photograph: how the jacket gets made. */}
+      {/* A panel beside a photograph: how the jacket gets made. */}
       <section className="home-feature">
         <Reveal className="home-feature-copy">
           <p className="eyebrow">{tJacket('shipsUnstitched')}</p>
@@ -231,7 +213,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* A word from us — the reference's community block, as WhatsApp. */}
+      {/* A word from us — the reference's sign-up block, as WhatsApp. */}
       <section className="home-band">
         <Reveal className="home-band-inner home-community">
           <h2 className="section-title">{t('trust.whatsapp')}</h2>
