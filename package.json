@@ -58,5 +58,13 @@
     "prisma": "^7.10.1",
     "typescript": "^6.0.3",
     "wrangler": "^4.158.0"
+  },
+  "overrides": {
+    "@node-minify/core": {
+      "glob": "10.5.0"
+    },
+    "@prisma/config": {
+      "effect": "3.22.5"
+    }
   }
 }
