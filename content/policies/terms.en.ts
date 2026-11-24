@@ -39,8 +39,9 @@ You do not need an account to shop: guest checkout is always available. After a 
 
 ## 3. Product Information
 
-We take care to show every saree as accurately as we can. Our photographs are of the actual sarees and are never filtered or retouched to change their colour. However:
+We take care to show every saree as accurately as we can. However:
 
+- Some of our product images feature AI-generated model photography, which shows how a saree may look when worn and may differ from the actual fabric texture, draping, fit and details. See our Product Colour & Image Disclaimer.
 - Colours may look slightly different depending on your screen, its settings and the light.
 - Cotton, handloom, batik and hand-painted fabrics are made by hand or in small batches, so small variations in weave, texture, print or finishing are a natural part of each piece, not a defect.
 - Availability can change at any time. We keep one stock record, so a saree shown as available is available when you view it, but it may sell before your order is placed.

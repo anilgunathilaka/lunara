@@ -239,13 +239,20 @@ export function ShopClient({ title, products, categories, initial, outOfStockLab
       )}
 
       <div className="shop-main">
-        <div className="shop-head">
-          <h1 className="shop-title">
-            {title} <span className="shop-count">({t('resultsCount', { count: results.length })})</span>
-          </h1>
-          <div className="shop-head-sort">{sortControl('shop-sort')}</div>
-        </div>
+        {/* The top bar, hidden while FEATURES.shopHead is off (founder decision 2026-11-24):
+            the title stays for screen readers and search engines. */}
+        {FEATURES.shopHead ? (
+          <div className="shop-head">
+            <h1 className="shop-title">
+              {title} <span className="shop-count">({t('resultsCount', { count: results.length })})</span>
+            </h1>
+            <div className="shop-head-sort">{sortControl('shop-sort')}</div>
+          </div>
+        ) : (
+          <h1 className="sr-only">{title}</h1>
+        )}
 
+        {(FEATURES.shopHead || FEATURES.shopFilters) && (
         <div className="shop-toolbar">
           {FEATURES.shopFilters && (
             <Button variant="secondary" size="sm" onClick={() => setDrawerOpen(true)}>
@@ -253,8 +260,9 @@ export function ShopClient({ title, products, categories, initial, outOfStockLab
               {chosen > 0 ? `${t('filters.button')} (${chosen})` : t('filters.button')}
             </Button>
           )}
-          {sortControl('shop-sort-mobile')}
+          {FEATURES.shopHead && sortControl('shop-sort-mobile')}
         </div>
+        )}
 
         <p className="sr-only" aria-live="polite">
           {t('resultsCount', { count: results.length })}
@@ -274,6 +282,7 @@ export function ShopClient({ title, products, categories, initial, outOfStockLab
             {results.slice(0, shown).map((product) => (
               <ProductCard
                 key={product.id}
+                favouriteId={product.id}
                 href={`/shop/${product.id}`}
                 image={{ src: product.imageUrl, alt: product.name }}
                 hoverImageSrc={product.gallery[1] ?? null}

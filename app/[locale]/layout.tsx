@@ -131,7 +131,7 @@ export default async function LocaleLayout({
       { label: tJacket('shipsUnstitched'), href: '/support/shipping' },
       { label: tTrust('dispatch'), href: '/support/shipping' },
       { label: tTrust('returns'), href: '/support/returns' },
-      { label: tTrust('colourPromise'), href: '/support/care-guide' },
+      { label: tTrust('colourPromise'), href: '/policies/colour' },
     ],
     labels: { region: tAnnouncement('region'), pause: tAnnouncement('pause'), play: tAnnouncement('play') },
   };
@@ -168,23 +168,24 @@ export default async function LocaleLayout({
               { href: '/support/returns', label: tFooter('returns') },
               { href: '/support/care-guide', label: tFooter('careGuide') },
               { href: '/support/shipping', label: tFooter('shipping') },
-              // Account is optional and post-purchase (PRD FR-33): a quiet footer link, not a header item.
-              { href: '/account/start', label: tFooter('myOrders') },
+              // About and Contact (founder decision 2026-11-24). "My orders" moved to
+              // the Contact page (account is optional and post-purchase, PRD FR-33).
+              { href: '/about', label: tFooter('about') },
+              { href: '/contact', label: tFooter('contact') },
+              { href: '/favourites', label: tFooter('favourites') },
             ]}
             footerHeadings={{ support: tFooter('support'), policies: tFooter('policiesHeading') }}
             footerTrust={[
               { key: 'unstitched', label: tJacket('shipsUnstitched'), href: '/support/shipping' },
               { key: 'dispatch', label: tTrust('dispatch'), href: '/support/shipping' },
               { key: 'returns', label: tTrust('returns'), href: '/support/returns' },
-              { key: 'colour', label: tTrust('colourPromise'), href: '/support/care-guide' },
+              { key: 'colour', label: tTrust('colourPromise'), href: '/policies/colour' },
             ]}
             footerPolicyLinks={[
               { href: '/policies/privacy', label: tFooter('privacy') },
               { href: '/policies/terms', label: tFooter('terms') },
+              { href: '/policies/colour', label: tFooter('colour') },
             ]}
-            registrationNumber="Business Reg. No. [placeholder — pending founder input]"
-            address="[Address placeholder — pending founder input]"
-            phone="[Phone placeholder — pending founder input]"
           >
             {children}
           </SiteChrome>

@@ -60,6 +60,39 @@ export async function listCustomerOrders(customer: Customer) {
   });
 }
 
+/** Statuses after which an order no longer moves: these leave "Track your orders". */
+export const FINISHED_STATUSES = ['delivered', 'cancelled', 'refunded', 'exchanged'] as const;
+
+/**
+ * Everything the profile page shows (founder decision 2026-11-24): the
+ * account, its orders with tracking, and the details from the latest order.
+ */
+export async function getCustomerProfile(customer: Customer) {
+  const prisma = getPrisma();
+  const [user, orders] = await Promise.all([
+    prisma.user.findUnique({ where: { id: customer.id }, select: { name: true, email: true, createdAt: true } }),
+    prisma.order.findMany({
+      where: ownedBy(customer),
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        number: true,
+        status: true,
+        total: true,
+        createdAt: true,
+        courier: true,
+        trackingNumber: true,
+        customerName: true,
+        phone: true,
+        addressLine: true,
+        district: true,
+        _count: { select: { lines: true } },
+      },
+    }),
+  ]);
+  return { user, orders };
+}
+
 const customerOrderInclude = {
   lines: { orderBy: { id: 'asc' } },
   events: { orderBy: { createdAt: 'asc' } },

@@ -15,6 +15,7 @@ import { Accordion } from '@/components/layout/Accordion';
 import { ProductImageGrid } from '@/components/product/ProductImageGrid';
 import { StickyBuyBar } from '@/components/product/StickyBuyBar';
 import { AddToCartFlow } from '@/components/commerce/AddToCartFlow';
+import { FavouriteButton } from '@/components/account/FavouriteButton';
 import { getCuratedListing, getCuratedListings } from '@/lib/catalogue/queries';
 import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
 import { categoryNamer } from '@/lib/catalogue/category-label';
@@ -36,7 +37,7 @@ export default async function ProductDetailPage({
   ]);
   if (!product) notFound();
 
-  const [tFabric, tOpacity, tJacket, tStock, tGallery, tPdp, tCart, tSlideover, tAccordion, tNav, tRail] =
+  const [tFabric, tOpacity, tJacket, tStock, tGallery, tPdp, tCart, tSlideover, tAccordion, tNav, tRail, tPolicies] =
     await Promise.all([
       getTranslations('product.fabric'),
       getTranslations('product.opacity'),
@@ -49,6 +50,7 @@ export default async function ProductDetailPage({
       getTranslations('layout.accordion'),
       getTranslations('layout.nav'),
       getTranslations('home.newArrivals'),
+      getTranslations('policies'),
     ]);
 
   const opacityLabel = { opaque: tOpacity('opaque'), 'semi-sheer': tOpacity('semiSheer'), sheer: tOpacity('sheer') }[
@@ -153,7 +155,10 @@ export default async function ProductDetailPage({
           <div className="pdp-summary">
             {reviewSummary && <p className="pdp-rating">{reviewSummary}</p>}
             {product.productCode && <p className="pdp-code">{product.productCode}</p>}
-            <h1 className="pdp-title">{product.name}</h1>
+            <div className="pdp-title-row">
+              <h1 className="pdp-title">{product.name}</h1>
+              <FavouriteButton listingId={product.id} />
+            </div>
             <PriceDisplay amount={product.price} className="pdp-price" />
             <p className="pdp-material">{materialLabel}</p>
             <StockState
@@ -220,7 +225,7 @@ export default async function ProductDetailPage({
                         materialLabel={tFabric('category')}
                         materialValue={materialLabel}
                         weightLabel={tFabric('weight')}
-                        weightValue={tFabric('weightValue', { gsm: product.gsm })}
+                        weightValue={product.weightGrams ? tFabric('weightGrams', { grams: product.weightGrams }) : undefined}
                         lengthLabel={tFabric('length')}
                         lengthValue={tFabric('lengthValue', { metres: product.lengthMetres })}
                         opacityLabel={tFabric('opacity')}
@@ -240,6 +245,9 @@ export default async function ProductDetailPage({
                     content: (
                       <div className="flex flex-col gap-3">
                         <p className="field-message">{tPdp('colourPromiseBody')}</p>
+                        <Link href="/policies/colour" className="text-link">
+                          {tPolicies('colourLink')}
+                        </Link>
                         <p className="field-message">{tAccordion('returnsContent')}</p>
                       </div>
                     ),
@@ -272,6 +280,7 @@ export default async function ProductDetailPage({
             {related.map((item) => (
               <ProductCard
                 key={item.id}
+                favouriteId={item.id}
                 href={`/shop/${item.id}`}
                 image={{ src: item.imageUrl, alt: item.name }}
                 name={item.name}

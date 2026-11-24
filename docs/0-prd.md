@@ -361,10 +361,10 @@ DECISION (2026-11-09, founder): the preview is a real 3D model rendered in the c
 | FR-41 | Orders MUST move through customer-visible states: Confirmed → Packed → Dispatched → Delivered. | MUST |
 | FR-42 | The customer MUST receive an automated SMS and WhatsApp notification at each state transition. | MUST |
 | FR-43 | The returns policy MUST be published in plain Sinhala, Tamil and English, and MUST appear on every product page, not only in the footer. | MUST |
-| FR-44 | A written colour-accuracy guarantee MUST appear on every product page, with its scope clearly stated. | MUST |
+| FR-44 | A written colour-accuracy guarantee MUST appear on every product page, with its scope clearly stated. (Founder decision 2026-11-24: suspended while product images are AI-generated model photography. Every product page instead shows a "Product colour" note linking to the Product Colour & Image Disclaimer at /policies/colour; the facts band says "Product colour", not "Colour-accurate photography". Restore the guarantee once real daylight photography is published.) | MUST |
 | FR-45 | A one-tap WhatsApp contact MUST be present on every page with a published first-response commitment. | MUST |
 | FR-46 | Verified customer photo reviews MUST be displayed on product pages. Negative reviews MUST be responded to publicly rather than removed. | MUST |
-| FR-47 | Business registration number, physical address and a phone number answered by a human MUST be published on the site. | MUST |
+| FR-47 | Business registration number, physical address and a phone number answered by a human MUST be published on the site. (Founder decision 2026-11-23: no longer in the footer; until a new place is chosen, the policy pages give the location, email and phone, and the registration number is not yet published.) | MUST |
 | FR-48 | Every parcel MUST include a printed cotton care card and a printed returns card with a three-step process and a WhatsApp number. | MUST |
 | FR-49 | An automated post-purchase sequence MUST run: receipt confirmation at delivery+1, satisfaction check at delivery+3, photo review request at delivery+14, and a relevant new-arrival prompt at delivery+45. | MUST |
 | FR-50 | The system SHOULD support a loyalty mechanism recognising repeat purchase, given the primary persona buys 4–8 times a year. | SHOULD |
@@ -442,6 +442,8 @@ Lunara now holds finished stock rather than producing to order. Inventory discip
 These policies are product features, not legal boilerplate. The market research found that clear, generous, prominently published returns terms are rare across the entire Sri Lankan online saree landscape, and that visible guarantees carry heavy influence on purchase decisions.
 
 6.1 Colour Accuracy Guarantee
+
+(Founder decision 2026-11-24: suspended until real photography exists. Some product images are AI-generated, so the site promises no colour-accurate photographs; it states that colours may vary slightly and AI images may differ in texture, drape, fit and detail, and asks customers to contact Lunara before buying if unsure. See FR-44 and /policies/colour.)
 
 Lunara commits that every material is photographed in natural daylight, that one unedited reference frame is published for every colourway, and that if a delivered item differs materially from that reference frame, Lunara will collect it at its own cost and either replace or refund it in full.
 

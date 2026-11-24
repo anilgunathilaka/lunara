@@ -17,9 +17,6 @@ export interface LayoutQaClientProps {
   navLabels: Record<'shop' | 'designYourOwn' | 'jacketMaterial' | 'support' | 'cart' | 'menu', string>;
   whatsappLabel: string;
   footerLabels: Record<'support' | 'returns' | 'careGuide' | 'shipping' | 'privacy' | 'terms', string>;
-  registrationNumber: string;
-  address: string;
-  phone: string;
   slideoverAddedTitle: string;
   slideoverClose: string;
   accordionItems: { id: string; title: string; content: string }[];
@@ -30,9 +27,6 @@ export function LayoutQaClient({
   navLabels,
   whatsappLabel,
   footerLabels,
-  registrationNumber,
-  address,
-  phone,
   slideoverAddedTitle,
   slideoverClose,
   accordionItems,
@@ -73,10 +67,6 @@ export function LayoutQaClient({
           ]}
           headings={{ support: footerLabels.support, policies: footerLabels.privacy }}
           trust={[{ key: 'returns', label: footerLabels.returns, href: '/' }]}
-          whatsapp={{ href: '/', label: 'WhatsApp' }}
-          registrationNumber={registrationNumber}
-          address={address}
-          phone={phone}
           languageLabels={languageLabels}
         />
       </section>

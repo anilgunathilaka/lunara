@@ -12,6 +12,7 @@ import {
   ExternalLink,
   LayoutDashboard,
   LogOut,
+  Mail,
   Menu,
   MessageSquare,
   Package,
@@ -38,6 +39,7 @@ type NavKey =
   | 'photos'
   | 'messages'
   | 'reviews'
+  | 'subscribers'
   | 'insights';
 
 interface NavEntry {
@@ -72,6 +74,7 @@ const GROUPS: { key: 'sales' | 'catalogue' | 'customers' | 'reports' | null; ite
     items: [
       { href: '/ops/messages', key: 'messages', icon: MessageSquare },
       { href: '/ops/reviews', key: 'reviews', icon: Star },
+      { href: '/ops/subscribers', key: 'subscribers', icon: Mail },
     ],
   },
   { key: 'reports', items: [{ href: '/ops/insights', key: 'insights', icon: BarChart3 }] },

@@ -24,6 +24,12 @@ const NEW = '__new';
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 const money = z.coerce.number().int().min(1).max(1_000_000);
 const count = z.coerce.number().int().min(0).max(100_000);
+/** Optional per-saree material details (founder decision 2026-11-24): empty → null → the category's value. */
+/** Grams, saree and jacket material together: a kitchen scale's reading. */
+const optionalGrams = z.union([z.literal('').transform(() => null), z.coerce.number().int().min(50).max(5000)]);
+const optionalLength = z.union([z.literal('').transform(() => null), z.coerce.number().min(1).max(15).multipleOf(0.01)]);
+const optionalOpacity = z.union([z.literal('').transform(() => null), z.enum(['opaque', 'semi_sheer', 'sheer'])]);
+const materialDetails = { weightGrams: optionalGrams.default(null), lengthMetres: optionalLength.default(null), opacity: optionalOpacity.default(null) };
 const text = (min: number, max: number) => z.string().trim().min(min).max(max);
 
 function lot(): string {
@@ -80,6 +86,7 @@ const createSchema = z.object({
   threshold: count,
   featured: checkbox,
   topSeller: checkbox,
+  ...materialDetails,
 });
 
 export async function createProductAction(form: FormData): Promise<void> {
@@ -147,6 +154,9 @@ export async function createProductAction(form: FormData): Promise<void> {
           price: input.price,
           isFeatured: input.featured,
           isTopSeller: input.topSeller,
+          weightGrams: input.weightGrams,
+          lengthMetres: input.lengthMetres,
+          opacity: input.opacity,
           sortOrder: (last._max.sortOrder ?? 0) + 1,
         },
       });
@@ -161,6 +171,9 @@ export async function createProductAction(form: FormData): Promise<void> {
         jacketColourwayId: jacket.id,
         price: input.price,
         topSeller: input.topSeller,
+        weightGrams: input.weightGrams,
+        lengthMetres: input.lengthMetres,
+        opacity: input.opacity,
       });
       return listingId;
     });
@@ -179,6 +192,7 @@ const updateSchema = z.object({
   threshold: count,
   featured: checkbox,
   topSeller: checkbox,
+  ...materialDetails,
 });
 
 export async function updateProductAction(form: FormData): Promise<void> {
@@ -212,7 +226,16 @@ export async function updateProductAction(form: FormData): Promise<void> {
       }
       await tx.curatedListing.update({
         where: { id: listing.id },
-        data: { name: input.name, isFeatured: input.featured, isTopSeller: input.topSeller, jacketColourwayId: jacket.id, price: input.price },
+        data: {
+          name: input.name,
+          isFeatured: input.featured,
+          isTopSeller: input.topSeller,
+          jacketColourwayId: jacket.id,
+          price: input.price,
+          weightGrams: input.weightGrams,
+          lengthMetres: input.lengthMetres,
+          opacity: input.opacity,
+        },
       });
       await audit(
         tx,
@@ -220,8 +243,8 @@ export async function updateProductAction(form: FormData): Promise<void> {
         'product.update',
         'curated_listing',
         listing.id,
-        { name: input.name, colourName: input.colourName, colourHex: input.colourHex, jacketColourwayId: jacket.id, featured: input.featured, topSeller: input.topSeller, threshold: input.threshold },
-        { name: listing.name, colourName: saree.colourName, colourHex: saree.colourHex, jacketColourwayId: listing.jacketColourwayId, featured: listing.isFeatured, topSeller: listing.isTopSeller, threshold: saree.stock.threshold },
+        { name: input.name, colourName: input.colourName, colourHex: input.colourHex, jacketColourwayId: jacket.id, featured: input.featured, topSeller: input.topSeller, threshold: input.threshold, weightGrams: input.weightGrams, lengthMetres: input.lengthMetres, opacity: input.opacity },
+        { name: listing.name, colourName: saree.colourName, colourHex: saree.colourHex, jacketColourwayId: listing.jacketColourwayId, featured: listing.isFeatured, topSeller: listing.isTopSeller, threshold: saree.stock.threshold, weightGrams: listing.weightGrams, lengthMetres: listing.lengthMetres?.toNumber() ?? null, opacity: listing.opacity },
       );
     });
   }, 'sareeUpdated');

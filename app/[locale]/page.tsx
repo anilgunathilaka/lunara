@@ -7,13 +7,11 @@ import { getCuratedListings } from '@/lib/catalogue/queries';
 import { getHomeTopSellVisible } from '@/lib/site/settings';
 import { categoryNamer } from '@/lib/catalogue/category-label';
 import type { CatalogueProduct } from '@/lib/catalogue/types';
-import { whatsappLink } from '@/lib/commerce/business';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
 import { HERO_BANNERS } from '@/lib/home/hero';
 import { FactMarquee } from '@/components/home/FactMarquee';
 import { ProductRail } from '@/components/home/ProductRail';
 import { HomeFilm } from '@/components/home/HomeFilm';
-import { Reveal } from '@/components/motion/Reveal';
 import { ScrollProgress, ScrollWords } from '@/components/motion/ScrollProgress';
 
 /** Waits for a read inside its own Suspense boundary, then renders with it. */
@@ -53,10 +51,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const categoryName = await categoryNamer();
   const t = await getTranslations('home');
   const tStock = await getTranslations('product.stock');
-  const tDrape = await getTranslations('configurator.drape');
   const tJacket = await getTranslations('product.jacket');
-  const tSupport = await getTranslations('support');
-  const tLayout = await getTranslations('layout');
 
   const formatLeft = (count: number) => tStock('left', { count });
 
@@ -95,6 +90,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     items.map((item) => (
         <ProductCard
           key={item.id}
+          favouriteId={item.id}
           href={`/shop/${item.id}`}
           image={{ src: item.imageUrl, alt: item.name }}
           name={item.name}
@@ -126,16 +122,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     );
 
   // Osariya is additionally shown in Sinhala script regardless of active locale — docs/3-components.md §4.3.
-  const osariyaLabel = `${tDrape('osariya')} · ඔසරිය`;
 
   // Three founder posters after the film (founder decision 2026-11-23). Their
   // words are part of the artwork, so the alt text repeats them. Served as-is
   // (unoptimized), like the hero banners: already high-quality WebP sized for
   // the row; a second compression blurs the fine lettering.
+  // Order and size (founder decision 2026-11-24): all three the same width and
+  // height, the Osaria poster second. `pos` keeps each poster's words in the
+  // frame: the tall first poster loses a sliver of floor and backdrop only.
   const trio = [
-    { src: '/images/home-trio-1.webp', width: 1400, height: 2099, alt: t('trio.alt1') },
-    { src: '/images/home-trio-2.webp', width: 1121, height: 1403, alt: t('trio.alt2') },
-    { src: '/images/home-trio-3.webp', width: 1400, height: 1749, alt: t('trio.alt3') },
+    { src: '/images/home-trio-1.webp', width: 1400, height: 2099, pos: '50% 47%', alt: t('trio.alt1') },
+    { src: '/images/home-trio-3.webp', width: 1400, height: 1749, pos: '50% 50%', alt: t('trio.alt3') },
+    { src: '/images/home-trio-2.webp', width: 1121, height: 1403, pos: '50% 50%', alt: t('trio.alt2') },
   ];
 
   return (
@@ -197,7 +195,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             <span className="home-stage-line home-stage-line-bottom">{t('stage.lineBottom')}</span>
           </p>
           {/* The film of a saree being worn grows to fill the screen (founder
-              decision 2026-11-23). Nothing is laid over it but its pause button. */}
+              decision 2026-11-23). Over it only words, the card and the pause
+              button: never a tint, gradient or scrim (CLAUDE.md). */}
           <div className="home-stage-media">
             <HomeFilm
               src="/video/home-film-720.mp4"
@@ -205,11 +204,23 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               labels={{ pause: t('film.pause'), play: t('film.play') }}
             />
           </div>
-          {/* The card: the two drape names as a label, then a title and a line. */}
+          {/* Three short lines on the open wall to the right of the film
+              (founder decision 2026-11-24): once the film fills the screen
+              each rises out of its own mask, one after another, and a gold
+              rule draws in beneath. Wide screens only; on phones the model
+              fills the frame and the card carries the words. */}
+          <p className="home-stage-over">
+            {[t('stage.over1'), t('stage.over2'), t('stage.over3')].map((line, i) => (
+              <span key={i} className="home-stage-over-mask">
+                <span className="home-stage-over-line" style={{ '--i': i } as CSSProperties}>
+                  {line}
+                </span>
+              </span>
+            ))}
+            <span className="home-stage-over-rule" aria-hidden="true" />
+          </p>
+          {/* The card: a title and a line (founder decision 2026-11-24: no label above). */}
           <div className="home-stage-card">
-            <p className="eyebrow">
-              {tDrape('saree')} · {osariyaLabel}
-            </p>
             <h2 className="home-stage-title">{t('stage.title')}</h2>
             <p className="home-stage-sub">{t('stage.sub')}</p>
             <Link href="/shop" className="solid-pill solid-pill-plum focus-ring">
@@ -234,12 +245,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </ScrollProgress>
 
-      {/* Three posters in one row, all the same height and each shown whole
-          (no crop: their words are part of the artwork). Phones swipe. */}
+      {/* Three posters in one row, all the same width and height (founder
+          decision 2026-11-24). Phones swipe. */}
       <section className="home-trio" aria-label={t('trio.label')}>
         <div className="home-trio-row">
           {trio.map((p) => (
-            <div key={p.src} className="home-trio-item" style={{ '--ar': p.width / p.height } as CSSProperties}>
+            <div key={p.src} className="home-trio-item" style={{ '--pos': p.pos } as CSSProperties}>
               <Image src={p.src} alt={p.alt} width={p.width} height={p.height} unoptimized />
             </div>
           ))}
@@ -253,16 +264,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Await promise={topSellP}>{renderTopSell}</Await>
       </Suspense>
 
-      {/* A word from us — the reference's sign-up block, as WhatsApp. */}
-      <section className="home-band">
-        <Reveal className="home-band-inner home-community">
-          <h2 className="section-title">{t('trust.whatsapp')}</h2>
-          <p className="home-community-body">{tSupport('contactBody')}</p>
-          <a href={whatsappLink()} className="solid-pill focus-ring" target="_blank" rel="noopener noreferrer">
-            {tLayout('whatsapp')}
-          </a>
-        </Reveal>
-      </section>
     </>
   );
 }
