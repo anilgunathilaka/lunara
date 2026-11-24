@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
     // (docs/4-architecture.md §4) — no format transform that would strip
     // the embedded colour profile.
     formats: ['image/avif', 'image/webp'],
+    // 90 for product photographs (PHOTO_QUALITY, lib/media/quality.ts): at the
+    // default 75 the weave, print and embroidery soften. 75 stays the default.
+    qualities: [75, 90],
     remotePatterns,
   },
   typedRoutes: true,

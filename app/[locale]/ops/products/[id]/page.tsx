@@ -8,6 +8,7 @@ import { requireStaffPage } from '@/lib/ops/staff';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
 import { CostForm } from '../CostForm';
 import { ProductPriceFields } from '../ProductPriceFields';
+import { MaterialFields } from '../MaterialFields';
 
 /** Edit, archive, restore or delete one saree product (docs/4-architecture.md §3.10). */
 export default async function OpsEditProductPage({
@@ -20,11 +21,12 @@ export default async function OpsEditProductPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/products/${id}`);
-  const [found, options, query, t] = await Promise.all([
+  const [found, options, query, t, tOpacity] = await Promise.all([
     productForEdit(id),
     productFormOptions(),
     searchParams,
     getTranslations('ops.products'),
+    getTranslations('product.opacity'),
   ]);
   if (!found) notFound();
   const { row, sold } = found;
@@ -76,6 +78,24 @@ export default async function OpsEditProductPage({
           </div>
         </fieldset>
 
+        <MaterialFields
+          labels={{
+                    legend: t('materialLegend'),
+                    weight: t('materialWeight'),
+            weightHint: t('materialWeightHint'),
+                    length: t('materialLength'),
+                    opacity: t('materialOpacity'),
+                    fromCategory: t('materialFromCategory'),
+            category: t('materialCategoryShort'),
+                    note: t('materialNote'),
+                    opaque: tOpacity('opaque'),
+                    semiSheer: tOpacity('semiSheer'),
+                    sheer: tOpacity('sheer'),
+                  }}
+          values={{ weightGrams: row.weightGrams, lengthMetres: row.lengthMetres?.toNumber() ?? null, opacity: row.opacity }}
+          category={{ lengthMetres: saree.material.lengthMetres.toNumber(), opacity: saree.material.opacity }}
+        />
+
         <fieldset>
           <legend>{t('jacketLegend')}</legend>
           <label className="field-label" htmlFor="jacketColourwayId">
@@ -112,6 +132,10 @@ export default async function OpsEditProductPage({
           <label className="ops-inline-form">
             <input type="checkbox" name="featured" defaultChecked={row.isFeatured} />
             {t('featured')}
+          </label>
+          <label className="ops-inline-form">
+            <input type="checkbox" name="topSeller" defaultChecked={row.isTopSeller} />
+            {t('topSeller')}
           </label>
         </fieldset>
 

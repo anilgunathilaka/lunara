@@ -1,17 +1,17 @@
 import Image from 'next/image';
-import { Suspense, type ReactNode } from 'react';
+import { Suspense, type CSSProperties, type ReactNode } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
 import { getCuratedListings } from '@/lib/catalogue/queries';
+import { getHomeTopSellVisible } from '@/lib/site/settings';
 import { categoryNamer } from '@/lib/catalogue/category-label';
 import type { CatalogueProduct } from '@/lib/catalogue/types';
-import { whatsappLink } from '@/lib/commerce/business';
 import { HeroShowcase, type HeroMore, type HeroSlide } from '@/components/home/HeroShowcase';
 import { HERO_BANNERS } from '@/lib/home/hero';
 import { FactMarquee } from '@/components/home/FactMarquee';
 import { ProductRail } from '@/components/home/ProductRail';
-import { Reveal } from '@/components/motion/Reveal';
+import { HomeFilm } from '@/components/home/HomeFilm';
 import { ScrollProgress, ScrollWords } from '@/components/motion/ScrollProgress';
 
 /** Waits for a read inside its own Suspense boundary, then renders with it. */
@@ -42,14 +42,16 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   setRequestLocale(locale);
   // Started together, awaited only where each is shown.
   const arrivalsP = getCuratedListings({ featuredOnly: true, limit: 6 });
+  // Top sell (founder decision 2026-11-23): the sarees the admin ticked, unless
+  // the admin has hidden the section. Degrades, never blocks: if either read
+  // fails (say, before its migration has run) the section simply isn't shown.
+  const topSellP: Promise<CatalogueProduct[]> = getHomeTopSellVisible()
+    .then((visible) => (visible ? getCuratedListings({ topSellersOnly: true, limit: 8 }) : []))
+    .catch(() => []);
   const categoryName = await categoryNamer();
   const t = await getTranslations('home');
   const tStock = await getTranslations('product.stock');
-  const tDrape = await getTranslations('configurator.drape');
   const tJacket = await getTranslations('product.jacket');
-  const tSupport = await getTranslations('support');
-  const tNav = await getTranslations('layout.nav');
-  const tLayout = await getTranslations('layout');
 
   const formatLeft = (count: number) => tStock('left', { count });
 
@@ -84,11 +86,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     viewAll: { href: '/shop', label: t('newArrivals.viewAll') },
     labels: { previous: t('newArrivals.previous'), next: t('newArrivals.next') },
   };
-  const renderRail = (arrivals: CatalogueProduct[]) => (
-    <ProductRail {...railProps}>
-      {arrivals.map((item) => (
+  const renderCards = (items: CatalogueProduct[]) =>
+    items.map((item) => (
         <ProductCard
           key={item.id}
+          favouriteId={item.id}
           href={`/shop/${item.id}`}
           image={{ src: item.imageUrl, alt: item.name }}
           name={item.name}
@@ -101,13 +103,38 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           lowStockLabel={tStock('lowStock')}
           formatLeft={formatLeft}
         />
-      ))}
-    </ProductRail>
-  );
+    ));
+  const renderRail = (arrivals: CatalogueProduct[]) => <ProductRail {...railProps}>{renderCards(arrivals)}</ProductRail>;
+  // Same rail as New arrivals. Nothing at all when hidden or when no saree is ticked.
+  const renderTopSell = (items: CatalogueProduct[]) =>
+    items.length === 0 ? null : (
+      <section className="home-band">
+        <div className="home-band-inner">
+          <ProductRail
+            heading={t('topSell.heading')}
+            viewAll={{ href: '/shop', label: t('newArrivals.viewAll') }}
+            labels={{ previous: t('newArrivals.previous'), next: t('newArrivals.next') }}
+          >
+            {renderCards(items)}
+          </ProductRail>
+        </div>
+      </section>
+    );
 
-  const drapeImage = '/placeholder/product.jpg';
   // Osariya is additionally shown in Sinhala script regardless of active locale — docs/3-components.md §4.3.
-  const osariyaLabel = `${tDrape('osariya')} · ඔසරිය`;
+
+  // Three founder posters after the film (founder decision 2026-11-23). Their
+  // words are part of the artwork, so the alt text repeats them. Served as-is
+  // (unoptimized), like the hero banners: already high-quality WebP sized for
+  // the row; a second compression blurs the fine lettering.
+  // Order and size (founder decision 2026-11-24): all three the same width and
+  // height, the Osaria poster second. `pos` keeps each poster's words in the
+  // frame: the tall first poster loses a sliver of floor and backdrop only.
+  const trio = [
+    { src: '/images/home-trio-1.webp', width: 1400, height: 2099, pos: '50% 47%', alt: t('trio.alt1') },
+    { src: '/images/home-trio-3.webp', width: 1400, height: 1749, pos: '50% 50%', alt: t('trio.alt3') },
+    { src: '/images/home-trio-2.webp', width: 1121, height: 1403, pos: '50% 50%', alt: t('trio.alt2') },
+  ];
 
   return (
     <>
@@ -142,20 +169,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* Sections after the hero follow ccopadel.com (docs/2-ui.md §7.4,
           founder decision 2026-11-23) on white, with Lunara's own words. */}
 
-      {/* Statement: a small label, then the promise in large type whose words
-          darken one by one as it scrolls in. */}
-      <ScrollProgress as="section" className="home-statement-block" aria-label={t('osariya.heading')}>
-        <div className="home-band-inner">
-          <p className="home-statement-big">
-            <span className="home-statement-label">{t('osariya.heading')}</span>
-            <ScrollWords text={t('osariya.body')} />
-          </p>
-          <Link href="/shop" className="text-link">
-            {t('shopNow')}
-          </Link>
-        </div>
-      </ScrollProgress>
-
       {/* New arrivals — a rail of cards that scrolls sideways (the earlier design, kept: founder decision 2026-11-23). */}
       <section className="home-band">
         <div className="home-band-inner">
@@ -173,23 +186,43 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </section>
 
-      {/* One saree, two drapes: the two names slide apart as the photograph
+      {/* One saree, two drapes: two lines ("Grace in" / "every drape") slide apart as the film
           grows to fill the screen, then a card with the door to the shop. */}
       <ScrollProgress mode="stage" as="section" className="home-stage" aria-label={t('osariya.heading')}>
         <div className="home-stage-pin">
           <p className="home-stage-lines" aria-hidden="true">
-            <span className="home-stage-line home-stage-line-top">{tDrape('saree')}</span>
-            <span className="home-stage-line home-stage-line-bottom">{osariyaLabel}</span>
+            <span className="home-stage-line home-stage-line-top">{t('stage.lineTop')}</span>
+            <span className="home-stage-line home-stage-line-bottom">{t('stage.lineBottom')}</span>
           </p>
+          {/* The film of a saree being worn grows to fill the screen (founder
+              decision 2026-11-23). Over it only words, the card and the pause
+              button: never a tint, gradient or scrim (CLAUDE.md). */}
           <div className="home-stage-media">
-            <Image src={drapeImage} alt="" fill sizes="100vw" />
+            <HomeFilm
+              src="/video/home-film-720.mp4"
+              poster="/video/home-film-poster.jpg"
+              labels={{ pause: t('film.pause'), play: t('film.play') }}
+            />
           </div>
+          {/* Three short lines on the open wall to the right of the film
+              (founder decision 2026-11-24): once the film fills the screen
+              each rises out of its own mask, one after another, and a gold
+              rule draws in beneath. Wide screens only; on phones the model
+              fills the frame and the card carries the words. */}
+          <p className="home-stage-over">
+            {[t('stage.over1'), t('stage.over2'), t('stage.over3')].map((line, i) => (
+              <span key={i} className="home-stage-over-mask">
+                <span className="home-stage-over-line" style={{ '--i': i } as CSSProperties}>
+                  {line}
+                </span>
+              </span>
+            ))}
+            <span className="home-stage-over-rule" aria-hidden="true" />
+          </p>
+          {/* The card: a title and a line (founder decision 2026-11-24: no label above). */}
           <div className="home-stage-card">
-            <h2 className="home-stage-title">
-              {tDrape('saree')}
-              <br />
-              {osariyaLabel}
-            </h2>
+            <h2 className="home-stage-title">{t('stage.title')}</h2>
+            <p className="home-stage-sub">{t('stage.sub')}</p>
             <Link href="/shop" className="solid-pill solid-pill-plum focus-ring">
               {t('shopNow')}
             </Link>
@@ -197,32 +230,40 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </div>
       </ScrollProgress>
 
-      {/* A panel beside a photograph: how the jacket gets made. */}
-      <section className="home-feature">
-        <Reveal className="home-feature-copy">
-          <p className="eyebrow">{tJacket('shipsUnstitched')}</p>
-          <h2 className="home-feature-title">{tSupport('jacketStitchingHeading')}</h2>
-          <p className="home-feature-body">{tSupport('jacketStitchingBody')}</p>
-          {/* Jacket material is not sold on its own (PRD v4.1): the panel leads to the stitching guide. */}
-          <Link href="/support" className="solid-pill solid-pill-plum focus-ring">
-            {tNav('support')}
+      {/* Statement, after the film (founder decision 2026-11-23): the promise, centred, in large type whose words
+          darken one by one as it scrolls in. */}
+      <ScrollProgress as="section" className="home-statement-block">
+        <div className="home-band-inner">
+          <p className="home-statement-big">
+            <span className="home-statement-words">
+              <ScrollWords text={t('osariya.body')} />
+            </span>
+          </p>
+          <Link href="/shop" className="text-link">
+            {t('shopNow')}
           </Link>
-        </Reveal>
-        <div className="home-feature-image">
-          <Image src="/placeholder/product.jpg" alt="" fill sizes="(min-width: 768px) 50vw, 100vw" />
+        </div>
+      </ScrollProgress>
+
+      {/* Three posters in one row, all the same width and height (founder
+          decision 2026-11-24). Phones swipe. */}
+      <section className="home-trio" aria-label={t('trio.label')}>
+        <div className="home-trio-row">
+          {trio.map((p) => (
+            <div key={p.src} className="home-trio-item" style={{ '--pos': p.pos } as CSSProperties}>
+              <Image src={p.src} alt={p.alt} width={p.width} height={p.height} unoptimized />
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* A word from us — the reference's sign-up block, as WhatsApp. */}
-      <section className="home-band">
-        <Reveal className="home-band-inner home-community">
-          <h2 className="section-title">{t('trust.whatsapp')}</h2>
-          <p className="home-community-body">{tSupport('contactBody')}</p>
-          <a href={whatsappLink()} className="solid-pill focus-ring" target="_blank" rel="noopener noreferrer">
-            {tLayout('whatsapp')}
-          </a>
-        </Reveal>
-      </section>
+      {/* Top sell, after the posters (founder decision 2026-11-23). Streams in
+          when ready; shows nothing while loading, so the page never jumps for
+          a section the admin may have hidden. */}
+      <Suspense fallback={null}>
+        <Await promise={topSellP}>{renderTopSell}</Await>
+      </Suspense>
+
     </>
   );
 }

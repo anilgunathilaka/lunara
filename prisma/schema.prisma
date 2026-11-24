@@ -33,8 +33,9 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  sessions Session[]
-  accounts Account[]
+  sessions   Session[]
+  accounts   Account[]
+  favourites Favourite[]
 
   @@map("user")
 }
@@ -436,6 +437,15 @@ model CuratedListing {
   /// saree alone; PRICE_MATRIX only seeds it when the saree is added.
   price             Int
   isFeatured        Boolean  @default(false)
+  /// Shown in the home page's Top sell section (founder decision 2026-11-23).
+  isTopSeller       Boolean  @default(false)
+  /// This saree's own weight in grams, saree and jacket material together
+  /// (founder decision 2026-11-24). Null: no weight is shown.
+  weightGrams       Int?
+  /// This saree's own length and opacity (founder decision 2026-11-24),
+  /// shown under Material on its page. Null: the category's.
+  lengthMetres      Decimal? @db.Decimal(4, 2)
+  opacity           Opacity?
   active            Boolean  @default(true)
   sortOrder         Int      @default(0)
   createdAt         DateTime @default(now())
@@ -443,6 +453,7 @@ model CuratedListing {
 
   sareeColourway  SareeColourway  @relation(fields: [sareeColourwayId], references: [id], onDelete: Restrict)
   jacketColourway JacketColourway @relation(fields: [jacketColourwayId], references: [id], onDelete: Restrict)
+  favourites      Favourite[]
 
   @@index([active, sortOrder])
   @@map("curated_listing")
@@ -572,6 +583,39 @@ enum StaffRole {
   admin
 }
 
+/// Sign-ups from the subscribe form after the footer (founder decision
+/// 2026-11-24): an email, a Sri Lankan mobile (+947XXXXXXXX), or both. One row
+/// per person; signing up again with the same email or mobile updates it.
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  phone     String?  @unique
+  /// The site language they signed up in: en | si | ta.
+  locale    String
+  /// When they last asked to hear from us (the form submit is the consent).
+  consentAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subscriber")
+}
+
+/// A saree a signed-in customer has hearted (founder decision 2026-11-24).
+/// Anyone can heart a saree; it is kept in their browser, and copied here
+/// once they sign in, so their profile shows it on any device.
+model Favourite {
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing CuratedListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+  @@index([listingId])
+  @@map("favourite")
+}
+
 /// Who may use /ops. Emails are added with `npm run staff:add`, never committed.
 model StaffMember {
   email     String    @id
@@ -581,6 +625,17 @@ model StaffMember {
   updatedAt DateTime  @updatedAt
 
   @@map("staff_member")
+}
+
+/// Site-wide switches changed in /ops (founder decision 2026-11-23), one row
+/// per key (lib/site/settings.ts). A missing row means the default.
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedBy String?
+  updatedAt DateTime @updatedAt
+
+  @@map("site_setting")
 }
 
 /// Stock and price changes made in /ops: who, what, before, after.

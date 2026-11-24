@@ -99,6 +99,8 @@ HOME
 
 │     └── Addresses
 
+│     (Founder decision 2026-11-24: the account is one profile page, /account: avatar, name (editable), email, mobile and address from the latest order; orders on their way with courier and tracking; order history; favourite sarees. Signed in, the header's account icon opens a menu: avatar, name and email to the profile, My orders, Favourites, Log out. Anyone can heart a saree with no sign-in — kept in the browser, copied to the account on sign-in — and see them at /favourites, so no one is asked to make an account before buying.)
+
 │
 
 └── SUPPORT

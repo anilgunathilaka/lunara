@@ -30,6 +30,8 @@ export interface CatalogueProduct {
   occasions: Occasion[];
   opacity: Opacity;
   gsm: number;
+  /** This saree's own weight in grams (saree + jacket material), or null: no weight shown (founder decision 2026-11-24). */
+  weightGrams: number | null;
   lengthMetres: number;
   jacketMaterialName: string;
   jacketColourName: string;

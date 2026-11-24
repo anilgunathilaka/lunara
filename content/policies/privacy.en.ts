@@ -38,6 +38,8 @@ You can order as a guest; you do not need an account. At checkout we collect:
 
 We do not collect a separate billing address.
 
+If you sign up with the form at the foot of our pages, we collect the email address or mobile number you give (or both), the language you were using and when you signed up.
+
 ### 1.2 If You Create an Account
 
 After a purchase you may choose to save your details. Accounts are passwordless: we email you a six-digit sign-in code each time. For an account we keep your name and email address, and for each signed-in session your IP address and browser type, so that the session stays secure.
@@ -66,6 +68,7 @@ We use your information to:
 - Send you order updates: when your order is placed, confirmed, packed, dispatched or cancelled.
 - Follow up after delivery: care tips and a check that all is well (by WhatsApp), and an invitation to review your order (by WhatsApp and email).
 - Tell you about new arrivals: one email about 45 days after delivery, only if you ticked "Email me about new arrivals" at checkout. The box is never ticked for you, and you can ask us to stop at any time (see Section 8).
+- Tell people who signed up with the form at the foot of our pages about new arrivals and restocks, by email, SMS or WhatsApp, until they ask us to stop.
 - Send you a sign-in code when you ask for one.
 - Arrange payments, refunds and returns.
 - Keep the website secure and prevent fraud.

@@ -9,6 +9,7 @@ import { Footer, type FooterLink, type FooterProps } from '@/components/layout/F
 import { MobileNav } from '@/components/layout/MobileNav';
 import { WhatsAppAction } from '@/components/layout/WhatsAppAction';
 import { SmoothScroll } from '@/components/motion/SmoothScroll';
+import { FavouritesSync } from '@/components/account/FavouritesSync';
 import { SlideOver } from '@/components/layout/SlideOver';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -25,9 +26,6 @@ export interface SiteChromeProps {
   footerPolicyLinks: FooterLink[];
   footerHeadings: FooterProps['headings'];
   footerTrust: FooterProps['trust'];
-  registrationNumber: string;
-  address: string;
-  phone: string;
   /** Facts for the strip above the header. */
   announcement?: AnnouncementBarProps;
   /** Panels under Shop and Support (docs/2-ui.md §7.2). */
@@ -61,9 +59,6 @@ function SiteChromeInner({
   footerPolicyLinks,
   footerHeadings,
   footerTrust,
-  registrationNumber,
-  address,
-  phone,
   announcement,
   menus,
   children,
@@ -83,10 +78,11 @@ function SiteChromeInner({
       </a>
 
       <Header
-        shop={{ href: '/shop', label: navLabels.shop, menu: menus?.shop }}
+        // Dropdowns hidden while FEATURES.headerMenus is off: plain links.
+        shop={{ href: '/shop', label: navLabels.shop, menu: FEATURES.headerMenus ? menus?.shop : undefined }}
         designYourOwn={FEATURES.designYourOwn ? { href: '/design-your-own', label: navLabels.designYourOwn } : undefined}
         jacketMaterial={FEATURES.jacketMaterialPage ? { href: '/jacket-material', label: navLabels.jacketMaterial } : undefined}
-        support={{ href: '/support', label: navLabels.support, menu: menus?.support }}
+        support={{ href: '/support', label: navLabels.support, menu: FEATURES.headerMenus ? menus?.support : undefined }}
         account={{ href: '/account/start', label: navLabels.account, text: navLabels.accountShort }}
         cartHref="/cart"
         cartLabel={navLabels.cart}
@@ -109,10 +105,6 @@ function SiteChromeInner({
           policyLinks={footerPolicyLinks}
           headings={footerHeadings}
           trust={footerTrust}
-          whatsapp={{ href: whatsappHref, label: whatsappLabel }}
-          registrationNumber={registrationNumber}
-          address={address}
-          phone={phone}
           languageLabels={languageLabels}
         />
       </div>
@@ -155,6 +147,7 @@ function SiteChromeInner({
       <WhatsAppAction href={whatsappHref} label={whatsappLabel} variant="floating" />
       {/* Smooth wheel scrolling on the store pages, not in the operations panel. */}
       <SmoothScroll />
+      <FavouritesSync />
     </div>
   );
 }

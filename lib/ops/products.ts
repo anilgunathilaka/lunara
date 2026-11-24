@@ -36,6 +36,7 @@ export async function productAdminList() {
         code: row.productCode,
         active: row.active && saree.active,
         featured: row.isFeatured,
+        topSeller: row.isTopSeller,
         detail: `${saree.design.name} · ${saree.material.name} · ${saree.colourName}`,
         colourHex: saree.colourHex,
         jacket: `${row.jacketColourway.material.name} · ${row.jacketColourway.colourName}`,

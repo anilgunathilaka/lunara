@@ -1072,9 +1072,14 @@ body {
   height: var(--space-8);
   justify-content: center;
   border-radius: var(--radius-full);
-  background: var(--lun-plum);
+  /* WhatsApp's own green, so it reads at a glance as WhatsApp (founder decision 2026-11-24). */
+  background: var(--whatsapp-green);
   color: var(--lun-surface);
   box-shadow: var(--elev-2);
+  transition: background var(--motion-quick);
+}
+.whatsapp-action-floating:hover {
+  background: var(--whatsapp-green-deep);
 }
 /* Wide screens have no bottom bar to clear: the button sits in the corner. */
 @media (min-width: 768px) {
@@ -1097,7 +1102,7 @@ body {
   gap: var(--space-4);
   padding: var(--space-3);
   border-bottom: 1px solid var(--lun-line);
-  background: var(--lun-surface);
+  background: var(--lun-header);
   transition: border-color var(--motion-header);
 }
 .site-header-nav {
@@ -1115,7 +1120,7 @@ body {
      scrolls away with the page and the header below it stays. */
   top: calc(var(--utility-h) * -1);
   z-index: 30;
-  background: var(--lun-surface);
+  background: var(--lun-header);
   animation: header-in var(--motion-page) both;
 }
 
@@ -1621,8 +1626,178 @@ body {
 .site-footer-wrap {
   --footer-muted: color-mix(in srgb, var(--lun-surface) 75%, transparent);
   --footer-rule: color-mix(in srgb, var(--lun-surface) 20%, transparent);
-  background: var(--lun-plum-deep);
+  /* The subscribe band under the footer panel: a shade deeper than the panel. */
+  background: color-mix(in srgb, var(--lun-plum-deep) 70%, var(--lun-ink));
   color: var(--lun-surface);
+}
+/* The footer is a raised panel: it scrolls up and away over the subscribe
+   band, which waits pinned beneath it (founder decision 2026-11-24, the
+   reveal on developeroffice.com). */
+.site-footer-panel {
+  position: relative;
+  z-index: 2;
+  background: var(--lun-plum-deep);
+  border-radius: 0 0 var(--radius-curtain) var(--radius-curtain);
+}
+
+/* Subscribe band (founder decision 2026-11-24, after developeroffice.com):
+   a large centred heading, email and mobile side by side, one round button. */
+/* The pin: tall enough for the band to stay put while the footer lifts
+   away, pulled up so the band starts beneath the footer's last screen. */
+.site-subscribe-pin {
+  position: relative;
+  z-index: 0;
+  height: 180vh;
+  margin-top: calc(-90vh - var(--space-6));
+}
+.site-subscribe {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100svh;
+  padding: 20vh clamp(var(--space-5), 5vw, var(--space-8)) 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+@media (max-width: 767px) {
+  .site-subscribe-pin {
+    margin-top: calc(var(--space-4) - 80vh);
+  }
+  /* Ends above the fixed bottom bar, which .site-content makes room for. */
+  .site-subscribe {
+    height: calc(100svh - var(--control-height-lg) - env(safe-area-inset-bottom, 0px));
+    padding: var(--space-9) var(--space-4) var(--space-4);
+  }
+}
+.site-subscribe-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 35rem;
+  margin: 0 auto;
+  text-align: center;
+  will-change: transform;
+}
+.site-subscribe-heading {
+  margin: 0;
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.4vw, 4.5rem);
+  font-weight: var(--type-display-l-weight);
+  line-height: 1.05;
+  letter-spacing: var(--type-display-l-tracking);
+  color: var(--lun-surface);
+  text-wrap: balance;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-subscribe-pin {
+    height: auto;
+    margin-top: 0;
+  }
+  .site-subscribe {
+    position: relative;
+    height: auto;
+    min-height: 100svh;
+  }
+  .site-subscribe-inner {
+    transform: none !important;
+    will-change: auto;
+  }
+}
+.site-subscribe-sub {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--footer-muted);
+  text-wrap: pretty;
+}
+.site-subscribe-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: start;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-2);
+}
+.site-subscribe-fields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .site-subscribe-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* The fields and button are the site's own: .input (as at checkout and
+   sign-in) and .solid-pill, the button the home page uses on dark bands. */
+.site-subscribe-error {
+  margin: 0;
+  min-height: 1lh;
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-gold-pale);
+}
+/* The site's .input, see-through on the dark band (founder decision
+   2026-11-24): same size, corners and focus ring, a faint white fill. */
+.site-subscribe-form .input {
+  border-color: var(--footer-rule);
+  background: color-mix(in srgb, var(--lun-surface) 8%, transparent);
+  color: var(--lun-surface);
+}
+.site-subscribe-form .input::placeholder {
+  color: var(--footer-muted);
+}
+.site-subscribe-form .input:hover {
+  border-color: var(--footer-muted);
+}
+/* A field to fix: gold, which reads on the dark band where the site's red does not. */
+.site-subscribe-form .input.field-invalid {
+  border-color: var(--lun-gold);
+}
+/* .solid-pill is styled for links; as a <button> it also needs these. Gold
+   fill with plum-deep ink (gold as a fill, never as text on white). */
+.site-subscribe-form .solid-pill {
+  border: 0;
+  cursor: pointer;
+  background: var(--lun-gold);
+  color: var(--lun-plum-deep);
+}
+.site-subscribe-form .solid-pill:hover:not(:disabled) {
+  background: var(--lun-gold-pale);
+}
+.site-subscribe-form .solid-pill:disabled {
+  opacity: var(--opacity-disabled);
+  cursor: progress;
+}
+.site-subscribe-fine {
+  margin: 0;
+  max-width: 28rem;
+  font: var(--type-label) var(--font-body);
+  color: var(--footer-muted);
+}
+.site-subscribe-fine-link {
+  color: var(--lun-surface);
+  text-decoration-line: underline;
+  text-underline-offset: var(--space-1);
+}
+.site-subscribe-done {
+  margin: var(--space-2) 0 0;
+  font: var(--type-body-l) var(--font-body);
+  color: var(--lun-surface);
+}
+/* The honeypot: off-screen, not display:none (some bots skip hidden fields). */
+.site-subscribe-trap {
+  position: absolute;
+  left: -100vw;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 .site-trust {
   display: grid;
@@ -1689,87 +1864,26 @@ body {
   }
 }
 
-/* The opening block: logo, business details, WhatsApp. */
-.site-footer-talk {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-4);
-  width: 100%;
-}
-.site-footer-talk .wordmark-logo {
-  height: var(--space-7);
-  width: auto;
-}
-.site-footer-legal {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-.site-footer-legal p {
-  margin: 0;
-}
-@media (min-width: 1024px) {
-  .site-footer-talk {
-    flex: 0 1 40%;
-    max-width: 27rem;
-    min-width: 0;
-  }
-}
-/* Looks like the reference's e-mail field: a row with a hairline beneath and an arrow. */
-.site-footer-talk-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
-  align-self: stretch;
-  min-height: 44px;
-  border-bottom: 1px solid var(--footer-muted);
-  color: var(--footer-muted);
-  text-decoration: none;
-  transition:
-    color var(--motion-quick),
-    border-bottom-color var(--motion-quick);
-}
-.site-footer-talk-row:hover,
-.site-footer-talk-row:focus-visible {
-  color: var(--lun-surface);
-  border-bottom-color: var(--lun-gold);
-}
-.site-footer-talk-arrow {
-  flex: none;
-  width: var(--space-4);
-  height: var(--space-4);
-  color: var(--lun-surface);
-  transition: transform var(--motion-quick);
-}
-.site-footer-talk-row:hover .site-footer-talk-arrow {
-  transform: translateX(var(--space-1));
-}
-
-/* Details and links: three equal columns on desktop, two then one on phones. */
+/* The Support links in one centred row, the language selector centred below
+   (founder decision 2026-11-23). */
 .site-footer-columns {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-5);
-  width: 100%;
-}
-@media (min-width: 1024px) {
-  .site-footer-columns {
-    flex: 1 1 60%;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-.site-footer-column {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
 }
-/* Headings as the reference's quiet labels: muted, not capitals. */
-.site-footer-heading {
-  margin: 0 0 var(--space-1);
-  color: var(--footer-muted);
+.site-footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2) var(--space-6);
+}
+/* The Support links one step above body size, so the row reads clearly (founder decision 2026-11-23). */
+.site-footer-row .site-footer-link {
+  min-height: 44px;
+  font: var(--type-body-l) var(--font-body);
 }
 .site-footer-link {
   display: inline-flex;
@@ -1805,11 +1919,42 @@ body {
   /* Gold on maroon: a decorative mark (aria-hidden), never text on white. */
   fill: var(--lun-gold);
 }
+/* The closing line, centred: copyright and the policy links in one row,
+   wrapping to two centred lines on a narrow phone. */
+.site-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  text-align: center;
+}
+.site-footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-5);
+}
+.site-footer-legal-link {
+  min-height: 44px;
+  font: var(--type-fine) var(--font-body);
+}
+/* The designer credit, at the end of the closing line in the same quiet label style. */
+.site-footer-credit {
+  margin: 0;
+  font: var(--type-fine) var(--font-body);
+  color: var(--footer-muted);
+}
+.site-footer-credit-link {
+  color: var(--lun-surface);
+  text-decoration-line: underline;
+  text-underline-offset: var(--space-1);
+  text-decoration-thickness: 1px;
+}
+/* The closing line in fine print, sentence case (founder decision 2026-11-23). */
 .site-footer-copyright {
   margin: 0;
-  font: var(--type-label) var(--font-body);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
+  font: var(--type-fine) var(--font-body);
   color: var(--footer-muted);
 }
 
@@ -2825,66 +2970,6 @@ body {
 }
 
 /* A panel beside a photograph, white like the whole site (founder decision 2026-11-10). */
-.home-feature {
-  display: grid;
-  background: var(--lun-surface);
-}
-@media (min-width: 768px) {
-  .home-feature {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-.home-feature-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-7) var(--space-5);
-}
-@media (min-width: 1024px) {
-  .home-feature-copy {
-    padding: var(--space-8) max(var(--space-8), calc((100vw - var(--container-max)) / 2));
-    padding-inline-end: var(--space-8);
-  }
-}
-.home-feature-title {
-  margin: 0;
-  font: var(--type-display-l) var(--font-display);
-  letter-spacing: var(--type-display-l-tracking);
-  color: var(--lun-plum-deep);
-}
-.home-feature-body {
-  margin: 0;
-  max-width: 52ch;
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink);
-}
-.home-feature-image {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  background: var(--lun-surface);
-}
-.home-feature-image img {
-  object-fit: cover;
-}
-@media (min-width: 768px) {
-  .home-feature-image {
-    aspect-ratio: 1 / 1;
-  }
-}
-
-/* A word from us, centred. */
-.home-community {
-  align-items: center;
-  max-width: 60ch;
-  text-align: center;
-}
-.home-community-body {
-  margin: 0;
-  font: var(--type-body) var(--font-body);
-  color: var(--lun-ink);
-}
 
 /*
  * ConfiguratorBar — docs/3-components.md §4.5. Pinned to the viewport
@@ -3066,6 +3151,392 @@ body {
 .account-order-end {
   align-items: flex-end;
   text-align: end;
+}
+
+/* Favourites (founder decision 2026-11-24): a heart on each saree. */
+.favourite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--lun-surface);
+  color: var(--lun-plum);
+  cursor: pointer;
+  transition: color var(--motion-quick), transform var(--motion-quick);
+}
+.favourite-button:hover {
+  color: var(--lun-plum-deep);
+}
+.favourite-button:active {
+  transform: scale(0.92);
+}
+.product-card-shell {
+  position: relative;
+}
+/* On the photograph's corner: a white disc, never a tint on the photo. */
+.product-card-favourite {
+  position: absolute;
+  top: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: 1;
+  box-shadow: var(--elev-1);
+}
+.pdp-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.favourites-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-3);
+}
+@media (min-width: 768px) {
+  .favourites-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1024px) {
+  .favourites-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Account menu in the header (founder decision 2026-11-24). */
+.account-menu {
+  position: relative;
+}
+.account-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height-md);
+  min-height: var(--control-height-md);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.account-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-full);
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.account-avatar-lg {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+  font: var(--type-body-l) var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+.account-avatar-xl {
+  flex: none;
+  width: var(--space-8);
+  height: var(--space-8);
+  font: var(--type-display-m) var(--font-display);
+}
+.account-menu-panel {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  inset-inline-end: 0;
+  z-index: 50;
+  width: min(18rem, calc(100vw - var(--space-6)));
+  padding: var(--space-2);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+  box-shadow: var(--elev-2);
+}
+.account-menu-who {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--lun-line);
+  color: var(--lun-ink);
+  text-decoration: none;
+}
+.account-menu-id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font: var(--type-body-s) var(--font-body);
+}
+.account-menu-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--lun-ink-muted);
+}
+.account-menu-profile {
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+.account-menu-links {
+  margin: 0;
+  padding: var(--space-1) 0 0;
+  list-style: none;
+}
+.account-menu-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-height-md);
+  padding-inline: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--lun-ink);
+  font: var(--type-body) var(--font-body);
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+.account-menu-link:hover {
+  background: var(--lun-ground);
+  color: var(--lun-plum);
+}
+
+/* Sign in (founder decision 2026-11-24): one card, centred on the white page. */
+.signin-page {
+  display: grid;
+  min-height: calc(100svh - var(--header-h));
+  background: var(--lun-surface);
+}
+.signin-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-7) var(--space-4);
+}
+.signin-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--space-6) var(--space-5);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-m);
+  background: var(--lun-surface);
+  box-shadow: var(--elev-1);
+}
+@media (min-width: 768px) {
+  .signin-card {
+    padding: var(--space-7) var(--space-6);
+  }
+}
+.signin-title {
+  margin: 0;
+  font: var(--type-display-m) var(--font-display);
+  font-weight: var(--type-display-m-weight);
+  letter-spacing: var(--type-display-m-tracking);
+  color: var(--lun-plum-deep);
+  text-align: center;
+}
+.signin-sub {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink-muted);
+  text-align: center;
+}
+.signin-steps {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0 0 var(--space-3);
+  list-style: none;
+  border-bottom: 1px solid var(--lun-line);
+}
+.signin-step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink-muted);
+}
+.signin-step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  font: var(--type-label) var(--font-body);
+}
+.signin-step.is-current {
+  color: var(--lun-plum-deep);
+  font-weight: var(--weight-semibold);
+}
+.signin-step.is-current .signin-step-dot {
+  border-color: var(--lun-plum);
+  background: var(--lun-plum);
+  color: var(--lun-surface);
+}
+.signin-step.is-done .signin-step-dot {
+  border-color: var(--lun-plum);
+  color: var(--lun-plum);
+}
+/* The code: large, spaced digits, easy to read back from an email. */
+.input.signin-code {
+  height: var(--control-height-lg);
+  font: var(--type-heading) var(--font-body);
+  letter-spacing: 0.5em;
+  text-align: center;
+}
+.signin-code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.signin-perks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-4) 0 0;
+  list-style: none;
+  border-top: 1px solid var(--lun-line);
+  font: var(--type-body-s) var(--font-body);
+  color: var(--lun-ink);
+}
+.signin-perks li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.signin-perks .icon {
+  flex: none;
+  color: var(--lun-plum);
+}
+.signin-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: center;
+}
+.signin-link {
+  color: var(--lun-plum);
+  text-decoration: underline;
+  text-underline-offset: var(--space-1);
+}
+
+/* Profile page (founder decision 2026-11-24). */
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 56rem;
+}
+.profile-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+/* The four sections as tabs: a row of words, the chosen one underlined in
+   plum; the row scrolls sideways on a narrow phone rather than wrapping. */
+.profile-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.profile-tablist {
+  display: flex;
+  gap: var(--space-5);
+  overflow-x: auto;
+  border-bottom: 1px solid var(--lun-line);
+  scrollbar-width: none;
+}
+.profile-tablist::-webkit-scrollbar {
+  display: none;
+}
+.profile-tab {
+  flex: none;
+  min-height: var(--control-height-md);
+  padding: 0 0 var(--space-2);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--lun-ink-muted);
+  font: var(--type-body) var(--font-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--motion-quick), border-color var(--motion-quick);
+}
+.profile-tab:hover {
+  color: var(--lun-plum);
+}
+.profile-tab.is-selected {
+  border-bottom-color: var(--lun-plum);
+  color: var(--lun-plum-deep);
+  font-weight: var(--weight-semibold);
+}
+.profile-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.profile-panel[hidden] {
+  display: none;
+}
+.profile-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 28rem;
+}
+.profile-name-row {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+.profile-name-row .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Each detail as the Name field above it: the label over the value, all on
+   one left edge (founder decision 2026-11-24: one alignment for the tab). */
+.profile-details {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 28rem;
+  margin: var(--space-2) 0 0;
+}
+.profile-details > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.profile-details dt {
+  font: var(--type-body-s) var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--lun-ink);
+}
+.profile-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
+.profile-status {
+  font-weight: var(--weight-semibold);
+  color: var(--lun-plum);
 }
 
 /* ── Ops: product photos (docs/4-architecture.md §3.7) ── */
@@ -3432,7 +3903,8 @@ body {
  */
 :root {
   --utility-h: 40px;
-  --logo-h: calc(var(--space-6) * 1.2);
+  /* The logo 20% larger again (founder decision 2026-11-24): 1.2 × 1.2. */
+  --logo-h: calc(var(--space-6) * 1.44);
   /* The header is as tall as its tallest item: the logo, or the 44px icons. */
   --header-h: calc(var(--header-pad-top) + var(--header-pad-bottom) + max(var(--logo-h), 44px) + 1px);
   --header-pad-top: var(--space-3);
@@ -3443,7 +3915,7 @@ body {
 @media (min-width: 768px) {
   :root {
     /* Tablets take the desktop logo size, so the menu fits beside it. */
-    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.2);
+    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.44);
     --bottom-bar-h: 0px;
   }
 }
@@ -3460,7 +3932,7 @@ body {
 }
 @media (min-width: 1024px) {
   :root {
-    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.2);
+    --logo-h: calc((var(--space-6) + var(--space-2)) * 1.44);
     --header-pad-top: var(--space-7);
     --header-pad-bottom: var(--space-5);
   }
@@ -5515,35 +5987,24 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
     padding: var(--space-9) var(--space-6);
   }
 }
+/* The promise, centred on the page (founder decision 2026-11-23): the
+   display-xl size from the tokens, 30% larger (1.3em on the words). */
+.home-statement-block .home-band-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
 .home-statement-big {
-  position: relative;
   margin: 0;
   max-width: 24em;
   font: var(--type-display-xl) var(--font-display);
   letter-spacing: var(--type-display-m-tracking);
   color: var(--lun-plum-deep);
 }
-.home-statement-label {
-  display: block;
-  margin-bottom: var(--space-3);
-  font: var(--type-label) var(--font-body);
-  font-weight: var(--type-label-weight);
-  letter-spacing: var(--type-label-tracking);
-  text-transform: uppercase;
-  color: var(--lun-ink-muted);
-}
-@media (min-width: 1024px) {
-  /* The label sits at the start of the first line; the sentence is indented past it. */
-  .home-statement-big {
-    text-indent: 28%;
-  }
-  .home-statement-label {
-    position: absolute;
-    inset-inline-start: 0;
-    top: var(--space-4);
-    margin: 0;
-    text-indent: 0;
-  }
+.home-statement-words {
+  font-size: 1.3em;
+  line-height: 1.2;
 }
 .scroll-word {
   opacity: clamp(0.18, calc(var(--p) * (var(--n) + 3) - var(--i)), 1);
@@ -5578,6 +6039,8 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   letter-spacing: var(--type-display-hero-tracking);
   color: var(--lun-plum-deep);
   white-space: nowrap;
+  /* All capitals: GRACE IN / EVERY DRAPE. */
+  text-transform: uppercase;
 }
 .home-stage-line-top {
   transform: translateX(calc((var(--p) - 0.3) * -40vw));
@@ -5620,11 +6083,77 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
     bottom: var(--space-8);
   }
 }
+/* Words on the film (founder decision 2026-11-24): three lines in display
+   type, white with a soft shadow on the letters, on the wall at the right
+   of the frame (no scrim on the film). Each line rises out of its own
+   mask once the film fills the screen (--p past 0.6), a beat apart, then a
+   gold rule draws in from the right. Scroll-linked, so it plays backwards
+   too; finished at once under reduced motion (--p is 1). */
+.home-stage-over {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .home-stage-over {
+    --o: clamp(0, calc((var(--p) - 0.58) * 3.4), 1);
+    position: absolute;
+    top: 50%;
+    inset-inline-end: var(--space-8);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin: 0;
+    translate: 0 -50%;
+    font-family: var(--font-display);
+    /* Sized to stay on the open wall (about the right 30% of the frame),
+       clear of the model as she turns. */
+    font-size: clamp(2rem, 3.1vw, 3.75rem);
+    font-weight: var(--type-display-l-weight);
+    line-height: 1.05;
+    letter-spacing: var(--type-display-l-tracking);
+    text-align: end;
+    text-transform: uppercase;
+    /* White (founder decision 2026-11-24). The wall behind is light, so a
+       soft shadow on the letters themselves keeps them legible; it sits on
+       the text only, never on the film. */
+    color: var(--lun-surface);
+    text-shadow: 0 0 0.6em color-mix(in srgb, var(--lun-plum-deep) 45%, transparent);
+    pointer-events: none;
+  }
+}
+.home-stage-over-mask {
+  display: block;
+  overflow: hidden;
+  /* Room for descenders inside the mask. */
+  padding-block-end: 0.08em;
+}
+.home-stage-over-line {
+  /* This line's own 0 → 1, starting a beat after the one above. */
+  --l: clamp(0, calc(var(--o) * 2.2 - var(--i) * 0.55), 1);
+  display: block;
+  opacity: var(--l);
+  transform: translateY(calc((1 - var(--l)) * 105%)) skewY(calc((1 - var(--l)) * 4deg));
+  transform-origin: left bottom;
+}
+.home-stage-over-rule {
+  display: block;
+  width: 40%;
+  height: 2px;
+  margin-block-start: var(--space-4);
+  background: var(--lun-gold);
+  transform: scaleX(clamp(0, calc(var(--o) * 2.2 - 1.3), 1));
+  transform-origin: right center;
+}
 .home-stage-title {
   margin: 0;
   font: var(--type-display-l) var(--font-display);
   letter-spacing: var(--type-display-l-tracking);
   color: var(--lun-plum-deep);
+}
+.home-stage-sub {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
 }
 
 
@@ -5718,6 +6247,43 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
   gap: var(--space-4);
   max-width: 44rem;
 }
+
+/* Contact us (founder decision 2026-11-24): one row per way to reach us,
+   an icon beside a label and the detail. */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--lun-line);
+}
+.contact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-block: var(--space-5);
+  border-bottom: 1px solid var(--lun-line);
+  color: var(--lun-plum);
+}
+.contact-item > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+.contact-label {
+  margin: 0;
+  font: var(--type-label) var(--font-body);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  color: var(--lun-ink-muted);
+}
+.contact-note {
+  margin: 0;
+  font: var(--type-body) var(--font-body);
+  color: var(--lun-ink);
+}
 .policy-text {
   color: var(--lun-ink);
   font: var(--type-body) var(--font-body);
@@ -5774,4 +6340,89 @@ body:has(.pdp-sticky.is-shown) .whatsapp-action-floating {
 }
 .policy-link:hover {
   color: var(--lun-plum-deep);
+}
+
+/*
+ * The home film (founder decision 2026-11-23) plays inside the two-drapes
+ * stage, in place of its photograph, and grows with it. Only its pause
+ * button sits on it: top right, clear of the white card at the bottom.
+ */
+.home-film-video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* When cropped to a wide screen, keep the face in frame. */
+  object-position: 50% 15%;
+}
+.home-film-toggle {
+  position: absolute;
+  top: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height-md);
+  min-height: var(--control-height-md);
+  border: 1px solid var(--lun-line);
+  border-radius: var(--radius-full);
+  background: var(--lun-surface);
+  color: var(--lun-plum);
+  cursor: pointer;
+}
+.home-film-toggle:hover {
+  border-color: var(--lun-plum);
+}
+
+/*
+ * Three posters after the film (founder decision 2026-11-23). All three the
+ * same width and height (founder decision 2026-11-24): one 18:25 frame, a
+ * ratio between the posters' own (2:3 and 4:5) so the trim is small on each
+ * and never reaches their words; --pos sets which part each keeps. From
+ * 768px: one row of equal columns. Phones: a sideways row that snaps, one
+ * poster and a glimpse of the next.
+ */
+.home-trio {
+  padding: var(--space-7) 0;
+  background: var(--lun-surface);
+}
+.home-trio-row {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-inline: var(--space-4);
+  scrollbar-width: none;
+}
+.home-trio-row::-webkit-scrollbar {
+  display: none;
+}
+.home-trio-item {
+  flex: 0 0 80%;
+  aspect-ratio: 18 / 25;
+  overflow: hidden;
+  scroll-snap-align: center;
+}
+.home-trio-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--pos, 50% 50%);
+}
+@media (min-width: 768px) {
+  .home-trio-row {
+    overflow: visible;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--space-5);
+    gap: var(--space-4);
+  }
+  .home-trio-item {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 }

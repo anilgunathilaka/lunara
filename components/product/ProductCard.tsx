@@ -1,7 +1,9 @@
 import Image from 'next/image';
+import { PHOTO_QUALITY } from '@/lib/media/quality';
 import { Link } from '@/i18n/navigation';
 import { PriceDisplay } from '@/components/product/PriceDisplay';
 import { StockState, type StockLevel } from '@/components/product/StockState';
+import { FavouriteButton } from '@/components/account/FavouriteButton';
 
 export interface ProductCardProps {
   href: string;
@@ -32,6 +34,8 @@ export interface ProductCardProps {
   badgeOnImage?: boolean;
   /** next/image sizes for the photographs; defaults to the four-across grid. */
   sizes?: string;
+  /** The saree's id: shows a heart on the photograph's corner (favourites, founder decision 2026-11-24). */
+  favouriteId?: string;
 }
 
 export function ProductCard({
@@ -52,6 +56,7 @@ export function ProductCard({
   hoverImageSrc,
   badgeOnImage = false,
   sizes = '(min-width: 768px) 25vw, 50vw',
+  favouriteId,
 }: ProductCardProps) {
   const stock = (
     <StockState
@@ -62,12 +67,12 @@ export function ProductCard({
       formatLeft={formatLeft}
     />
   );
-  return (
+  const card = (
     <Link href={href} className="product-card">
       <div className="product-card-image">
         {/* Drape photograph — no filter, overlay, gradient or hover-zoom. */}
-        <Image src={image.src} alt={image.alt} fill sizes={sizes} />
-        {hoverImageSrc && <Image src={hoverImageSrc} alt="" fill sizes={sizes} className="product-card-image-alt" />}
+        <Image src={image.src} alt={image.alt} fill sizes={sizes} quality={PHOTO_QUALITY} />
+        {hoverImageSrc && <Image src={hoverImageSrc} alt="" fill sizes={sizes} quality={PHOTO_QUALITY} className="product-card-image-alt" />}
         {badgeOnImage && <span className="product-card-image-badge">{stock}</span>}
       </div>
       {!badgeOnImage && stock}
@@ -84,5 +89,13 @@ export function ProductCard({
       </div>
       )}
     </Link>
+  );
+  if (!favouriteId) return card;
+  // The heart sits beside the link, never inside it (no button within a link).
+  return (
+    <div className="product-card-shell">
+      {card}
+      <FavouriteButton listingId={favouriteId} className="product-card-favourite" />
+    </div>
   );
 }

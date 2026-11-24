@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { PHOTO_QUALITY } from '@/lib/media/quality';
 import { cn } from '@/lib/utils';
 
 export interface GalleryAsset {
@@ -34,7 +35,7 @@ export function ProductGallery({ assets, referenceFrameLabel }: ProductGalleryPr
         {active.type === 'video' ? (
           <video src={active.src} muted loop playsInline controls aria-label={active.alt} />
         ) : (
-          <Image src={active.src} alt={active.alt} fill sizes="(min-width: 768px) 50vw, 100vw" />
+          <Image src={active.src} alt={active.alt} fill sizes="(min-width: 768px) 50vw, 100vw" quality={PHOTO_QUALITY} />
         )}
         {active.isReferenceFrame && (
           <span className="gallery-reference-label absolute left-2 top-2">

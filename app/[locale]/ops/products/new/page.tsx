@@ -8,6 +8,7 @@ import { formatProductCode } from '@/lib/catalogue/product-code';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
 import { ShowWhen } from '../../ShowWhen';
 import { ProductPriceFields } from '../ProductPriceFields';
+import { MaterialFields } from '../MaterialFields';
 
 /** Add a saree product (docs/4-architecture.md §3.10). A plain form: works without JavaScript. */
 export default async function OpsNewProductPage({
@@ -20,7 +21,12 @@ export default async function OpsNewProductPage({
   const { locale } = await params;
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/products/new`);
-  const [options, query, t] = await Promise.all([productFormOptions(), searchParams, getTranslations('ops.products')]);
+  const [options, query, t, tOpacity] = await Promise.all([
+    productFormOptions(),
+    searchParams,
+    getTranslations('ops.products'),
+    getTranslations('product.opacity'),
+  ]);
   const jacketAddOns = Object.fromEntries(options.jackets.map((j) => [j.id, j.addOn]));
 
   return (
@@ -108,6 +114,22 @@ export default async function OpsNewProductPage({
           </div>
         </fieldset>
 
+        <MaterialFields
+          labels={{
+                    legend: t('materialLegend'),
+                    weight: t('materialWeight'),
+            weightHint: t('materialWeightHint'),
+                    length: t('materialLength'),
+                    opacity: t('materialOpacity'),
+                    fromCategory: t('materialFromCategory'),
+            category: t('materialCategoryShort'),
+                    note: t('materialNote'),
+                    opaque: tOpacity('opaque'),
+                    semiSheer: tOpacity('semiSheer'),
+                    sheer: tOpacity('sheer'),
+                  }}
+        />
+
         <fieldset>
           <legend>{t('jacketLegend')}</legend>
           <label className="field-label" htmlFor="jacketColourwayId">
@@ -164,6 +186,10 @@ export default async function OpsNewProductPage({
           <label className="ops-inline-form">
             <input type="checkbox" name="featured" />
             {t('featured')}
+          </label>
+          <label className="ops-inline-form">
+            <input type="checkbox" name="topSeller" />
+            {t('topSeller')}
           </label>
         </fieldset>
 

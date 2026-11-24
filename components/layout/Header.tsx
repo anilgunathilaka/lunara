@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ShoppingBag, UserRound } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { Icon } from '@/components/primitives/Icon';
 import { Wordmark } from '@/components/brand/Wordmark';
+import { AccountMenu } from '@/components/account/AccountMenu';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { AnnouncementBar, type AnnouncementBarProps } from '@/components/layout/AnnouncementBar';
 import { NavItem, type HeaderMegaMenu } from '@/components/layout/MegaMenu';
@@ -100,12 +101,8 @@ export function Header({
           {/* On mobile the language selector lives in the MobileNav "Menu" panel
               instead, to keep the compact header down to wordmark + cart. */}
           <LanguageSelector labels={languageLabels} className="hidden md:flex" />
-          {account && (
-            <Link href={account.href} className="site-header-cart focus-ring" aria-label={account.label}>
-              <Icon icon={UserRound} />
-              {account.text && <span className="site-header-account-text">{account.text}</span>}
-            </Link>
-          )}
+          {/* Signed out: the sign-in link. Signed in: avatar menu (founder decision 2026-11-24). */}
+          {account && <AccountMenu href={account.href} label={account.label} text={account.text} />}
           <Link href={cartHref} className="site-header-cart focus-ring" aria-label={cartLabel}>
             <Icon icon={ShoppingBag} />
             {cartCount > 0 && <span className="site-header-cart-count">{cartCount}</span>}

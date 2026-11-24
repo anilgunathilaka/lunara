@@ -6,6 +6,7 @@
 export const OPS_DONE_CODES = [
   'sareeAdded',
   'sareeUpdated',
+  'homeSectionUpdated',
   'sareeArchived',
   'sareeRestored',
   'sareeDeleted',

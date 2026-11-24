@@ -13,6 +13,7 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
   const t = await getTranslations('support');
   const tLayout = await getTranslations('layout');
   const tFooter = await getTranslations('layout.footer');
+  const tPolicies = await getTranslations('policies');
 
   return (
     <div className="home-section">
@@ -42,7 +43,14 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
             {
               id: 'colour-promise',
               title: t('colourPromiseHeading'),
-              content: <p className="field-message">{t('colourPromiseBody')}</p>,
+              content: (
+                <div className="flex flex-col gap-3">
+                  <p className="field-message">{t('colourPromiseBody')}</p>
+                  <Link href="/policies/colour" className="text-link">
+                    {tPolicies('colourLink')}
+                  </Link>
+                </div>
+              ),
             },
             {
               id: 'jacket-stitching',

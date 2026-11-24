@@ -6,11 +6,6 @@ import { LayoutQaClient } from './LayoutQaClient';
  * SlideOver and Accordion (docs/3-components.md §6.2). Not part of the
  * shipped product surface — delete or gate behind an env check before
  * launch.
- *
- * registrationNumber/address/phone below are placeholders — real
- * business registration and contact details are an explicit open founder
- * decision (docs/0-prd.md "Business registration and published contact
- * details | Founder | Before Phase 1 launch"), never fabricated here.
  */
 export default async function LayoutQaPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -54,9 +49,6 @@ export default async function LayoutQaPage({ params }: { params: Promise<{ local
             privacy: tFooter('privacy'),
             terms: tFooter('terms'),
           }}
-          registrationNumber="Business Reg. No. [placeholder — pending founder input]"
-          address="[Address placeholder — pending founder input]"
-          phone="[Phone placeholder — pending founder input]"
           slideoverAddedTitle={tSlideover('addedTitle')}
           slideoverClose={tSlideover('close')}
           accordionItems={[

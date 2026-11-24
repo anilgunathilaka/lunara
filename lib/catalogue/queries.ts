@@ -62,9 +62,11 @@ function toProduct(row: ListingRow): CatalogueProduct {
     colourName: saree.colourName,
     colourHex: saree.colourHex,
     occasions: saree.design.occasionTags,
-    opacity: OPACITY[saree.material.opacity] ?? 'opaque',
+    // This saree's own values where set (founder decision 2026-11-24), else its category's.
+    opacity: OPACITY[row.opacity ?? saree.material.opacity] ?? 'opaque',
     gsm: saree.material.gsm,
-    lengthMetres: saree.material.lengthMetres.toNumber(),
+    weightGrams: row.weightGrams,
+    lengthMetres: (row.lengthMetres ?? saree.material.lengthMetres).toNumber(),
     jacketMaterialName: jacket.material.name,
     jacketColourName: jacket.colourName,
     jacketSwatchHex: jacket.colourHex,
@@ -78,18 +80,37 @@ function toProduct(row: ListingRow): CatalogueProduct {
   };
 }
 
-export async function getCuratedListings(options: { featuredOnly?: boolean; limit?: number } = {}): Promise<
+export async function getCuratedListings(
+  options: { featuredOnly?: boolean; topSellersOnly?: boolean; limit?: number } = {},
+): Promise<
   CatalogueProduct[]
 > {
   await connection();
   const rows = await getPrisma().curatedListing.findMany({
     relationLoadStrategy: 'join',
-    where: { ...activeListing, ...(options.featuredOnly ? { isFeatured: true } : {}) },
+    where: {
+      ...activeListing,
+      ...(options.featuredOnly ? { isFeatured: true } : {}),
+      ...(options.topSellersOnly ? { isTopSeller: true } : {}),
+    },
     include: listingInclude,
     orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
     take: options.limit,
   });
   return rows.map(toProduct);
+}
+
+/** Sarees on sale among these ids, in the order given (favourites, founder decision 2026-11-24). */
+export async function getCuratedListingsByIds(ids: string[]): Promise<CatalogueProduct[]> {
+  if (ids.length === 0) return [];
+  await connection();
+  const rows = await getPrisma().curatedListing.findMany({
+    relationLoadStrategy: 'join',
+    where: { ...activeListing, id: { in: ids } },
+    include: listingInclude,
+  });
+  const byId = new Map(rows.map((row) => [row.id, toProduct(row)]));
+  return ids.map((id) => byId.get(id)).filter((p): p is CatalogueProduct => p !== undefined);
 }
 
 export async function getCuratedListing(id: string): Promise<CatalogueProduct | null> {

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import { Heart, KeyRound, Package } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { SectionMarker } from '@/components/brand/SectionMarker';
 import { SignInForm } from '@/components/account/SignInForm';
+import { Icon } from '@/components/primitives/Icon';
+import { Link } from '@/i18n/navigation';
+import { whatsappLink } from '@/lib/commerce/business';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -23,6 +26,12 @@ function safeNext(value: string | string[] | undefined, locale: string): string 
   }
 }
 
+/**
+ * Sign in (founder decision 2026-11-24: a fuller page): one card in the
+ * middle of the white page, with a welcome, the two steps
+ * (email, code) and what an account gives. Accounts stay optional: the page says so and
+ * leads back to shopping as a guest (PRD FR-33).
+ */
 export default async function SignInPage({
   params,
   searchParams,
@@ -36,13 +45,47 @@ export default async function SignInPage({
   const t = await getTranslations('auth.signIn');
 
   return (
-    <div className="home-section">
-      <div className="home-section-inner flex flex-col gap-4" style={{ maxWidth: '420px' }}>
-        <div>
-          <SectionMarker />
-          <h1 className="home-section-title">{t('title')}</h1>
+    <div className="signin-page">
+      <div className="signin-panel">
+        <div className="signin-card">
+          <h1 className="signin-title">{t('welcome')}</h1>
+          <p className="signin-sub">{t('subtitle')}</p>
+
+          <SignInForm next={safeNext(next, locale)} showSteps />
+
+          <ul className="signin-perks">
+            <li>
+              <Icon icon={KeyRound} size="inline" />
+              {t('perkNoPassword')}
+            </li>
+            <li>
+              <Icon icon={Package} size="inline" />
+              {t('perkOrders')}
+            </li>
+            <li>
+              <Icon icon={Heart} size="inline" />
+              {t('perkFavourites')}
+            </li>
+          </ul>
+
+          <div className="signin-foot">
+            <p className="field-message">
+              {t('guestNote')}{' '}
+              <Link href="/shop" className="signin-link focus-ring">
+                {t('guestLink')}
+              </Link>
+            </p>
+            <p className="field-message">
+              {t.rich('help', {
+                link: (chunks) => (
+                  <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" className="signin-link focus-ring">
+                    {chunks}
+                  </a>
+                ),
+              })}
+            </p>
+          </div>
         </div>
-        <SignInForm next={safeNext(next, locale)} />
       </div>
     </div>
   );

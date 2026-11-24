@@ -14,6 +14,7 @@
       "materialSuper": "Super Cotton",
       "weight": "Weight",
       "weightValue": "{gsm} GSM",
+      "weightGrams": "{grams} g (saree and jacket material)",
       "length": "Length",
       "lengthValue": "{metres} m",
       "opacity": "Opacity"
@@ -183,6 +184,13 @@
       "menu": "Menu"
     },
     "whatsapp": "Chat on WhatsApp",
+    "accountMenu": {
+      "open": "Account menu",
+      "profile": "My profile",
+      "myOrders": "My orders",
+      "favourites": "Favourites",
+      "signOut": "Log out"
+    },
     "footer": {
       "support": "Support",
       "returns": "Returns",
@@ -190,8 +198,29 @@
       "shipping": "Shipping",
       "privacy": "Privacy policy",
       "terms": "Terms of service",
+      "colour": "Product colour",
       "myOrders": "My orders",
-      "policiesHeading": "Policies"
+      "about": "About us",
+      "contact": "Contact us",
+      "favourites": "Favourites",
+      "policiesHeading": "Policies",
+      "credit": "Site designed and developed by <link>ayulian.com</link>"
+    },
+    "subscribe": {
+      "heading": "Be the first to see new sarees.",
+      "sub": "New arrivals and restocks, a few times a month. Leave your email, your mobile number, or both.",
+      "emailLabel": "Email address",
+      "phoneLabel": "Mobile number",
+      "phonePlaceholder": "Mobile number (07X XXX XXXX)",
+      "submit": "Subscribe",
+      "sending": "Subscribing…",
+      "done": "Thank you. You're on the list, and we'll tell you when new sarees arrive.",
+      "errorNone": "Enter an email address or a mobile number.",
+      "errorEmail": "Check the email address.",
+      "errorPhone": "Enter a Sri Lankan mobile number, like 071 234 5678.",
+      "errorServer": "Something went wrong and you're not on the list yet. Please try again, or message us on WhatsApp.",
+      "fine": "We send news by email, SMS or WhatsApp. Ask us to stop at any time. See our <link>privacy policy</link>.",
+      "trap": "Leave this empty"
     },
     "slideover": {
       "addedTitle": "Added to cart",
@@ -201,7 +230,7 @@
       "shipping": "Shipping & delivery",
       "shippingContent": "Dispatched within one working day. Delivery in 1–2 working days to the Western Province, 2–4 to most districts, 3–5 to the Northern and Eastern Provinces.",
       "care": "Cotton care",
-      "careContent": "Machine wash cold, inside out. Line dry in shade. Warm iron on the reverse.",
+      "careContent": "Machine wash cold on a gentle cycle, inside out, with similar colours. Line dry in the shade. Warm iron on the reverse while slightly damp. No bleach or harsh detergents, and keep it out of long, direct sun.",
       "returns": "Returns & exchanges",
       "returnsContent": "Return or exchange within 7 days of delivery: unworn, unwashed, tags attached, jacket material uncut. Message us on WhatsApp to start."
     },
@@ -306,7 +335,7 @@
       }
     },
     "trust": {
-      "colourPromise": "Colour-accurate photography",
+      "colourPromise": "Product colour",
       "returns": "7-day returns",
       "dispatch": "Dispatched in 1 working day",
       "whatsapp": "Reach us on WhatsApp"
@@ -316,6 +345,28 @@
       "viewAll": "View all",
       "previous": "Previous sarees",
       "next": "More sarees"
+    },
+    "topSell": {
+      "heading": "Top sellers"
+    },
+    "trio": {
+      "label": "Lookbook",
+      "alt1": "Kandyan Heritage — Timeless Grace in Every Weave: a blue printed saree draped as a Kandyan Osariya",
+      "alt2": "Classic Beauty, Ethereal Charm: a peach saree draped as a Kandyan Osariya",
+      "alt3": "Kandyan Bloom, Ethereal Greenery — The Art of the Osaria: a green saree draped as a Kandyan Osariya"
+    },
+    "stage": {
+      "lineTop": "Grace in",
+      "lineBottom": "every drape",
+      "title": "Drape it your way",
+      "sub": "Kandyan sarees made for the Osariya drape, each with its jacket material unstitched.",
+      "over1": "Pure cotton.",
+      "over2": "Timeless drape.",
+      "over3": "Truly yours."
+    },
+    "film": {
+      "pause": "Pause the film",
+      "play": "Play the film"
     },
     "osariya": {
       "heading": "One saree, two drapes",
@@ -378,8 +429,8 @@
     "addToCart": "Add to cart",
     "customiseThis": "Customise this",
     "sendSwatches": "Send me swatches",
-    "colourPromiseHeading": "Colour accuracy promise",
-    "colourPromiseBody": "This material is photographed in natural daylight, with one unedited reference frame published for its colourway. If the delivered item differs materially from that reference, we collect it at our cost and replace or refund in full.",
+    "colourPromiseHeading": "Product colour",
+    "colourPromiseBody": "Some of our images use AI-generated model photography to show how a saree may look when worn. The actual colour may vary slightly from what you see on screen, and the fabric's texture, drape and details may differ from an AI-generated image. If you're unsure about a saree's colour, fabric or design, message us before you buy.",
     "deliveryHeading": "Delivery",
     "reviewsHeading": "Reviews",
     "reviewsNone": "Customer photo reviews will appear here once published.",
@@ -407,15 +458,79 @@
     "intro": "Delivery, returns, colour accuracy and care — the questions we're asked most, answered plainly.",
     "contactHeading": "Contact us",
     "contactBody": "Reach us on WhatsApp for the fastest response, or by phone during service hours.",
-    "colourPromiseHeading": "Colour accuracy promise",
-    "colourPromiseBody": "Every material is photographed in natural daylight, with one unedited reference frame published per colourway. If a delivered item differs materially from that reference, we collect it at our cost and replace or refund it in full. The Design Your Own preview is a rendered approximation and is not covered by this promise — see the honesty note in the configurator.",
+    "colourPromiseHeading": "Product colour",
+    "colourPromiseBody": "Some of our images use AI-generated model photography to show how a saree may look when worn. The actual colour may vary slightly from what you see on screen, and the fabric's texture, drape and details may differ from an AI-generated image. If you're unsure about a saree's colour, fabric or design, message us before you buy. The Design Your Own preview is also a rendered approximation.",
     "jacketStitchingHeading": "Getting your jacket stitched",
     "jacketStitchingBody": "Your jacket material ships unstitched, cut to the piece length stated on the listing. Take it to your regular tailor along with your measurements — we don't take measurements or stitch, so any tailor of your choice can complete it.",
     "returnsPageTitle": "Returns & exchanges",
     "careGuidePageTitle": "Cotton care guide",
+    "careEnglishOnly": "This guide is available in English only for now.",
     "shippingPageTitle": "Shipping & delivery"
   },
+  "about": {
+    "title": "About Lunara Sarees",
+    "artHeading": "The Art of Wearing Tradition",
+    "art1": "Rooted in Kandy, Sri Lanka, <b>Lunara Sarees</b> celebrates the timeless elegance of the Kandyan saree and the beauty of the traditional Osariya drape.",
+    "art2": "We bring together thoughtfully selected sarees that honour Sri Lankan heritage while embracing the individuality of the modern woman. From everyday elegance to life's most meaningful occasions, each piece is chosen to make you feel confident, graceful and beautifully yourself.",
+    "collectionsHeading": "Our Collections",
+    "collections1": "Discover a considered selection of Kandyan sarees in cotton, handloom, batik and hand-painted fabrics.",
+    "collections2": "Every collection brings together distinctive colours, thoughtful details and beautiful craftsmanship. Each saree is offered as a complete set, including the saree and its matching jacket material, so you have everything you need to create a coordinated look.",
+    "yoursHeading": "Made to Be Yours",
+    "yours1": "At Lunara, we believe your outfit should reflect your own style.",
+    "yours2": "Our sarees are supplied with unstitched jacket material, giving you the freedom to choose your preferred design, fit and tailoring style.",
+    "yours3": "Jacket stitching and measurements are not provided. We leave that creative freedom in your hands, so your finished outfit can be tailored to your personal preference.",
+    "shoppingHeading": "A Thoughtful Shopping Experience",
+    "shopping1": "We believe shopping for a saree should be simple, convenient and reassuring.",
+    "point": {
+      "orderingLabel": "Easy Ordering:",
+      "ordering": "Shop as a guest without creating an account.",
+      "deliveryLabel": "Islandwide Delivery:",
+      "delivery": "We deliver across all 25 districts of Sri Lanka.",
+      "dispatchLabel": "Prompt Dispatch:",
+      "dispatch": "Orders are dispatched within one working day after confirmation.",
+      "paymentsLabel": "Flexible Payments:",
+      "payments": "Choose between Cash on Delivery and bank transfer.",
+      "careLabel": "Customer Care:",
+      "care": "Eligible returns and exchanges are accepted within 7 days of delivery, provided the saree is unworn and the jacket material remains uncut."
+    },
+    "shopping2": "Please refer to our <shipping>Shipping & Delivery Policy</shipping> and <returns>Returns & Refund Policy</returns> for complete details.",
+    "honestHeading": "Our Commitment to Honest Presentation",
+    "honest1": "We believe that knowing what you are buying is just as important as loving what you see.",
+    "honest2": "Some of our fashion images feature AI-generated model photography, created to illustrate how a saree may look when worn. These images are visual representations and may not perfectly reflect the actual product's colour, fabric texture or finer details.",
+    "honest3": "We encourage you to review the product descriptions and available product details before placing an order. If you have questions about a particular saree, its colour or design, please contact us. We will be happy to help.",
+    "honest4": "For more information, please read our <colour>Product Colour & Image Disclaimer</colour>.",
+    "experienceHeading": "The Lunara Experience",
+    "experience1": "A saree is more than an outfit. It is an expression of culture, individuality and personal elegance.",
+    "experience2": "At Lunara Sarees, we invite you to discover pieces that celebrate tradition, complement your style and become part of your most cherished moments.",
+    "closing": "Lunara Sarees — Elegance in Every Thread.",
+    "shopNow": "Shop now",
+    "contactUs": "Contact us"
+  },
+  "contact": {
+    "title": "Contact us",
+    "intro": "A question about a saree, its colour or fabric, an order or a delivery? We're happy to help.",
+    "whatsappLabel": "WhatsApp",
+    "whatsappNote": "The fastest way to reach us.",
+    "whatsappButton": "Chat on WhatsApp",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "locationLabel": "Where we are",
+    "location": "Kandy, Central Province, Sri Lanka",
+    "helpHeading": "Help with an order",
+    "helpBody": "Delivery times and charges, returns and exchanges, and caring for your saree are all set out here."
+  },
+  "favourites": {
+    "add": "Add to favourites",
+    "remove": "Remove from favourites",
+    "heading": "Favourites",
+    "intro": "The sarees you have hearted. They stay in this browser; sign in after an order to keep them on every device.",
+    "empty": "You haven't hearted any sarees yet. Tap the heart on a saree to keep it here.",
+    "browse": "Browse sarees",
+    "loading": "Loading your favourites…"
+  },
   "policies": {
+    "colourTitle": "Product colour & image disclaimer",
+    "colourLink": "Read the product colour & image disclaimer",
     "privacyTitle": "Privacy policy",
     "termsTitle": "Terms of service",
     "pending": "This page is pending final legal review and will be published before launch. For questions in the meantime, reach us on WhatsApp.",
@@ -429,6 +544,20 @@
     },
     "signIn": {
       "title": "Sign in",
+      "welcome": "Welcome back",
+      "subtitle": "Sign in to follow your orders and keep your favourite sarees.",
+      "stepsLabel": "Sign-in steps",
+      "stepEmail": "Your email",
+      "stepCode": "Your code",
+      "resend": "Send a new code",
+      "resendIn": "Send a new code in {seconds}s",
+      "resent": "A new code is on its way. Check your inbox (and spam folder).",
+      "perkNoPassword": "No password to remember: a 6-digit code by email.",
+      "perkOrders": "Your orders and their delivery, in one place.",
+      "perkFavourites": "Your favourite sarees on every device.",
+      "guestNote": "An account is optional. You can always shop as a guest.",
+      "guestLink": "Continue shopping",
+      "help": "Trouble signing in? <link>Message us on WhatsApp</link>.",
       "intro": "We'll email you a 6-digit code. No password needed.",
       "emailLabel": "Email",
       "sendCode": "Send code",
@@ -479,6 +608,7 @@
     "done": {
       "sareeAdded": "Saree added.",
       "sareeUpdated": "Saree changes saved.",
+      "homeSectionUpdated": "Home page section updated.",
       "sareeArchived": "Saree archived. It is no longer in the shop.",
       "sareeRestored": "Saree restored. It is back in the shop.",
       "sareeDeleted": "Saree deleted.",
@@ -522,7 +652,8 @@
       "products": "Products",
       "costs": "Costs",
       "office": "Office sales",
-      "overview": "Overview"
+      "overview": "Overview",
+      "subscribers": "Subscribers"
     },
     "columns": {
       "number": "Order",
@@ -674,6 +805,17 @@
         "network": "Connection lost while uploading {name}. Try again."
       }
     },
+    "subscribers": {
+      "intro": "People who signed up with the form after the footer, newest first. Message them only about new arrivals and restocks, and stop as soon as someone asks.",
+      "none": "No one has signed up yet.",
+      "unavailable": "The subscriber list is not set up yet (the database update has not been run).",
+      "count": "{count, plural, one {# subscriber} other {# subscribers}}",
+      "download": "Download CSV",
+      "colEmail": "Email",
+      "colPhone": "Mobile",
+      "colLanguage": "Language",
+      "colDate": "Signed up"
+    },
     "reviews": {
       "intro": "Every review is from a delivered order. Reply in public to criticism; never hide a review for being negative. Hide only for one of the listed reasons.",
       "none": "No reviews yet.",
@@ -808,6 +950,21 @@
       "startingQuantity": "Starting quantity",
       "lowAt": "Warn when stock is at or below",
       "featured": "Feature on the home page",
+      "topSeller": "Show in Top sellers on the home page",
+      "materialLegend": "Material details",
+      "materialWeight": "Weight (grams)",
+      "materialWeightHint": "e.g. 987",
+      "materialLength": "Length (metres)",
+      "materialOpacity": "Opacity",
+      "materialFromCategory": "Category's value",
+      "materialCategoryShort": "category",
+      "materialNote": "Shown under Material on this saree's page. Weight: the saree and jacket material together, in grams; left empty, no weight is shown. Length or opacity left empty uses the category's value.",
+      "topSellTag": "top seller",
+      "topSellHeading": "Home page: Top sellers",
+      "topSellShown": "Shown on the home page, with {count, plural, =0 {no sarees ticked yet, so nothing appears} one {# saree} other {# sarees}}. Tick “Show in Top sellers” on a saree’s page to add it.",
+      "topSellHidden": "Hidden: the home page does not show the Top sellers section.",
+      "topSellHide": "Hide the section",
+      "topSellShow": "Show the section",
       "photosAfter": "After saving, add photos on the Photos page.",
       "create": "Save product",
       "inStockNow": "{count} in stock.",
@@ -1152,6 +1309,23 @@
     "startShopping": "Browse sarees",
     "itemCount": "{count, plural, one {# item} other {# items}}",
     "signOut": "Sign out",
+    "profileTitle": "My profile",
+    "memberSince": "Customer since {date}",
+    "detailsHeading": "My details",
+    "nameLabel": "Name",
+    "saveName": "Save",
+    "nameSaved": "Your name is saved.",
+    "nameInvalid": "Enter your name (up to 80 characters).",
+    "emailLabel": "Email",
+    "phoneLabel": "Mobile",
+    "addressLabel": "Delivery address",
+    "fromLatestOrder": "Mobile and address are from your latest order.",
+    "trackingHeading": "Track my orders",
+    "noActiveOrders": "No orders on their way right now.",
+    "trackingNumber": "Tracking {number}",
+    "seeProgress": "See progress",
+    "historyHeading": "Order history",
+    "favouritesHeading": "Favourite sarees",
     "saveOrder": {
       "heading": "Keep track of this order",
       "body": "Optional: save this order to an account to follow its delivery any time. We'll email you a 6-digit code — no password.",

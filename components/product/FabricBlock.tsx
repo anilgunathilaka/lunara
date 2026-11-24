@@ -4,7 +4,8 @@ export interface FabricBlockProps {
   materialLabel: string;
   materialValue: string;
   weightLabel: string;
-  weightValue: string;
+  /** Omitted: the weight row is left out (no weight entered for this saree). */
+  weightValue?: string;
   lengthLabel: string;
   lengthValue: string;
   opacityLabel: string;
@@ -33,10 +34,12 @@ export function FabricBlock({
         <dt className="spec-row-term">{materialLabel}</dt>
         <dd>{materialValue}</dd>
       </div>
-      <div className="spec-row">
+      {weightValue && (
+        <div className="spec-row">
         <dt className="spec-row-term">{weightLabel}</dt>
         <dd>{weightValue}</dd>
       </div>
+      )}
       <div className="spec-row">
         <dt className="spec-row-term">{lengthLabel}</dt>
         <dd>{lengthValue}</dd>
