@@ -17,7 +17,19 @@ export type PlaceOrderOutcome =
   /** Price or fee moved since the customer's last quote: show it, ask again. */
   | { ok: false; reason: 'changed'; quote: CartQuote }
   /** A line is unavailable or short: show which, ask the customer to adjust. */
-  | { ok: false; reason: 'unavailable'; quote: CartQuote };
+  | { ok: false; reason: 'unavailable'; quote: CartQuote }
+  /** Too many unconfirmed orders on this mobile number lately: ask them to message us. */
+  | { ok: false; reason: 'tooMany' };
+
+/**
+ * Stock guard (security review 2026-11-24): stock is held the moment an order
+ * is placed, and most sarees have one left, so a script placing fake cash-on-
+ * delivery orders could empty the shop. At most this many unconfirmed orders
+ * (placed or awaiting payment) per mobile number in a day; staff confirming
+ * or cancelling one frees a place.
+ */
+const MAX_OPEN_ORDERS_PER_PHONE = 3;
+const OPEN_ORDER_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 // No 0/O, 1/I/L: order numbers get read aloud over the phone.
 const ORDER_ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
@@ -75,6 +87,15 @@ export async function placeOrder(input: PlaceOrderInput, userId: string | null =
   const token = randomBytes(24).toString('base64url');
   const phone = normaliseSriLankanMobile(details.phone)!;
   const status = paymentMethod === 'bank_transfer' ? 'payment_pending' : 'placed';
+
+  const open = await prisma.order.count({
+    where: {
+      phone,
+      status: { in: ['placed', 'payment_pending'] },
+      createdAt: { gte: new Date(Date.now() - OPEN_ORDER_WINDOW_MS) },
+    },
+  });
+  if (open >= MAX_OPEN_ORDERS_PER_PHONE) return { ok: false, reason: 'tooMany' };
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const number = newOrderNumber();

@@ -62,7 +62,7 @@ export interface CheckoutClientProps {
   designYourOwnLabel: string;
 }
 
-type CheckoutError = 'network' | 'invalid' | 'changed' | 'unavailable' | null;
+type CheckoutError = 'network' | 'tooMany' | 'invalid' | 'changed' | 'unavailable' | null;
 
 /** Inline, beside the line — never a toast (CLAUDE.md: attribute every price change). */
 function LineNotice({ item, quoted }: { item: CartLineItem; quoted: QuotedLine | undefined }) {
@@ -183,6 +183,9 @@ export function CheckoutClient(props: CheckoutClientProps) {
       if (result.reason === 'invalid') {
         setError('invalid');
         setStep(2);
+      } else if (result.reason === 'tooMany') {
+        // Several orders already waiting on this number: WhatsApp still works.
+        setError('tooMany');
       } else if (result.reason === 'changed') {
         setQuote(result.quote);
         setError('changed');
@@ -392,9 +395,9 @@ export function CheckoutClient(props: CheckoutClientProps) {
             onAcknowledge={setAcknowledged}
             acknowledgeLabel={props.unstitchedAcknowledgeLabel}
           />
-          {error === 'network' && (
+          {(error === 'network' || error === 'tooMany') && (
             <div className="flex flex-col gap-3" role="alert">
-              <p className="field-message-error">{t('networkError')}</p>
+              <p className="field-message-error">{error === 'tooMany' ? t('tooManyOrders') : t('networkError')}</p>
               <a
                 href={whatsappFallbackHref()}
                 target="_blank"

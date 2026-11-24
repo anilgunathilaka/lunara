@@ -16,8 +16,20 @@ interface Env {
   BETTER_AUTH_URL?: string;
 }
 
+/**
+ * Plain http:// on the real domain goes to https:// (security review
+ * 2026-11-24: the site answered over http with no redirect). Only for
+ * lunarasarees.com, so `wrangler dev` on http://localhost keeps working.
+ */
+function httpsRedirect(request: Request): Response | null {
+  const url = new URL(request.url);
+  if (url.protocol !== 'http:' || !/(^|\.)lunarasarees\.com$/.test(url.hostname)) return null;
+  url.protocol = 'https:';
+  return Response.redirect(url.toString(), 301);
+}
+
 const worker = {
-  fetch: (request: Request, env: Env, ctx: unknown) => handler.fetch(request, env, ctx),
+  fetch: (request: Request, env: Env, ctx: unknown) => httpsRedirect(request) ?? handler.fetch(request, env, ctx),
 
   async scheduled(_controller: unknown, env: Env, ctx: { waitUntil: (p: Promise<unknown>) => void }) {
     if (!env.CRON_SECRET) return; // not configured: nothing to do
