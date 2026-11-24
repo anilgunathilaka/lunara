@@ -109,6 +109,7 @@
       "phoneHint": "Sri Lankan mobile, e.g. 077 123 4567",
       "phoneInvalid": "Enter a Sri Lankan mobile number, e.g. 077 123 4567.",
       "networkError": "That didn't go through. Your details are saved — try again, or send this to us on WhatsApp.",
+      "tooManyOrders": "You already have orders waiting for us to confirm. Please send this one to us on WhatsApp and we will help you right away.",
       "retry": "Try again",
       "sendOnWhatsApp": "Send on WhatsApp",
       "whatsappOrderIntro": "Hello Lunara, I'd like to place this order:",

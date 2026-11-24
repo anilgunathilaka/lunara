@@ -40,7 +40,15 @@ const nextConfig: NextConfig = {
           { key: 'Strict-Transport-Security', value: 'max-age=31536000' },
           // No page may be framed by another site (clickjacking), the ops panel above all.
           { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+          // Security review 2026-11-24: also no plugins, no <base> rewrites, forms
+          // post only to this site, and any http:// sub-resource is upgraded.
+          // Scripts are not restricted here: Next's inline scripts would need nonces.
+          {
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'; upgrade-insecure-requests",
+          },
+          // Windows this site opens (or that open it) cannot reach into it.
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           // Order and review links carry tokens in the query: never send them to other sites.
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
