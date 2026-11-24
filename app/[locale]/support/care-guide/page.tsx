@@ -1,7 +1,15 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { PolicyText } from '@/components/content/PolicyText';
 import { COTTON_CARE_EN } from '@/content/care/cotton.en';
+import { pageMetadata } from '@/lib/seo/meta';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '/support/care-guide', title: t('careTitle'), description: t('careDescription') });
+}
 
 /**
  * Cotton Care Guide — the founder's approved English text (content/care/,

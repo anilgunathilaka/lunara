@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { MessageCircle } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
@@ -6,6 +7,13 @@ import { Accordion } from '@/components/layout/Accordion';
 import { Icon } from '@/components/primitives/Icon';
 import { Link } from '@/i18n/navigation';
 import { whatsappLink } from '@/lib/commerce/business';
+import { pageMetadata } from '@/lib/seo/meta';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '/support', title: t('supportTitle'), description: t('supportDescription') });
+}
 
 export default async function SupportPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -1,9 +1,17 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getCuratedListings, getSareeCategories } from '@/lib/catalogue/queries';
 import { categoryNamer } from '@/lib/catalogue/category-label';
 import { ShopClient } from './ShopClient';
 import { parseShopQuery } from './shop-query';
+import { pageMetadata } from '@/lib/seo/meta';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '/shop', title: t('shopTitle'), description: t('shopDescription') });
+}
 
 /**
  * The shop (docs/2-ui.md §7.6; founder decision 2026-11-22, after
