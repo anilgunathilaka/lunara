@@ -1,7 +1,15 @@
+import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Link } from '@/i18n/navigation';
+import { pageMetadata } from '@/lib/seo/meta';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '/about', title: t('aboutTitle'), description: t('aboutDescription') });
+}
 
 /**
  * About us — the founder's text of 2026-11-24, in all three languages

@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -20,8 +22,32 @@ import { getCuratedListing, getCuratedListings } from '@/lib/catalogue/queries';
 import { PLACEHOLDER_IMAGE } from '@/lib/catalogue/types';
 import { categoryNamer } from '@/lib/catalogue/category-label';
 import { FEATURES } from '@/lib/features';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { BRAND, SITE_URL, absoluteUrl, pageMetadata } from '@/lib/seo/meta';
 
 // Rendered per request: price and stock are live (docs/4-architecture.md §3.3).
+/** The price as a plain number for search text ("5,300"): the words around it say LKR or රු. */
+const PRICE_NUMBER = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+
+/** One read per request, shared by the metadata and the page. */
+const loadProduct = cache(getCuratedListing);
+
+/** Search title, description and share card for one saree (SEO, founder decision 2026-11-24). */
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; id: string }> }): Promise<Metadata> {
+  const { locale, id } = await params;
+  const product = await loadProduct(id);
+  if (!product) return {};
+  const [t, categoryName] = await Promise.all([getTranslations({ locale, namespace: 'seo' }), categoryNamer()]);
+  const category = categoryName(product.categoryId, product.categoryName);
+  return pageMetadata({
+    locale,
+    path: `/shop/${product.id}`,
+    title: t('productTitle', { name: product.name, category }),
+    description: t('productDescription', { name: product.name, category, price: PRICE_NUMBER.format(product.price) }),
+    image: product.gallery[0] ?? undefined,
+  });
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -30,7 +56,7 @@ export default async function ProductDetailPage({
   setRequestLocale(locale);
   // Parallel, not sequential: each read is a round trip to the database.
   const [product, others, reviewData] = await Promise.all([
-    getCuratedListing(id),
+    loadProduct(id),
     // All listings, in shop order: the related sarees and the previous / next ones.
     getCuratedListings(),
     listingReviews(id),
@@ -99,8 +125,53 @@ export default async function ProductDetailPage({
   // beside the details; a band of tabs across the page; related sarees under a
   // centred heading; and a bar that slides up with Add to cart once the page's
   // own button has scrolled away.
+  // Structured data for search results (schema.org; SEO, founder decision
+  // 2026-11-24): the saree with its price in LKR, stock and photographs,
+  // its rating only once it has published reviews, and the breadcrumb trail.
+  const tSeo = await getTranslations('seo');
+  const pageUrl = `${SITE_URL}/${locale}/shop/${product.id}`;
+  const productData = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    sku: product.productCode ?? product.id,
+    image: (product.gallery.length > 0 ? product.gallery : [PLACEHOLDER_IMAGE]).map((src) => absoluteUrl(src)),
+    description: tSeo('productDescription', { name: product.name, category: materialLabel, price: PRICE_NUMBER.format(product.price) }),
+    category: materialLabel,
+    color: product.colourName,
+    brand: { '@type': 'Brand', name: BRAND },
+    offers: {
+      '@type': 'Offer',
+      url: pageUrl,
+      priceCurrency: 'LKR',
+      price: product.price,
+      itemCondition: 'https://schema.org/NewCondition',
+      availability:
+        product.stockState === 'out'
+          ? 'https://schema.org/OutOfStock'
+          : product.stockState === 'low'
+            ? 'https://schema.org/LimitedAvailability'
+            : 'https://schema.org/InStock',
+      seller: { '@id': `${SITE_URL}/#store` },
+    },
+    ...(reviewData.summary.count > 0 && reviewData.summary.average !== null
+      ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: Number(reviewData.summary.average.toFixed(1)), reviewCount: reviewData.summary.count } }
+      : {}),
+  };
+  const breadcrumbData = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: tSeo('breadcrumbHome'), item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: tSeo('breadcrumbShop'), item: `${SITE_URL}/${locale}/shop` },
+      { '@type': 'ListItem', position: 3, name: product.name, item: pageUrl },
+    ],
+  };
+
   return (
     <div className="pdp">
+      <JsonLd data={productData} />
+      <JsonLd data={breadcrumbData} />
       <div className="pdp-inner">
         <div className="pdp-topline">
           <nav aria-label={tPdp('breadcrumb')}>

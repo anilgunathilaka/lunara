@@ -1,6 +1,11 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { CartPageClient } from './CartPageClient';
+import { NO_INDEX } from '@/lib/seo/meta';
+
+/** Never in search results (SEO, 2026-11-24). */
+export const metadata: Metadata = NO_INDEX;
 
 export default async function CartPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

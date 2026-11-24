@@ -1,14 +1,22 @@
+import type { Metadata } from 'next';
 import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { SectionMarker } from '@/components/brand/SectionMarker';
 import { Icon } from '@/components/primitives/Icon';
 import { Link } from '@/i18n/navigation';
 import { whatsappLink } from '@/lib/commerce/business';
+import { pageMetadata } from '@/lib/seo/meta';
 
 // The same contact details the policies publish (content/policies/terms.en.ts §17).
 const PHONE_DISPLAY = '+94 70 214 4064';
 const PHONE_HREF = 'tel:+94702144064';
 const EMAIL = 'hello@lunarasarees.com';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '/contact', title: t('contactTitle'), description: t('contactDescription') });
+}
 
 /**
  * Contact us (founder decision 2026-11-24): WhatsApp first (the fastest

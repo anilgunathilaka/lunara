@@ -650,7 +650,7 @@ The COD fee and its waiver on prepayment are shown at the payment step, framed a
 | Localisation | Full Sinhala, Tamil and English coverage across interface, transactional messages and policies. Correct language attributes and font loading per script. |
 | Observability | Structured logging, error tracking, and the PRD Section 8 metrics instrumented from launch rather than retrofitted. |
 | Backup | Daily database backup with a tested restore path. Media assets replicated — the reference frames are contractual evidence and their loss is unrecoverable. |
-| SEO | Server-rendered catalogue with structured data. The market research identifies high-intent local search as a compounding acquisition channel. |
+| SEO | Server-rendered catalogue with structured data. The market research identifies high-intent local search as a compounding acquisition channel. Built 2026-11-24 (lib/seo/meta.ts): every public page has its own title and description in en/si/ta (messages "seo"), a canonical address, hreflang links to its other languages (x-default: English) and an Open Graph / Twitter card (a saree page shares its first photograph). app/sitemap.ts lists the public pages and every saree on sale in all three languages; app/robots.ts points to it and keeps admin, account, cart, checkout, sign-in, reviews and favourites out (those also carry noindex). JSON-LD: ClothingStore on the home page; Product (price in LKR, stock, photographs, rating once reviewed) and BreadcrumbList on each saree page. While COMING_SOON is on, visitors and crawlers see the noindex landing page, so nothing is indexed until the shop opens. |
 
 9. Risks and Open Decisions
 

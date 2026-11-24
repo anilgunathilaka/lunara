@@ -1,7 +1,12 @@
+import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CheckoutClient } from './CheckoutClient';
 import { COD_FEE, DISTRICT_IDS } from '@/lib/commerce/delivery';
 import { formatAmount } from '@/lib/pricing/format';
+import { NO_INDEX } from '@/lib/seo/meta';
+
+/** Never in search results (SEO, 2026-11-24). */
+export const metadata: Metadata = NO_INDEX;
 
 export default async function CheckoutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -9,16 +9,31 @@ import '../globals.css';
 import { whatsappLink } from '@/lib/commerce/business';
 import { HERO_BANNERS } from '@/lib/home/hero';
 import { FEATURES } from '@/lib/features';
+import { BRAND, DEFAULT_SHARE_IMAGE, SITE_URL } from '@/lib/seo/meta';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-export const metadata: Metadata = {
-  title: 'Lunara Sarees',
-  description:
-    'Premium Sri Lankan cotton sarees with unstitched jacket material. See it before you wear it.',
-};
+/**
+ * Site-wide SEO defaults (founder decision 2026-11-24): every page's title
+ * ends "| Lunara Sarees"; pages set their own title, description,
+ * canonical address, hreflang links and share card (lib/seo/meta.ts).
+ */
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return {
+    metadataBase: new URL(SITE_URL),
+    applicationName: BRAND,
+    title: { default: t('siteTitle'), template: `%s | ${BRAND}` },
+    description: t('siteDescription'),
+    openGraph: { siteName: BRAND, type: 'website', images: [{ url: DEFAULT_SHARE_IMAGE }] },
+    twitter: { card: 'summary_large_image' },
+    // Phone numbers are links only where we make them links (Contact page).
+    formatDetection: { telephone: false },
+  };
+}
 
 export default async function LocaleLayout({
   children,

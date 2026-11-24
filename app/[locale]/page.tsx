@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Suspense, type CSSProperties, type ReactNode } from 'react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -13,6 +14,9 @@ import { FactMarquee } from '@/components/home/FactMarquee';
 import { ProductRail } from '@/components/home/ProductRail';
 import { HomeFilm } from '@/components/home/HomeFilm';
 import { ScrollProgress, ScrollWords } from '@/components/motion/ScrollProgress';
+import { JsonLd } from '@/components/seo/JsonLd';
+import { BRAND, SITE_URL, absoluteUrl, pageMetadata } from '@/lib/seo/meta';
+import { WHATSAPP_NUMBER } from '@/lib/commerce/business';
 
 /** Waits for a read inside its own Suspense boundary, then renders with it. */
 async function Await<T>({ promise, children }: { promise: Promise<T>; children: (value: T) => ReactNode }) {
@@ -37,6 +41,43 @@ function CardSkeleton() {
 // section of words go out at once; the featured sarees and the rail
 // follow as the reads answer, each in
 // a space the same size, so nothing shifts.
+/** The home page's search title stands alone (no "| Lunara Sarees" suffix): it already starts with the name. */
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'seo' });
+  return pageMetadata({ locale, path: '', title: { absolute: t('homeTitle') }, description: t('homeDescription') });
+}
+
+/**
+ * Who Lunara is, for search engines (schema.org ClothingStore): name, logo,
+ * where, how to reach us. The same facts as the Contact page.
+ */
+function storeData(locale: string, description: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ClothingStore',
+    '@id': `${SITE_URL}/#store`,
+    name: BRAND,
+    description,
+    url: `${SITE_URL}/${locale}`,
+    logo: absoluteUrl('/brand/lunara-logo.webp'),
+    image: absoluteUrl('/video/home-film-poster.jpg'),
+    email: 'hello@lunarasarees.com',
+    telephone: '+94 70 214 4064',
+    currenciesAccepted: 'LKR',
+    paymentAccepted: 'Cash, Bank transfer',
+    areaServed: { '@type': 'Country', name: 'Sri Lanka' },
+    address: { '@type': 'PostalAddress', addressLocality: 'Kandy', addressRegion: 'Central Province', addressCountry: 'LK' },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      telephone: '+94 70 214 4064',
+      url: `https://wa.me/${WHATSAPP_NUMBER}`,
+      availableLanguage: ['English', 'Sinhala', 'Tamil'],
+    },
+  };
+}
+
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -136,8 +177,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     { src: '/images/home-trio-2.webp', width: 1121, height: 1403, pos: '50% 50%', alt: t('trio.alt2') },
   ];
 
+  const tSeo = await getTranslations('seo');
+
   return (
     <>
+      <JsonLd data={storeData(locale, tSeo('siteDescription'))} />
       {/* On arrival a maroon curtain lifts off the page (after ccopadel.com,
           founder decision 2026-11-23). CSS only; skipped under reduced motion. */}
       <div className="home-curtain" aria-hidden="true" />
