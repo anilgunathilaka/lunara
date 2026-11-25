@@ -1900,6 +1900,30 @@ body {
   text-decoration-line: underline;
 }
 
+/* The social icons: round 44px targets, outlined like the footer rules (founder decision 2026-11-25). */
+.site-footer-social {
+  gap: var(--space-3);
+}
+.site-footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--footer-rule);
+  border-radius: var(--radius-full);
+  color: var(--lun-surface);
+  transition: border-color var(--motion-quick);
+}
+.site-footer-social-link:hover,
+.site-footer-social-link:focus-visible {
+  border-color: var(--lun-surface);
+}
+.site-footer-social-icon {
+  width: var(--size-icon-default);
+  height: var(--size-icon-default);
+}
+
 /* LUNARA across the full width. */
 .site-footer-bottom {
   display: flex;

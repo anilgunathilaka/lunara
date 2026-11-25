@@ -16,7 +16,7 @@ import { HomeFilm } from '@/components/home/HomeFilm';
 import { ScrollProgress, ScrollWords } from '@/components/motion/ScrollProgress';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { BRAND, SITE_URL, absoluteUrl, pageMetadata } from '@/lib/seo/meta';
-import { WHATSAPP_NUMBER } from '@/lib/commerce/business';
+import { SOCIAL_LINKS, WHATSAPP_NUMBER } from '@/lib/commerce/business';
 
 /** Waits for a read inside its own Suspense boundary, then renders with it. */
 async function Await<T>({ promise, children }: { promise: Promise<T>; children: (value: T) => ReactNode }) {
@@ -61,6 +61,7 @@ function storeData(locale: string, description: string) {
     description,
     url: `${SITE_URL}/${locale}`,
     logo: absoluteUrl('/brand/lunara-logo.webp'),
+    sameAs: SOCIAL_LINKS.map((s) => s.href),
     image: absoluteUrl('/video/home-film-poster.jpg'),
     email: 'hello@lunarasarees.com',
     telephone: '+94 70 214 4064',
