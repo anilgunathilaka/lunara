@@ -13,7 +13,10 @@
 
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
+    // Serve .html files at their exact address, with no redirect to the
+    // extensionless one: Google's Search Console file must answer 200 as is.
+    "html_handling": "none"
   },
 
   // Lets OpenNext call the Worker from within itself (required by the adapter).
