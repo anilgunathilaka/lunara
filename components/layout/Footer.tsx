@@ -4,6 +4,8 @@ import { Link } from '@/i18n/navigation';
 import { Reveal } from '@/components/motion/Reveal';
 import { LanguageSelector, type LanguageSelectorProps } from '@/components/layout/LanguageSelector';
 import { SubscribeForm } from '@/components/layout/SubscribeForm';
+import { SocialIcon } from '@/components/brand/SocialIcon';
+import { SOCIAL_LINKS } from '@/lib/commerce/business';
 
 export interface FooterLink {
   href: string;
@@ -78,6 +80,22 @@ export function Footer({
                 <Link key={link.href} href={link.href} className="site-footer-link focus-ring">
                   {link.label}
                 </Link>
+              ))}
+            </nav>
+
+            {/* Instagram, Facebook and TikTok (founder decision 2026-11-25). */}
+            <nav className="site-footer-row site-footer-social" aria-label={t('social')}>
+              {SOCIAL_LINKS.map((s) => (
+                <a
+                  key={s.network}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="site-footer-social-link focus-ring"
+                  aria-label={t('followOn', { network: s.network })}
+                >
+                  <SocialIcon network={s.network} className="site-footer-social-icon" />
+                </a>
               ))}
             </nav>
 

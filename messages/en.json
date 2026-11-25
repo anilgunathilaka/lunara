@@ -205,7 +205,9 @@
       "contact": "Contact us",
       "favourites": "Favourites",
       "policiesHeading": "Policies",
-      "credit": "Site designed and developed by <link>ayulian.com</link>"
+      "credit": "Site designed and developed by <link>ayulian.com</link>",
+      "social": "Follow Lunara Sarees",
+      "followOn": "Lunara Sarees on {network} (opens in a new tab)"
     },
     "subscribe": {
       "heading": "Be the first to see new sarees.",
