@@ -3,7 +3,7 @@ import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/primitives/Button';
 import { MAX_INSTALMENTS, OFFICE_ITEM_ROWS, addMonths, todayInSriLanka } from '@/lib/office/plan';
 import { createOfficeSaleAction } from '@/lib/ops/office-actions';
-import { officeItemOptions } from '@/lib/ops/office';
+import { officeItemOptions, officeNames } from '@/lib/ops/office';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
@@ -17,7 +17,7 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
   const { locale } = await params;
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/office/new`);
-  const [options, query, t] = await Promise.all([officeItemOptions(), searchParams, getTranslations('ops.office')]);
+  const [options, offices, query, t] = await Promise.all([officeItemOptions(), officeNames(), searchParams, getTranslations('ops.office')]);
   const today = todayInSriLanka();
   const option = (o: { value: string; name: string; price: number; available: number }) => (
     <option key={o.value} value={o.value} disabled={o.available <= 0}>
@@ -53,10 +53,25 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
               <input id="phone" name="phone" type="tel" inputMode="tel" className="input" required maxLength={20} placeholder="07X XXX XXXX" autoComplete="off" />
             </div>
           </div>
-          <label className="field-label" htmlFor="address">
-            {t('address')}
-          </label>
-          <input id="address" name="address" className="input" maxLength={500} autoComplete="off" />
+          <div className="ops-form-row">
+            <div className="flex flex-col gap-1">
+              <label className="field-label" htmlFor="office">
+                {t('office')}
+              </label>
+              <input id="office" name="office" className="input" maxLength={120} autoComplete="off" list="office-names" placeholder={t('officeHint')} />
+              <datalist id="office-names">
+                {offices.map((o) => (
+                  <option key={o} value={o} />
+                ))}
+              </datalist>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="field-label" htmlFor="address">
+                {t('address')}
+              </label>
+              <input id="address" name="address" className="input" maxLength={500} autoComplete="off" />
+            </div>
+          </div>
           <label className="field-label" htmlFor="customerNote">
             {t('customerNoteField')}
           </label>
