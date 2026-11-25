@@ -81,10 +81,15 @@ export async function officeCustomerDetail(id: string) {
   };
 }
 
-export async function officeCustomerList() {
+/**
+ * Office customers, optionally only those from one office (matched without
+ * regard to case, so "Dialog" and "dialog" are the same office).
+ */
+export async function officeCustomerList(office?: string) {
   const today = todayInSriLanka();
   const customers = await getPrisma().officeCustomer.findMany({
     relationLoadStrategy: 'join',
+    where: office ? { office: { equals: office, mode: 'insensitive' } } : undefined,
     orderBy: { name: 'asc' },
     include: { sales: { where: { status: 'active' }, include: { instalments: true, payments: true } } },
   });
@@ -94,11 +99,23 @@ export async function officeCustomerList() {
       id: c.id,
       name: c.name,
       phone: c.phone,
+      office: c.office,
       sales: c.sales.length,
       outstanding: balances.reduce((n, b) => n + Math.max(0, b.outstanding), 0),
       overdue: balances.reduce((n, b) => n + b.overdue, 0),
     };
   });
+}
+
+/** Every office named on a customer, once each (case-insensitive), A–Z: the filter and form suggestions. */
+export async function officeNames(): Promise<string[]> {
+  const rows = await getPrisma().officeCustomer.findMany({ where: { office: { not: null } }, select: { office: true }, distinct: ['office'] });
+  const byKey = new Map<string, string>();
+  for (const { office } of rows) {
+    const name = office!.trim();
+    if (name && !byKey.has(name.toLowerCase())) byKey.set(name.toLowerCase(), name);
+  }
+  return [...byKey.values()].sort((a, b) => a.localeCompare(b));
 }
 
 /** What can be sold in the office: the live shop products and jackets, at their shop prices. */

@@ -78,6 +78,7 @@ const saleSchema = z.object({
   customerName: z.string().trim().min(2).max(120),
   phone: z.string().max(20),
   address: optionalText(500),
+  office: optionalText(120),
   customerNote: optionalText(300),
   soldOn: day,
   discount: z.coerce.number().int().min(0).max(10_000_000),
@@ -137,8 +138,8 @@ export async function createOfficeSaleAction(form: FormData): Promise<void> {
 
           const customer = await tx.officeCustomer.upsert({
             where: { phone: phone! },
-            create: { name: input.customerName, phone: phone!, address: input.address, note: input.customerNote },
-            update: { name: input.customerName, ...(input.address ? { address: input.address } : {}), ...(input.customerNote ? { note: input.customerNote } : {}) },
+            create: { name: input.customerName, phone: phone!, address: input.address, office: input.office, note: input.customerNote },
+            update: { name: input.customerName, ...(input.address ? { address: input.address } : {}), ...(input.office ? { office: input.office } : {}), ...(input.customerNote ? { note: input.customerNote } : {}) },
           });
 
           const sale = await tx.officeSale.create({
@@ -340,6 +341,7 @@ const customerSchema = z.object({
   name: z.string().trim().min(2).max(120),
   phone: z.string().max(20),
   address: optionalText(500),
+  office: optionalText(120),
   note: optionalText(300),
 });
 
@@ -358,15 +360,15 @@ export async function updateOfficeCustomerAction(form: FormData): Promise<void> 
       const before = await tx.officeCustomer.findUnique({ where: { id: input.id } });
       if (!before) throw new OpsError('notFound');
       if (phone !== before.phone && (await tx.officeCustomer.findUnique({ where: { phone: phone! } }))) throw new OpsError('phoneTaken');
-      await tx.officeCustomer.update({ where: { id: input.id }, data: { name: input.name, phone: phone!, address: input.address, note: input.note } });
+      await tx.officeCustomer.update({ where: { id: input.id }, data: { name: input.name, phone: phone!, address: input.address, office: input.office, note: input.note } });
       await tx.auditLog.create({
         data: {
           actor: staff.email,
           action: 'office.customer.update',
           entityType: 'office_customer',
           entityId: input.id,
-          before: { name: before.name, phone: before.phone, address: before.address, note: before.note },
-          after: { name: input.name, phone: phone!, address: input.address, note: input.note },
+          before: { name: before.name, phone: before.phone, address: before.address, office: before.office, note: before.note },
+          after: { name: input.name, phone: phone!, address: input.address, office: input.office, note: input.note },
         },
       });
     });

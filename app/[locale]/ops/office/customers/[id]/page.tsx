@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/primitives/Button';
 import { updateOfficeCustomerAction } from '@/lib/ops/office-actions';
-import { officeCustomerDetail } from '@/lib/ops/office';
+import { officeCustomerDetail, officeNames } from '@/lib/ops/office';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatDate } from '@/lib/format/date';
 import { formatPriceLKR } from '@/lib/pricing/format';
@@ -14,7 +14,7 @@ export default async function OpsOfficeCustomerPage({ params, searchParams }: { 
   const { locale, id } = await params;
   setRequestLocale(locale);
   await requireStaffPage(locale, `/${locale}/ops/office/customers/${id}`);
-  const [found, query, t] = await Promise.all([officeCustomerDetail(id), searchParams, getTranslations('ops.office')]);
+  const [found, offices, query, t] = await Promise.all([officeCustomerDetail(id), officeNames(), searchParams, getTranslations('ops.office')]);
   if (!found) notFound();
   const { customer, sales, totals } = found;
 
@@ -24,6 +24,7 @@ export default async function OpsOfficeCustomerPage({ params, searchParams }: { 
         ← {t('customers')}
       </Link>
       <h2 className="checkout-step-title">{customer.name}</h2>
+      {customer.office && <p className="ops-muted">{t('officeLine', { office: customer.office })}</p>}
       <OpsFlash searchParams={query} />
 
       <dl className="ops-cost-summary">
@@ -97,10 +98,25 @@ export default async function OpsOfficeCustomerPage({ params, searchParams }: { 
               <input id="phone" name="phone" type="tel" inputMode="tel" className="input" required maxLength={20} defaultValue={customer.phone} />
             </div>
           </div>
-          <label className="field-label" htmlFor="address">
-            {t('address')}
-          </label>
-          <input id="address" name="address" className="input" maxLength={500} defaultValue={customer.address ?? ''} />
+          <div className="ops-form-row">
+            <div className="flex flex-col gap-1">
+              <label className="field-label" htmlFor="office">
+                {t('office')}
+              </label>
+              <input id="office" name="office" className="input" maxLength={120} autoComplete="off" list="office-names" placeholder={t('officeHint')} defaultValue={customer.office ?? ''} />
+              <datalist id="office-names">
+                {offices.map((o) => (
+                  <option key={o} value={o} />
+                ))}
+              </datalist>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="field-label" htmlFor="address">
+                {t('address')}
+              </label>
+              <input id="address" name="address" className="input" maxLength={500} defaultValue={customer.address ?? ''} />
+            </div>
+          </div>
           <label className="field-label" htmlFor="note">
             {t('customerNoteField')}
           </label>
