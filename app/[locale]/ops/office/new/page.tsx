@@ -58,7 +58,7 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
               <label className="field-label" htmlFor="office">
                 {t('office')}
               </label>
-              <input id="office" name="office" className="input" maxLength={120} autoComplete="off" list="office-names" placeholder={t('officeHint')} />
+              <input id="office" name="office" className="input" required minLength={2} maxLength={120} autoComplete="off" list="office-names" placeholder={t('officeHint')} />
               <datalist id="office-names">
                 {offices.map((o) => (
                   <option key={o} value={o} />

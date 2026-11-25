@@ -78,7 +78,8 @@ const saleSchema = z.object({
   customerName: z.string().trim().min(2).max(120),
   phone: z.string().max(20),
   address: optionalText(500),
-  office: optionalText(120),
+  // Required on every new sale (founder decision 2026-11-25).
+  office: z.string().trim().min(2).max(120),
   customerNote: optionalText(300),
   soldOn: day,
   discount: z.coerce.number().int().min(0).max(10_000_000),
@@ -139,7 +140,7 @@ export async function createOfficeSaleAction(form: FormData): Promise<void> {
           const customer = await tx.officeCustomer.upsert({
             where: { phone: phone! },
             create: { name: input.customerName, phone: phone!, address: input.address, office: input.office, note: input.customerNote },
-            update: { name: input.customerName, ...(input.address ? { address: input.address } : {}), ...(input.office ? { office: input.office } : {}), ...(input.customerNote ? { note: input.customerNote } : {}) },
+            update: { name: input.customerName, ...(input.address ? { address: input.address } : {}), office: input.office,...(input.customerNote ? { note: input.customerNote } : {}) },
           });
 
           const sale = await tx.officeSale.create({
