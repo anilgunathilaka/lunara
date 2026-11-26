@@ -7,6 +7,7 @@ import { officeItemOptions, officeNames } from '@/lib/ops/office';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
+import { ItemRows, type ItemOption } from './ItemRows';
 
 /**
  * Record a sale made in the office (docs/4-architecture.md §3.13). Items
@@ -19,11 +20,11 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
   await requireStaffPage(locale, `/${locale}/ops/office/new`);
   const [options, offices, query, t] = await Promise.all([officeItemOptions(), officeNames(), searchParams, getTranslations('ops.office')]);
   const today = todayInSriLanka();
-  const option = (o: { value: string; name: string; price: number; available: number }) => (
-    <option key={o.value} value={o.value} disabled={o.available <= 0}>
-      {o.name} · {formatPriceLKR(o.price)} · {t('inStock', { count: o.available })}
-    </option>
-  );
+  const option = (o: { value: string; name: string; price: number; available: number }): ItemOption => ({
+    value: o.value,
+    label: `${o.name} · ${formatPriceLKR(o.price)} · ${t('inStock', { count: o.available })}`,
+    disabled: o.available <= 0,
+  });
 
   return (
     <div className="flex flex-col gap-4">
@@ -81,26 +82,20 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
         <fieldset>
           <legend>{t('items')}</legend>
           <p className="field-message">{t('itemsNote')}</p>
-          {Array.from({ length: OFFICE_ITEM_ROWS }, (_, i) => (
-            <div key={i} className="ops-form-row">
-              <div className="flex flex-col gap-1">
-                <label className="field-label" htmlFor={`item_${i}`}>
-                  {t('itemN', { n: i + 1 })}
-                </label>
-                <select id={`item_${i}`} name={`item_${i}`} className="input" defaultValue="" required={i === 0}>
-                  <option value="">{i === 0 ? t('choose') : t('none_')}</option>
-                  <optgroup label={t('sarees')}>{options.sarees.map(option)}</optgroup>
-                  <optgroup label={t('jacketsAlone')}>{options.jackets.map(option)}</optgroup>
-                </select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="field-label" htmlFor={`qty_${i}`}>
-                  {t('quantity')}
-                </label>
-                <input id={`qty_${i}`} name={`qty_${i}`} type="number" min={1} max={20} step={1} defaultValue={1} className="input ops-number-input" />
-              </div>
-            </div>
-          ))}
+          <ItemRows
+            max={OFFICE_ITEM_ROWS}
+            sarees={options.sarees.map(option)}
+            jackets={options.jackets.map(option)}
+            labels={{
+              item: t.raw('itemN') as string,
+              quantity: t('quantity'),
+              choose: t('choose'),
+              sarees: t('sarees'),
+              jacketsAlone: t('jacketsAlone'),
+              addItem: t('addItem'),
+              removeItem: t.raw('removeItem') as string,
+            }}
+          />
         </fieldset>
 
         <fieldset>
