@@ -3729,6 +3729,16 @@ body {
 .ops-form-row > * {
   flex: 1 1 calc(var(--space-9) * 2);
 }
+/* The remove (×) slot of an office sale item row: fixed width, never grows (founder decision 2026-11-25). */
+.ops-form-row > .ops-item-remove {
+  flex: 0 0 44px;
+  display: flex;
+  align-items: flex-end;
+}
+.ops-item-remove > .btn {
+  width: 100%;
+  padding-inline: 0;
+}
 .ops-colour-input {
   min-height: var(--control-height-md);
   padding: var(--space-1);
