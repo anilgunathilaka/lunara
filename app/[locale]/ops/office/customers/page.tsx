@@ -55,6 +55,7 @@ export default async function OpsOfficeCustomersPage({ params, searchParams }: {
                 <th scope="col">{t('phone')}</th>
                 <th scope="col">{t('office')}</th>
                 <th scope="col">{t('salesHeading')}</th>
+                <th scope="col">{t('bought')}</th>
                 <th scope="col">{t('outstanding')}</th>
               </tr>
             </thead>
@@ -69,6 +70,7 @@ export default async function OpsOfficeCustomersPage({ params, searchParams }: {
                   <td>{c.phone}</td>
                   <td>{c.office ?? '—'}</td>
                   <td>{c.sales}</td>
+                  <td>{formatPriceLKR(c.bought)}</td>
                   <td className={c.overdue > 0 ? 'ops-status-out' : undefined}>
                     {formatPriceLKR(c.outstanding)}
                     {c.overdue > 0 ? ` · ${t('overdueAmount', { amount: formatPriceLKR(c.overdue) })}` : ''}

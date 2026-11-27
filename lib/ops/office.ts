@@ -101,6 +101,8 @@ export async function officeCustomerList(office?: string) {
       phone: c.phone,
       office: c.office,
       sales: c.sales.length,
+      // Same rule as the customer page: active sales only, cancelled ones don't count.
+      bought: c.sales.reduce((n, s) => n + s.total, 0),
       outstanding: balances.reduce((n, b) => n + Math.max(0, b.outstanding), 0),
       overdue: balances.reduce((n, b) => n + b.overdue, 0),
     };
