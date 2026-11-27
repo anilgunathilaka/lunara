@@ -22,7 +22,7 @@ export function whatsappLink(text?: string): string {
 
 /** Lunara's social media pages (founder decision 2026-11-25): footer icons and the store's schema.org sameAs. */
 export const SOCIAL_LINKS = [
-  { network: 'Instagram', href: 'https://www.instagram.com/lunara.sarees/' },
+  { network: 'Instagram', href: 'https://www.instagram.com/lunarasarees/' },
   { network: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61585275432968' },
   { network: 'TikTok', href: 'https://www.tiktok.com/@lunara.sarees' },
 ] as const;
