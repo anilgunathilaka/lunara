@@ -6,6 +6,7 @@ import { getPrisma } from '@/lib/prisma';
 import { OpsError, back, checkbox, langOf, opsLocale, run, skuCode, slugify, uniqueValue } from './flow';
 import { recordCreated } from '@/lib/stock/movements';
 import { formatProductCode } from '@/lib/catalogue/product-code';
+import { activeListing } from '@/lib/catalogue/queries';
 import { MAX_PHOTO_BYTES, photoKey, sniffPhoto } from '@/lib/media/photos';
 import { getStorage } from '@/lib/storage';
 import { requireStaffAction } from './staff';
@@ -142,7 +143,9 @@ export async function createProductAction(form: FormData): Promise<void> {
       });
 
       const listingId = await uniqueValue(slugify(input.name), async (v) => !!(await tx.curatedListing.findUnique({ where: { id: v } })));
-      const last = await tx.curatedListing.aggregate({ _max: { sortOrder: true } });
+      // New sarees open the shop (founder decision 2026-11-28): one place before
+      // the current first. The admin moves it from there on the Products list.
+      const first = await tx.curatedListing.aggregate({ _min: { sortOrder: true } });
       await tx.curatedListing.create({
         data: {
           id: listingId,
@@ -157,7 +160,7 @@ export async function createProductAction(form: FormData): Promise<void> {
           weightGrams: input.weightGrams,
           lengthMetres: input.lengthMetres,
           opacity: input.opacity,
-          sortOrder: (last._max.sortOrder ?? 0) + 1,
+          sortOrder: (first._min.sortOrder ?? 1) - 1,
         },
       });
       await audit(tx, staff.email, 'product.create', 'curated_listing', listingId, {
@@ -459,4 +462,45 @@ export async function jacketStatusAction(form: FormData): Promise<void> {
     });
     return op === 'delete' ? `/${lang}/ops/products` : undefined;
   }, ({ archive: 'jacketArchived', restore: 'jacketRestored', delete: 'jacketDeleted' } as const)[op]);
+}
+
+// ── Shop order ────────────────────────────────────────────────────────────
+
+const moveSchema = z.object({ id: z.string().min(1).max(100), direction: z.enum(['up', 'down']) });
+
+/**
+ * Moves a saree one place up or down in the shop (founder decision
+ * 2026-11-28). The shop's "Featured" order is curated_listing.sortOrder;
+ * the sarees on sale (the shop's own activeListing rule) are renumbered
+ * 1…n in their new order, so ties and gaps from older data disappear.
+ * Archived sarees keep their numbers and are not part of the order.
+ */
+export async function moveProductAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const lang = langOf(form);
+  const path = `/${lang}/ops/products`;
+  const parsed = moveSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) back(path, { error: 'invalid' });
+  const { id, direction } = parsed.data;
+
+  await run(path, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      // One reorder at a time: two admins moving sarees at once can't interleave.
+      await tx.$queryRaw`select id from curated_listing where active for update`;
+      const rows = await tx.curatedListing.findMany({ where: activeListing, orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }], select: { id: true, sortOrder: true } });
+      const from = rows.findIndex((r) => r.id === id);
+      if (from < 0) throw new OpsError('notFound');
+      const to = direction === 'up' ? from - 1 : from + 1;
+      if (to < 0 || to >= rows.length) return; // Already first or last.
+      const order = rows.map((r) => r.id);
+      [order[from], order[to]] = [order[to]!, order[from]!];
+      for (const [i, rowId] of order.entries()) {
+        const before = rows.find((r) => r.id === rowId)!.sortOrder;
+        if (before !== i + 1) await tx.curatedListing.update({ where: { id: rowId }, data: { sortOrder: i + 1 } });
+      }
+      await tx.auditLog.create({
+        data: { actor: staff.email, action: 'product.move', entityType: 'curated_listing', entityId: id, before: { position: from + 1 }, after: { position: to + 1 } },
+      });
+    });
+  }, 'productMoved');
 }
