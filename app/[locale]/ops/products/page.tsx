@@ -4,6 +4,8 @@ import { Link } from '@/i18n/navigation';
 import { productAdminList } from '@/lib/ops/products';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { homeTopSellAction } from '@/lib/ops/home-actions';
+import { moveProductAction } from '@/lib/ops/product-actions';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import { getHomeTopSellVisible } from '@/lib/site/settings';
 import { Button } from '@/components/primitives/Button';
 import { formatPriceLKR } from '@/lib/pricing/format';
@@ -68,10 +70,12 @@ export default async function OpsProductsPage({
             {t('manageCategories')}
           </Link>
         </div>
+        <p className="field-message">{t('orderNote')}</p>
         <div className="ops-table-wrap">
           <table className="ops-table">
             <thead>
               <tr>
+                <th scope="col">{t('shopOrder')}</th>
                 <th scope="col">{t('photo')}</th>
                 <th scope="col">{t('product')}</th>
                 <th scope="col">{t('jacket')}</th>
@@ -86,6 +90,34 @@ export default async function OpsProductsPage({
             <tbody>
               {data.sarees.map((row) => (
                 <tr key={row.id}>
+                  <td>
+                    {row.position === null ? (
+                      <span className="ops-muted" title={t('notInShop')}>
+                        —
+                      </span>
+                    ) : (
+                      <div className="ops-order">
+                        <span className="ops-order-number">{row.position}</span>
+                        {(['up', 'down'] as const).map((direction) => (
+                          <form key={direction} action={moveProductAction}>
+                            <input type="hidden" name="locale" value={locale} />
+                            <input type="hidden" name="id" value={row.id} />
+                            <input type="hidden" name="direction" value={direction} />
+                            <Button
+                              type="submit"
+                              variant="tertiary"
+                              size="sm"
+                              className="ops-order-button"
+                              disabled={direction === 'up' ? row.position === 1 : row.position === data.onSaleCount}
+                              aria-label={t(direction === 'up' ? 'moveUp' : 'moveDown', { name: row.name })}
+                            >
+                              {direction === 'up' ? <ArrowUp className="icon icon-inline" aria-hidden="true" /> : <ArrowDown className="icon icon-inline" aria-hidden="true" />}
+                            </Button>
+                          </form>
+                        ))}
+                      </div>
+                    )}
+                  </td>
                   <td>
                     <span className="ops-thumb">
                       {row.cover ? <Image src={row.cover} alt="" fill sizes="64px" unoptimized /> : null}

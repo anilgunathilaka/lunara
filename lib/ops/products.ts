@@ -1,4 +1,5 @@
 import 'server-only';
+import { activeListing } from '@/lib/catalogue/queries';
 import { mediaUrl } from '@/lib/media/photos';
 import { getPrisma } from '@/lib/prisma';
 import { resolvePairedPrice } from '@/lib/pricing/resolve';
@@ -12,7 +13,7 @@ import { availabilityOf } from '@/lib/stock/state';
 
 export async function productAdminList() {
   const prisma = getPrisma();
-  const [listings, jackets] = await Promise.all([
+  const [listings, jackets, onSale] = await Promise.all([
     prisma.curatedListing.findMany({
       relationLoadStrategy: 'join',
       orderBy: [{ active: 'desc' }, { sortOrder: 'asc' }, { id: 'asc' }],
@@ -26,14 +27,22 @@ export async function productAdminList() {
       orderBy: [{ active: 'desc' }, { material: { sortOrder: 'asc' } }, { id: 'asc' }],
       include: { material: true, stock: true, _count: { select: { listings: true } } },
     }),
+    // The sarees the shop shows, in the shop's order: their positions (founder decision 2026-11-28).
+    prisma.curatedListing.findMany({ where: activeListing, orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }], select: { id: true } }),
   ]);
+  const shopPosition = new Map(onSale.map((r, i) => [r.id, i + 1]));
+  // On-sale sarees first, in the shop's order; then the rest as before.
+  listings.sort((a, b) => (shopPosition.get(a.id) ?? Infinity) - (shopPosition.get(b.id) ?? Infinity));
   return {
+    onSaleCount: onSale.length,
     sarees: listings.map((row) => {
       const saree = row.sareeColourway;
       return {
         id: row.id,
         name: row.name,
         code: row.productCode,
+        /** 1-based place in the shop, or null when the shop doesn't show it. */
+        position: shopPosition.get(row.id) ?? null,
         active: row.active && saree.active,
         featured: row.isFeatured,
         topSeller: row.isTopSeller,

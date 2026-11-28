@@ -671,7 +671,8 @@
       "planUpdated": "Payment plan saved.",
       "saleCancelled": "Sale cancelled. The stock is back.",
       "customerUpdated": "Customer details saved.",
-      "customerDeleted": "Customer deleted."
+      "customerDeleted": "Customer deleted.",
+      "productMoved": "Order saved. The shop shows the new order."
     },
     "pricesNote": "Changes apply on the next page load. Customers with the item in their cart see the change marked beside it.",
     "nav": {
@@ -957,6 +958,11 @@
       "edit": "Edit",
       "live": "On sale",
       "liveFeatured": "On sale · featured",
+      "shopOrder": "Shop order",
+      "orderNote": "The shop shows sarees on sale in this order (its “Featured” sort). Use the arrows to move a saree up or down. New sarees start at the top.",
+      "moveUp": "Move {name} up",
+      "moveDown": "Move {name} down",
+      "notInShop": "Not in the shop (archived or not on sale)",
       "archived": "Archived",
       "priceAlone": "Price on its own",
       "pairingAddOn": "Add-on with a saree",

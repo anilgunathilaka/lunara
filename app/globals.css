@@ -3739,6 +3739,21 @@ body {
   width: 100%;
   padding-inline: 0;
 }
+/* Shop order on the admin Products list: the place, then up and down (founder decision 2026-11-28). */
+.ops-order {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+.ops-order-number {
+  min-width: var(--space-5);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.ops-order-button {
+  min-width: 44px;
+  padding-inline: 0;
+}
 .ops-colour-input {
   min-height: var(--control-height-md);
   padding: var(--space-1);

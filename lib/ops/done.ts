@@ -37,6 +37,7 @@ export const OPS_DONE_CODES = [
   'saleCancelled',
   'customerUpdated',
   'customerDeleted',
+  'productMoved',
 ] as const;
 
 export type OpsDoneCode = (typeof OPS_DONE_CODES)[number];
