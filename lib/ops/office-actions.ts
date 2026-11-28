@@ -375,3 +375,40 @@ export async function updateOfficeCustomerAction(form: FormData): Promise<void> 
     });
   }, 'customerUpdated');
 }
+
+// ── Delete customer ───────────────────────────────────────────────────────
+
+const deleteCustomerSchema = z.object({ id: z.string().min(1).max(100) });
+
+/**
+ * Deletes an office customer who has no sales (founder decision 2026-11-27).
+ * A customer with any sale — cancelled ones too — is kept, so sales,
+ * payments and stock history stay whole; the database refuses it anyway
+ * (office_sale.customer_id is ON DELETE RESTRICT). Audited with the details.
+ */
+export async function deleteOfficeCustomerAction(form: FormData): Promise<void> {
+  const staff = await requireStaffAction();
+  const lang = langOf(form);
+  const list = `/${lang}/ops/office/customers`;
+  const parsed = deleteCustomerSchema.safeParse(Object.fromEntries(form));
+  if (!parsed.success) back(list, { error: 'invalid' });
+  const { id } = parsed.data;
+
+  await run(list, async () => {
+    await getPrisma().$transaction(async (tx) => {
+      const customer = await tx.officeCustomer.findUnique({ where: { id }, include: { _count: { select: { sales: true } } } });
+      if (!customer) throw new OpsError('notFound');
+      if (customer._count.sales > 0) throw new OpsError('customerHasSales');
+      await tx.officeCustomer.delete({ where: { id } });
+      await tx.auditLog.create({
+        data: {
+          actor: staff.email,
+          action: 'office.customer.delete',
+          entityType: 'office_customer',
+          entityId: id,
+          before: { name: customer.name, phone: customer.phone, office: customer.office, address: customer.address, note: customer.note },
+        },
+      });
+    });
+  }, 'customerDeleted');
+}

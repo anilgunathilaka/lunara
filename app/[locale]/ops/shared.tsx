@@ -8,6 +8,7 @@ import { FlashReveal } from './FlashReveal';
 export type OpsSearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 const ERROR_CODES = [
+  'customerHasSales',
   'invalid',
   'conflict',
   'negative',

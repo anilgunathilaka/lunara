@@ -4,7 +4,8 @@ import { Button } from '@/components/primitives/Button';
 import { officeCustomerList, officeNames } from '@/lib/ops/office';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
-import type { OpsSearchParams } from '../../shared';
+import { OpsFlash, type OpsSearchParams } from '../../shared';
+import { DeleteCustomerButton } from './DeleteCustomerButton';
 
 /**
  * Everyone who has bought in the office, with what they still owe
@@ -26,6 +27,7 @@ export default async function OpsOfficeCustomersPage({ params, searchParams }: {
         ← {t('back')}
       </Link>
       <h2 className="checkout-step-title">{t('customers')}</h2>
+      <OpsFlash searchParams={query} />
       {offices.length > 0 && (
         <form method="get" className="ops-inline-form" role="search" aria-label={t('officeFilter')}>
           <label className="field-label" htmlFor="office-filter">
@@ -57,6 +59,7 @@ export default async function OpsOfficeCustomersPage({ params, searchParams }: {
                 <th scope="col">{t('salesHeading')}</th>
                 <th scope="col">{t('bought')}</th>
                 <th scope="col">{t('outstanding')}</th>
+                <th scope="col">{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -74,6 +77,30 @@ export default async function OpsOfficeCustomersPage({ params, searchParams }: {
                   <td className={c.overdue > 0 ? 'ops-status-out' : undefined}>
                     {formatPriceLKR(c.outstanding)}
                     {c.overdue > 0 ? ` · ${t('overdueAmount', { amount: formatPriceLKR(c.overdue) })}` : ''}
+                  </td>
+                  <td>
+                    <div className="ops-inline-form">
+                      <Link
+                        href={`/ops/office/customers/${c.id}#customer-details`}
+                        className="btn focus-ring btn-secondary btn-sm"
+                        aria-label={t('editCustomer', { name: c.name })}
+                      >
+                        {t('edit')}
+                      </Link>
+                      {c.deletable ? (
+                        <DeleteCustomerButton
+                          id={c.id}
+                          locale={locale}
+                          label={t('deleteCustomer')}
+                          ariaLabel={t('deleteLabel', { name: c.name })}
+                          confirmText={t('deleteConfirm', { name: c.name })}
+                        />
+                      ) : (
+                        <span className="ops-muted" title={t('cannotDeleteNote')}>
+                          {t('cannotDelete')}
+                        </span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
