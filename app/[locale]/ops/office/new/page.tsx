@@ -1,13 +1,14 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/primitives/Button';
-import { MAX_INSTALMENTS, OFFICE_ITEM_ROWS, addMonths, todayInSriLanka } from '@/lib/office/plan';
+import { MAX_INSTALMENTS, OFFICE_ITEM_ROWS, todayInSriLanka } from '@/lib/office/plan';
 import { createOfficeSaleAction } from '@/lib/ops/office-actions';
 import { officeItemOptions, officeNames } from '@/lib/ops/office';
 import { requireStaffPage } from '@/lib/ops/staff';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../shared';
 import { ItemRows, type ItemOption } from './ItemRows';
+import { InstalmentRows } from './InstalmentRows';
 
 /**
  * Record a sale made in the office (docs/4-architecture.md §3.13). Items
@@ -127,33 +128,19 @@ export default async function OpsNewOfficeSalePage({ params, searchParams }: { p
 
         <fieldset>
           <legend>{t('planLegend')}</legend>
-          <label className="field-label" htmlFor="instalments">
-            {t('instalmentCount')}
-          </label>
-          <select id="instalments" name="instalments" className="input" defaultValue="3">
-            {Array.from({ length: MAX_INSTALMENTS }, (_, i) => (
-              <option key={i} value={i + 1}>
-                {t('instalmentsN', { count: i + 1 })}
-              </option>
-            ))}
-          </select>
           <p className="field-message">{t('planNote')}</p>
-          {Array.from({ length: MAX_INSTALMENTS }, (_, i) => (
-            <div key={i} className="ops-form-row">
-              <div className="flex flex-col gap-1">
-                <label className="field-label" htmlFor={`due_${i + 1}`}>
-                  {t('dueN', { n: i + 1 })}
-                </label>
-                <input id={`due_${i + 1}`} name={`due_${i + 1}`} type="date" className="input" defaultValue={addMonths(today, i)} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="field-label" htmlFor={`amount_${i + 1}`}>
-                  {t('amountN', { n: i + 1 })}
-                </label>
-                <input id={`amount_${i + 1}`} name={`amount_${i + 1}`} type="number" min={1} step={1} className="input ops-number-input" placeholder={t('auto')} />
-              </div>
-            </div>
-          ))}
+          <InstalmentRows
+            max={MAX_INSTALMENTS}
+            initial={2}
+            today={today}
+            labels={{
+              due: t.raw('dueN') as string,
+              amount: t.raw('amountN') as string,
+              auto: t('auto'),
+              add: t('addInstalment'),
+              remove: t.raw('removeInstalment') as string,
+            }}
+          />
         </fieldset>
 
         <fieldset>

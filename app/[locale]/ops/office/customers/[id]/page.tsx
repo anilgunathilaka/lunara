@@ -8,6 +8,7 @@ import { requireStaffPage } from '@/lib/ops/staff';
 import { formatDate } from '@/lib/format/date';
 import { formatPriceLKR } from '@/lib/pricing/format';
 import { OpsFlash, type OpsSearchParams } from '../../../shared';
+import { DeleteCustomerButton } from '../DeleteCustomerButton';
 
 /** One office customer: details and every sale with its balance (docs/4-architecture.md §3.13). */
 export default async function OpsOfficeCustomerPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: OpsSearchParams }) {
@@ -79,7 +80,7 @@ export default async function OpsOfficeCustomerPage({ params, searchParams }: { 
         </div>
       </section>
 
-      <form action={updateOfficeCustomerAction} className="ops-form">
+      <form id="customer-details" action={updateOfficeCustomerAction} className="ops-form">
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="id" value={customer.id} />
         <fieldset>
@@ -128,6 +129,18 @@ export default async function OpsOfficeCustomerPage({ params, searchParams }: { 
           </Button>
         </div>
       </form>
+
+      {sales.length === 0 && (
+        <section className="ops-form" aria-labelledby="delete-customer">
+          <fieldset>
+            <legend id="delete-customer">{t('deleteHeading')}</legend>
+            <p className="field-message">{t('deleteNote')}</p>
+            <div>
+              <DeleteCustomerButton id={customer.id} locale={locale} label={t('deleteCustomer')} confirmText={t('deleteConfirm', { name: customer.name })} size="md" />
+            </div>
+          </fieldset>
+        </section>
+      )}
     </div>
   );
 }

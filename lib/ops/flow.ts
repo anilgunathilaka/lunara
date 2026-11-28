@@ -23,6 +23,7 @@ export type OpsErrorCode =
   | 'overpay'
   | 'phone'
   | 'phoneTaken'
+  | 'customerHasSales'
   | 'planDates'
   | 'planMismatch';
 

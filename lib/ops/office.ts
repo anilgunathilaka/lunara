@@ -91,7 +91,7 @@ export async function officeCustomerList(office?: string) {
     relationLoadStrategy: 'join',
     where: office ? { office: { equals: office, mode: 'insensitive' } } : undefined,
     orderBy: { name: 'asc' },
-    include: { sales: { where: { status: 'active' }, include: { instalments: true, payments: true } } },
+    include: { sales: { where: { status: 'active' }, include: { instalments: true, payments: true } }, _count: { select: { sales: true } } },
   });
   return customers.map((c) => {
     const balances = c.sales.map((s) => balanceOf(s.total, s.instalments, s.payments, today));
@@ -103,6 +103,8 @@ export async function officeCustomerList(office?: string) {
       sales: c.sales.length,
       // Same rule as the customer page: active sales only, cancelled ones don't count.
       bought: c.sales.reduce((n, s) => n + s.total, 0),
+      // Any sale at all, cancelled ones too: only a customer with none can be deleted.
+      deletable: c._count.sales === 0,
       outstanding: balances.reduce((n, b) => n + Math.max(0, b.outstanding), 0),
       overdue: balances.reduce((n, b) => n + b.overdue, 0),
     };
